@@ -7,7 +7,7 @@ abstract final class AppConfig {
   /// Adresse de l'API (sans « / » final). Valeur par défaut : serveur XAMPP vu depuis l'émulateur Android.
   static const apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'https://eftpnonformel.ins.ne/api/v1',
+    defaultValue: 'https://eftpnonformel.ins.ne',
   );
 
   /// Version envoyée dans X-App-Version (contrôlée par le serveur : 426 si trop ancienne). Garder alignée sur pubspec.yaml.
