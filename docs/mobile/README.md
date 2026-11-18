@@ -84,4 +84,6 @@ Ajouts du 15/11/2026 :
 - **Synchronisation en arrière-plan (WorkManager) non encore faite** : la synchronisation se fait à l'ouverture, au retour du réseau, toutes les 10 minutes application ouverte, et manuellement.
 - Campagne en mode `PAPIER` : la tablette refuse de commencer une collecte (saisie dans le back-office).
 
+Production (18/11/2026) : adresse par défaut `https://eftpnonformel.ins.ne/api/v1` ; HTTPS seul en release, exceptions HTTP de développement limitées au build de débogage (`src/debug/res/xml/network_security_config.xml`) ; signature par `android/key.properties` (repli sur la clé de débogage avec avertissement). Compilation : `deploy/mobile/build-apk.ps1` — voir [deploy/README.md](../../deploy/README.md) §7.
+
 Limites connues : APK non produit sur le poste de développement (disque plein : 1,4 Go libres, compilation Gradle interrompue) ; aucun essai sur tablette réelle ; identifiant d'application provisoire `ne.eftpnf.eftp_nf_collecte`, à remplacer par l'identifiant officiel ; trafic HTTP en clair autorisé seulement vers les adresses de développement (`network_security_config.xml`, à retirer en production).

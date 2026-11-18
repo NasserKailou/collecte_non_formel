@@ -1,0 +1,12 @@
+# /etc/logrotate.d/eftp-nonformel
+/var/www/eftpnonformel/shared/storage/logs/worker.log
+/var/log/php8.3-fpm-eftp.log
+/var/log/eftp-backup.log {
+    weekly
+    rotate 12
+    compress
+    delaycompress
+    missingok
+    notifempty
+    copytruncate
+}

@@ -1,0 +1,19 @@
+# MariaDB — /etc/mysql/mariadb.conf.d/90-eftp.cnf
+# L'application impose déjà le mode strict à chaque connexion (docs/database/README.md) ; on l'impose aussi au serveur.
+[mysqld]
+bind-address            = 127.0.0.1
+character-set-server    = utf8mb4
+collation-server        = utf8mb4_unicode_ci
+sql_mode                = STRICT_ALL_TABLES,NO_ZERO_DATE,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
+default_time_zone       = '+01:00'
+max_allowed_packet      = 64M
+
+# Mémoire InnoDB : ~40 % de la RAM du VPS (ici pour 4 Go). À ajuster.
+innodb_buffer_pool_size = 1536M
+innodb_log_file_size    = 256M
+innodb_flush_log_at_trx_commit = 1
+
+max_connections         = 150
+slow_query_log          = 1
+slow_query_log_file     = /var/log/mysql/slow.log
+long_query_time         = 2

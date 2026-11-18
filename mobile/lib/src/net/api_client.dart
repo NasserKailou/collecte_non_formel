@@ -95,10 +95,14 @@ class ApiClient {
       text = await streamed.stream.bytesToString().timeout(AppConfig.requestTimeout);
     } on TimeoutException {
       throw ApiException(0, 'TIMEOUT', 'Le serveur ne répond pas (délai dépassé).');
-    } on SocketException {
-      throw ApiException(0, 'NETWORK', 'Pas de connexion au serveur.');
-    } on HandshakeException {
-      throw ApiException(0, 'TLS', 'Connexion sécurisée refusée (certificat du serveur invalide).');
+    } on SocketException catch (e) {
+      final cause = e.osError?.message ?? e.message;
+      final dns = cause.contains('host lookup') || cause.contains('No address associated');
+      throw ApiException(0, 'NETWORK', dns
+          ? 'Adresse du serveur introuvable (DNS) : ${Uri.parse(baseUrl).host}.'
+          : 'Pas de connexion au serveur ($cause).');
+    } on HandshakeException catch (e) {
+      throw ApiException(0, 'TLS', 'Connexion sécurisée refusée (certificat du serveur invalide) : ${e.message}');
     } on http.ClientException catch (e) {
       throw ApiException(0, 'NETWORK', 'Connexion au serveur impossible : ${e.message}');
     }

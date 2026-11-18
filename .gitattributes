@@ -1,0 +1,5 @@
+# Fichiers exécutés ou lus sur le serveur Linux : toujours en LF (sinon bash et cron échouent).
+*.sh            text eol=lf
+deploy/**       text eol=lf
+deploy/mobile/*.ps1 text eol=crlf
+*.php           text eol=lf

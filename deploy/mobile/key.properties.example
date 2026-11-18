@@ -1,0 +1,7 @@
+# À copier en mobile/android/key.properties (NON versionné : déjà ignoré par mobile/android/.gitignore).
+# Clé créée une seule fois (voir deploy/README.md §7) et conservée en lieu sûr avec ses mots de passe :
+# sa perte empêche toute mise à jour des tablettes déjà installées.
+storePassword=__MOT_DE_PASSE_DU_MAGASIN__
+keyPassword=__MOT_DE_PASSE_DE_LA_CLE__
+keyAlias=eftpnf
+storeFile=C:/cles/eftpnf-release.jks

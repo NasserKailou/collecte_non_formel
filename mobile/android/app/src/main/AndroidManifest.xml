@@ -10,13 +10,9 @@
             <action android:name="android.intent.action.VIEW"/>
             <data android:scheme="https"/>
         </intent>
-        <intent>
-            <action android:name="android.intent.action.VIEW"/>
-            <data android:scheme="http"/>
-        </intent>
     </queries>
     <!-- allowBackup=false : la base locale (chiffrée) et les secrets ne sont pas copiés dans les sauvegardes Android.
-         networkSecurityConfig : HTTPS obligatoire, sauf adresses de développement déclarées. -->
+         networkSecurityConfig : HTTPS obligatoire (exceptions HTTP de développement dans le seul build de débogage). -->
     <application
         android:label="Collecte EFTP"
         android:name="${applicationName}"

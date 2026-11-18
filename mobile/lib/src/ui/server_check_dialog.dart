@@ -101,7 +101,10 @@ class _ServerCheckDialogState extends State<_ServerCheckDialog> {
               )
             : Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
                 _line(r.reachable, 'Réseau et serveur',
-                    r.reachable ? 'Serveur joignable (réponse en ${r.latencyMs} ms).' : 'Aucune réponse du serveur après ${((r.latencyMs ?? 0) / 1000).toStringAsFixed(0)} s.'),
+                    r.reachable
+                        ? 'Serveur joignable (réponse en ${r.latencyMs} ms).'
+                        : 'Aucune réponse du serveur après ${((r.latencyMs ?? 0) / 1000).toStringAsFixed(0)} s.'
+                            '${r.detail != null ? '\n${r.detail}' : ''}'),
                 _line(r.reachable ? r.database : null, 'Base de données',
                     !r.reachable ? 'Non testée.' : (r.database == true ? 'Disponible.' : 'Indisponible pour le moment.')),
                 if (app.session != null)
