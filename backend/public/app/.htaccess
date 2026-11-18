@@ -1,0 +1,13 @@
+# Back-office web : fichiers statiques servis tels quels, avec une politique de sécurité stricte.
+DirectoryIndex index.html
+<IfModule mod_headers.c>
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob: https://tile.openstreetmap.org https://server.arcgisonline.com; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "DENY"
+  Header always set Referrer-Policy "no-referrer"
+  # Revalidation à chaque chargement (réponse 304 légère grâce à l'ETag) : une mise à jour de l'interface est vue
+  # aussitôt par tous les utilisateurs, sans vider le cache du navigateur.
+  <FilesMatch "\.(html|js|mjs|css)$">
+    Header always set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>

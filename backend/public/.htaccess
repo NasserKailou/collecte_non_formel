@@ -1,0 +1,22 @@
+# Toutes les requêtes vers index.php (sauf fichiers existants). Ne jamais exposer le dossier parent.
+# Rouvre ce seul dossier (la racine du projet est fermée par non_formel/.htaccess).
+Require all granted
+Options -Indexes
+# HTTPS uniquement en production (https://eftpnonformel.ins.ne) : le navigateur ne repasse plus en HTTP pendant un an.
+# N'est envoyé que sur une requête HTTPS (sans effet en développement sous XAMPP en HTTP).
+<IfModule mod_headers.c>
+  Header always set Strict-Transport-Security "max-age=31536000" "expr=%{HTTPS} == 'on'"
+</IfModule>
+RewriteEngine On
+# Transmettre l'en-tête Authorization à PHP (nécessaire sous Apache/CGI) — avant la règle finale
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+# La racine de public/ mène au back-office.
+RewriteCond %{REQUEST_URI} ^(.*/)$
+RewriteRule ^$ %1app/ [R=302,L]
+# Le back-office web (dossier app/ à la racine de public/) est servi tel quel ; la règle est ancrée sur le chemin
+# relatif pour ne pas capturer les routes de l'API qui contiennent « /app/ » (ex. api/v1/app/releases).
+RewriteRule ^app(/|$) - [L]
+# Tout le reste va à l'API.
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ index.php [QSA,L]

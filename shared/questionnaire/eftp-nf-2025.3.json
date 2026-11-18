@@ -1,0 +1,6915 @@
+{
+  "schema": 1,
+  "questionnaire": "EFTP_NF",
+  "version": "2025.3",
+  "title": "Recensement EFTP non formel — Questionnaire 2025-2026",
+  "source": "Questionnaire_EFTP_Non_Formel_do30 12 2025 (DSD/MEFTP)",
+  "enums": {
+    "duration": [
+      {
+        "code": "LE3",
+        "label": "≤ 3 mois"
+      },
+      {
+        "code": "M4_9",
+        "label": "4 à 9 mois"
+      },
+      {
+        "code": "GT9",
+        "label": "> 9 mois"
+      }
+    ],
+    "sector": [
+      {
+        "code": "s1",
+        "id": 1,
+        "label": "Secteur Primaire/Agricole"
+      },
+      {
+        "code": "s2",
+        "id": 2,
+        "label": "Secteur Secondaire/Industriel"
+      },
+      {
+        "code": "s3",
+        "id": 3,
+        "label": "Secteur Tertiaire/Service"
+      }
+    ]
+  },
+  "sections": [
+    {
+      "code": "S1",
+      "number": "I",
+      "title": "Localisation et identification de la structure",
+      "items": [
+        {
+          "code": "Q1_1",
+          "number": "1.1",
+          "label": "Nom de la structure",
+          "type": "text",
+          "required": true,
+          "min_length": 3,
+          "max_length": 150,
+          "prefill": "structure.name",
+          "locked": true
+        },
+        {
+          "code": "Q1_2",
+          "number": "1.2",
+          "label": "Code",
+          "type": "text",
+          "required": false,
+          "pattern": "^[0-9]{10}$",
+          "prefill": "structure.official_code",
+          "locked": true,
+          "help": "Code officiel à 10 chiffres, attribué par le référentiel des structures."
+        },
+        {
+          "code": "Q1_3",
+          "number": "1.3",
+          "label": "La structure dispose-t-elle d'un document administratif ?",
+          "type": "yesno",
+          "required": true
+        },
+        {
+          "code": "Q1_3_1",
+          "number": "1.3.1",
+          "label": "Précisez le ministère de tutelle",
+          "type": "text",
+          "required": true,
+          "max_length": 200,
+          "visible_if": {
+            "==": [
+              {
+                "var": "Q1_3"
+              },
+              true
+            ]
+          }
+        },
+        {
+          "code": "Q1_3_2",
+          "number": "1.3.2",
+          "label": "Précisez le type du document administratif",
+          "type": "text",
+          "required": true,
+          "max_length": 200,
+          "visible_if": {
+            "==": [
+              {
+                "var": "Q1_3"
+              },
+              true
+            ]
+          }
+        },
+        {
+          "code": "Q1_3_3",
+          "number": "1.3.3",
+          "label": "Références du document administratif",
+          "type": "text",
+          "required": true,
+          "max_length": 200,
+          "visible_if": {
+            "==": [
+              {
+                "var": "Q1_3"
+              },
+              true
+            ]
+          }
+        },
+        {
+          "code": "Q1_4",
+          "number": "1.4",
+          "label": "Date d'autorisation de création / début d'exercice",
+          "type": "date",
+          "required": true,
+          "partial": true,
+          "help": "Si le jour ou le mois est inconnu, saisir l'année seule."
+        },
+        {
+          "code": "Q1_5",
+          "number": "1.5",
+          "label": "Date d'ouverture",
+          "type": "date",
+          "required": true,
+          "partial": true,
+          "help": "Si le jour ou le mois est inconnu, saisir l'année seule."
+        },
+        {
+          "code": "Q1_6_1",
+          "number": "1.6.1",
+          "label": "Région",
+          "type": "geo",
+          "level": "region",
+          "prefill": "structure.region_id",
+          "locked": true,
+          "group": "1.6 Localisation administrative"
+        },
+        {
+          "code": "Q1_6_2",
+          "number": "1.6.2",
+          "label": "Département",
+          "type": "geo",
+          "level": "department",
+          "prefill": "structure.department_id",
+          "locked": true,
+          "group": "1.6 Localisation administrative"
+        },
+        {
+          "code": "Q1_6_3",
+          "number": "1.6.3",
+          "label": "Commune",
+          "type": "geo",
+          "level": "commune",
+          "prefill": "structure.commune_id",
+          "locked": true,
+          "group": "1.6 Localisation administrative"
+        },
+        {
+          "code": "Q1_6_4",
+          "number": "1.6.4",
+          "label": "Quartier/village",
+          "type": "text",
+          "required": true,
+          "min_length": 2,
+          "max_length": 150,
+          "prefill": "structure.locality_label",
+          "group": "1.6 Localisation administrative",
+          "help": "Saisi par l'agent (il n'existe pas de référentiel officiel des villages)."
+        },
+        {
+          "code": "Q1_7",
+          "number": "1.7",
+          "label": "Zone",
+          "type": "single",
+          "required": true,
+          "prefill": "structure.zone",
+          "options": [
+            {
+              "code": "a",
+              "label": "Urbaine"
+            },
+            {
+              "code": "b",
+              "label": "Rurale"
+            }
+          ]
+        },
+        {
+          "code": "Q1_8",
+          "number": "1.8",
+          "label": "Statut",
+          "type": "single",
+          "required": true,
+          "prefill": "structure.legal_status",
+          "options": [
+            {
+              "code": "a",
+              "label": "Public"
+            },
+            {
+              "code": "b",
+              "label": "Privé"
+            }
+          ]
+        },
+        {
+          "code": "Q1_9",
+          "number": "1.9",
+          "label": "Type de structure de la formation professionnelle non formelle",
+          "type": "single",
+          "required": true,
+          "prefill": "structure.type_code",
+          "options": [
+            {
+              "code": "a",
+              "label": "SFMA (SIFA)"
+            },
+            {
+              "code": "b",
+              "label": "CFA"
+            },
+            {
+              "code": "c",
+              "label": "Atelier"
+            },
+            {
+              "code": "d",
+              "label": "SAA"
+            },
+            {
+              "code": "e",
+              "label": "Foyer"
+            },
+            {
+              "code": "f",
+              "label": "Groupement"
+            },
+            {
+              "code": "g",
+              "label": "Garage"
+            },
+            {
+              "code": "h",
+              "label": "Coopérative/Association"
+            },
+            {
+              "code": "i",
+              "label": "Cabinet de formation"
+            },
+            {
+              "code": "j",
+              "label": "Plateforme d'orientation"
+            },
+            {
+              "code": "k",
+              "label": "Autre structure"
+            }
+          ]
+        },
+        {
+          "code": "Q1_9_autre",
+          "number": "1.9",
+          "label": "Autre structure : préciser",
+          "type": "text",
+          "required": true,
+          "max_length": 150,
+          "visible_if": {
+            "==": [
+              {
+                "var": "Q1_9"
+              },
+              "k"
+            ]
+          }
+        },
+        {
+          "code": "Q1_10",
+          "number": "1.10",
+          "label": "Source(s) de financement de la structure",
+          "type": "multi",
+          "required": true,
+          "help": "Plusieurs réponses possibles.",
+          "options": [
+            {
+              "code": "a",
+              "label": "État"
+            },
+            {
+              "code": "b",
+              "label": "PTF"
+            },
+            {
+              "code": "c",
+              "label": "FAFPA"
+            },
+            {
+              "code": "d",
+              "label": "EPA"
+            },
+            {
+              "code": "e",
+              "label": "ONG"
+            },
+            {
+              "code": "f",
+              "label": "Associations"
+            },
+            {
+              "code": "g",
+              "label": "Fonds propres"
+            },
+            {
+              "code": "h",
+              "label": "Autres"
+            }
+          ]
+        },
+        {
+          "code": "Q1_10_autre",
+          "number": "1.10",
+          "label": "Autres sources : préciser",
+          "type": "text",
+          "required": true,
+          "max_length": 150,
+          "visible_if": {
+            "in": [
+              "h",
+              {
+                "var": "Q1_10"
+              }
+            ]
+          }
+        },
+        {
+          "code": "Q1_11",
+          "number": "1.11",
+          "label": "Régime de la structure",
+          "type": "single",
+          "required": true,
+          "options": [
+            {
+              "code": "a",
+              "label": "Internat"
+            },
+            {
+              "code": "b",
+              "label": "Externat"
+            }
+          ]
+        },
+        {
+          "code": "Q1_12",
+          "number": "1.12",
+          "label": "Cette structure délivre-t-elle des attestations en fin de formation ?",
+          "type": "yesno",
+          "required": true
+        },
+        {
+          "code": "Q1_13",
+          "number": "1.13",
+          "label": "Type d'accompagnement",
+          "type": "multi",
+          "required": true,
+          "help": "Plusieurs réponses possibles. Réservée aux plateformes d'orientation.",
+          "visible_if": {
+            "==": [
+              {
+                "var": "Q1_9"
+              },
+              "j"
+            ]
+          },
+          "options": [
+            {
+              "code": "a",
+              "label": "En espèces"
+            },
+            {
+              "code": "b",
+              "label": "En matériel et outillage technique"
+            },
+            {
+              "code": "c",
+              "label": "Renforcement des capacités techniques"
+            },
+            {
+              "code": "d",
+              "label": "Placement"
+            },
+            {
+              "code": "e",
+              "label": "Autres"
+            }
+          ]
+        },
+        {
+          "code": "Q1_13_autre",
+          "number": "1.13",
+          "label": "Autre accompagnement : préciser",
+          "type": "text",
+          "required": true,
+          "max_length": 150,
+          "visible_if": {
+            "in": [
+              "e",
+              {
+                "var": "Q1_13"
+              }
+            ]
+          }
+        },
+        {
+          "code": "Q1_14",
+          "number": "1.14",
+          "label": "La formation est-elle payante ?",
+          "type": "yesno",
+          "required": true
+        },
+        {
+          "code": "Q1_14_1",
+          "number": "1.14.1",
+          "label": "Mode(s) de paiement",
+          "type": "multi",
+          "required": true,
+          "help": "Plusieurs réponses possibles.",
+          "visible_if": {
+            "==": [
+              {
+                "var": "Q1_14"
+              },
+              true
+            ]
+          },
+          "options": [
+            {
+              "code": "a",
+              "label": "Paiement en espèces"
+            },
+            {
+              "code": "b",
+              "label": "Paiement en chèque"
+            },
+            {
+              "code": "c",
+              "label": "Paiement en ligne"
+            },
+            {
+              "code": "d",
+              "label": "Paiement en nature"
+            }
+          ]
+        },
+        {
+          "code": "GPS",
+          "number": "1.15 / 1.16",
+          "label": "Coordonnées GPS de la structure (longitude, latitude)",
+          "type": "gps",
+          "required": true,
+          "help": "Capturer la position devant la structure. Si le GPS ne fonctionne pas, indiquer pourquoi."
+        }
+      ]
+    },
+    {
+      "code": "S2",
+      "number": "II",
+      "title": "Environnement d'apprentissage",
+      "items": [
+        {
+          "code": "Q2_1",
+          "number": "2.1",
+          "label": "Effectif des apprentis par durée selon le secteur et le sexe",
+          "type": "grid",
+          "help": "Saisir le nombre d'apprentis par durée de formation. Ces chiffres doivent correspondre aux métiers déclarés en Section IV : un écart est signalé (sans bloquer) pour être vérifié.",
+          "rows": [
+            {
+              "code": "LE3",
+              "label": "≤ 3 mois"
+            },
+            {
+              "code": "M4_9",
+              "label": "4 à 9 mois"
+            },
+            {
+              "code": "GT9",
+              "label": "> 9 mois"
+            }
+          ],
+          "columns": [
+            {
+              "code": "s1.M",
+              "label": "Secteur Primaire/Agricole — M"
+            },
+            {
+              "code": "s1.F",
+              "label": "Secteur Primaire/Agricole — F"
+            },
+            {
+              "code": "s2.M",
+              "label": "Secteur Secondaire/Industriel — M"
+            },
+            {
+              "code": "s2.F",
+              "label": "Secteur Secondaire/Industriel — F"
+            },
+            {
+              "code": "s3.M",
+              "label": "Secteur Tertiaire/Service — M"
+            },
+            {
+              "code": "s3.F",
+              "label": "Secteur Tertiaire/Service — F"
+            }
+          ],
+          "cell": {
+            "type": "integer",
+            "min": 0,
+            "max": 9999
+          },
+          "totals": true
+        },
+        {
+          "code": "accompanied",
+          "number": "2.2",
+          "label": "Nombre de jeunes accompagnés par durée selon le sexe",
+          "type": "grid",
+          "required": true,
+          "help": "Jeunes appuyés en dehors de la formation reçue, dans le cadre de l'orientation et de l'insertion professionnelle.",
+          "rows": [
+            {
+              "code": "LE3",
+              "label": "≤ 3 mois"
+            },
+            {
+              "code": "M4_9",
+              "label": "4 à 9 mois"
+            },
+            {
+              "code": "GT9",
+              "label": "> 9 mois"
+            }
+          ],
+          "columns": [
+            {
+              "code": "INSCRITS.M",
+              "label": "Jeunes inscrits — Masculin"
+            },
+            {
+              "code": "INSCRITS.F",
+              "label": "Jeunes inscrits — Féminin"
+            },
+            {
+              "code": "PLACES.M",
+              "label": "Dont placés — Masculin"
+            },
+            {
+              "code": "PLACES.F",
+              "label": "Dont placés — Féminin"
+            },
+            {
+              "code": "OUTILLES.M",
+              "label": "Dont outillés (espèces, nature ou kits) — Masculin"
+            },
+            {
+              "code": "OUTILLES.F",
+              "label": "Dont outillés (espèces, nature ou kits) — Féminin"
+            }
+          ],
+          "cell": {
+            "type": "integer",
+            "min": 0,
+            "max": 9999
+          },
+          "totals": true
+        },
+        {
+          "code": "Q2_3",
+          "number": "2.3",
+          "label": "La structure est-elle alimentée en électricité ?",
+          "type": "yesno",
+          "required": true
+        },
+        {
+          "code": "Q2_3_1",
+          "number": "2.3.1",
+          "label": "Principale source",
+          "type": "single",
+          "required": true,
+          "visible_if": {
+            "==": [
+              {
+                "var": "Q2_3"
+              },
+              true
+            ]
+          },
+          "options": [
+            {
+              "code": "a",
+              "label": "Groupe électrogène"
+            },
+            {
+              "code": "b",
+              "label": "Panneau solaire"
+            },
+            {
+              "code": "c",
+              "label": "Réseau électrique"
+            }
+          ]
+        },
+        {
+          "code": "Q2_4",
+          "number": "2.4",
+          "label": "La structure dispose-t-elle d'un point d'eau potable ?",
+          "type": "yesno",
+          "required": true
+        },
+        {
+          "code": "Q2_4_1",
+          "number": "2.4.1",
+          "label": "Principale source",
+          "type": "single",
+          "required": true,
+          "visible_if": {
+            "==": [
+              {
+                "var": "Q2_4"
+              },
+              true
+            ]
+          },
+          "options": [
+            {
+              "code": "a",
+              "label": "Robinet"
+            },
+            {
+              "code": "b",
+              "label": "AEP"
+            },
+            {
+              "code": "c",
+              "label": "Forage"
+            },
+            {
+              "code": "d",
+              "label": "Puits cimenté"
+            }
+          ]
+        },
+        {
+          "code": "Q2_5",
+          "number": "2.5",
+          "label": "La structure dispose-t-elle d'une clôture ?",
+          "type": "yesno",
+          "required": true
+        },
+        {
+          "code": "Q2_6",
+          "number": "2.6",
+          "label": "La structure dispose-t-elle d'une infirmerie fonctionnelle ?",
+          "type": "yesno",
+          "required": true
+        },
+        {
+          "code": "Q2_7",
+          "number": "2.7",
+          "label": "La structure dispose-t-elle d'une boîte à pharmacie ?",
+          "type": "yesno",
+          "required": true
+        },
+        {
+          "code": "Q2_8",
+          "number": "2.8",
+          "label": "La structure dispose-t-elle d'un dépotoir ?",
+          "type": "yesno",
+          "required": true
+        },
+        {
+          "code": "Q2_8_1",
+          "number": "2.8.1",
+          "label": "Nombre de dépotoirs",
+          "type": "integer",
+          "required": true,
+          "min": 1,
+          "max": 999,
+          "visible_if": {
+            "==": [
+              {
+                "var": "Q2_8"
+              },
+              true
+            ]
+          }
+        },
+        {
+          "code": "Q2_9",
+          "number": "2.9",
+          "label": "La structure dispose-t-elle de rampes adaptées aux personnes handicapées ?",
+          "type": "yesno",
+          "required": true
+        },
+        {
+          "code": "Q2_10",
+          "number": "2.10",
+          "label": "La structure dispose-t-elle d'une cour de récréation ?",
+          "type": "yesno",
+          "required": true
+        },
+        {
+          "code": "Q2_11",
+          "number": "2.11",
+          "label": "La structure dispose-t-elle de latrines fonctionnelles ?",
+          "type": "yesno",
+          "required": true
+        },
+        {
+          "code": "Q2_11_1",
+          "number": "2.11.1",
+          "label": "Nombre total de latrines",
+          "type": "integer",
+          "required": true,
+          "min": 1,
+          "max": 99,
+          "visible_if": {
+            "==": [
+              {
+                "var": "Q2_11"
+              },
+              true
+            ]
+          }
+        },
+        {
+          "code": "Q2_11_2_a",
+          "number": "2.11.2 a",
+          "label": "Dont fonctionnelles pour les apprenants (masculin + féminin)",
+          "type": "integer",
+          "required": true,
+          "min": 0,
+          "max": 99,
+          "visible_if": {
+            "==": [
+              {
+                "var": "Q2_11"
+              },
+              true
+            ]
+          },
+          "group": "2.11.2 Dont fonctionnelles pour"
+        },
+        {
+          "code": "Q2_11_2_b",
+          "number": "2.11.2 b",
+          "label": "Dont fonctionnelles pour les filles uniquement",
+          "type": "integer",
+          "required": true,
+          "min": 0,
+          "max": 99,
+          "visible_if": {
+            "==": [
+              {
+                "var": "Q2_11"
+              },
+              true
+            ]
+          },
+          "group": "2.11.2 Dont fonctionnelles pour"
+        },
+        {
+          "code": "Q2_11_2_c",
+          "number": "2.11.2 c",
+          "label": "Dont fonctionnelles pour le personnel",
+          "type": "integer",
+          "required": true,
+          "min": 0,
+          "max": 99,
+          "visible_if": {
+            "==": [
+              {
+                "var": "Q2_11"
+              },
+              true
+            ]
+          },
+          "group": "2.11.2 Dont fonctionnelles pour"
+        },
+        {
+          "code": "Q2_11_2_d",
+          "number": "2.11.2 d",
+          "label": "Dont fonctionnelles pour les handicapés",
+          "type": "integer",
+          "required": true,
+          "min": 0,
+          "max": 99,
+          "visible_if": {
+            "==": [
+              {
+                "var": "Q2_11"
+              },
+              true
+            ]
+          },
+          "group": "2.11.2 Dont fonctionnelles pour"
+        },
+        {
+          "code": "Q2_12",
+          "number": "2.12",
+          "label": "La structure dispose-t-elle d'une bibliothèque ?",
+          "type": "yesno",
+          "required": true
+        },
+        {
+          "code": "Q2_13",
+          "number": "2.13",
+          "label": "La structure dispose-t-elle d'une connexion Internet ?",
+          "type": "yesno",
+          "required": true
+        },
+        {
+          "code": "Q2_13_1",
+          "number": "2.13.1",
+          "label": "Type(s) de connexion",
+          "type": "multi",
+          "required": true,
+          "visible_if": {
+            "==": [
+              {
+                "var": "Q2_13"
+              },
+              true
+            ]
+          },
+          "options": [
+            {
+              "code": "a",
+              "label": "ADSL"
+            },
+            {
+              "code": "b",
+              "label": "Liaison satellite"
+            },
+            {
+              "code": "c",
+              "label": "Connexion mobile"
+            }
+          ]
+        },
+        {
+          "code": "Q2_13_2",
+          "number": "2.13.2",
+          "label": "Qui a accès à l'Internet ?",
+          "type": "multi",
+          "required": true,
+          "visible_if": {
+            "==": [
+              {
+                "var": "Q2_13"
+              },
+              true
+            ]
+          },
+          "help": "Numérotée « 2.14.2 » par erreur sur le formulaire papier.",
+          "options": [
+            {
+              "code": "a",
+              "label": "Apprentis"
+            },
+            {
+              "code": "b",
+              "label": "Formateurs"
+            },
+            {
+              "code": "c",
+              "label": "Personnel administratif"
+            },
+            {
+              "code": "d",
+              "label": "Externe"
+            }
+          ]
+        },
+        {
+          "code": "Q2_14",
+          "number": "2.14",
+          "label": "La structure dispose-t-elle d'un terrain de sport ?",
+          "type": "yesno",
+          "required": true
+        },
+        {
+          "code": "Q2_14_1",
+          "number": "2.14.1",
+          "label": "Type(s) de sport",
+          "type": "multi",
+          "required": true,
+          "visible_if": {
+            "==": [
+              {
+                "var": "Q2_14"
+              },
+              true
+            ]
+          },
+          "options": [
+            {
+              "code": "a",
+              "label": "Football"
+            },
+            {
+              "code": "b",
+              "label": "Handball"
+            },
+            {
+              "code": "c",
+              "label": "Basketball"
+            },
+            {
+              "code": "d",
+              "label": "Volleyball"
+            },
+            {
+              "code": "e",
+              "label": "Dojo"
+            },
+            {
+              "code": "f",
+              "label": "Ring"
+            },
+            {
+              "code": "g",
+              "label": "Autres"
+            }
+          ]
+        },
+        {
+          "code": "Q2_14_1_autre",
+          "number": "2.14.1",
+          "label": "Autres sports : préciser",
+          "type": "text",
+          "required": true,
+          "max_length": 150,
+          "visible_if": {
+            "in": [
+              "g",
+              {
+                "var": "Q2_14_1"
+              }
+            ]
+          }
+        },
+        {
+          "code": "Q2_14_2",
+          "number": "2.14.2",
+          "label": "Cette activité sportive dispose-t-elle de plateau technique ?",
+          "type": "yesno",
+          "required": true,
+          "visible_if": {
+            "==": [
+              {
+                "var": "Q2_14"
+              },
+              true
+            ]
+          }
+        },
+        {
+          "code": "Q2_15",
+          "number": "2.15",
+          "label": "La structure dispose-t-elle d'un aménagement paysager ?",
+          "type": "yesno",
+          "required": true
+        },
+        {
+          "code": "Q2_16",
+          "number": "2.16",
+          "label": "La structure dispose-t-elle d'un parking auto/moto ?",
+          "type": "yesno",
+          "required": true
+        },
+        {
+          "code": "Q2_17",
+          "number": "2.17",
+          "label": "La structure dispose-t-elle d'un dispositif de lavage des mains ?",
+          "type": "yesno",
+          "required": true
+        },
+        {
+          "code": "Q2_18",
+          "number": "2.18",
+          "label": "La structure dispose-t-elle d'un dispositif de collecte des ordures ?",
+          "type": "yesno",
+          "required": true
+        },
+        {
+          "code": "Q2_19",
+          "number": "2.19",
+          "label": "Nombre de maîtres artisans/formateurs (Homme, Femme, Total)",
+          "type": "computed",
+          "source": "Q2_19",
+          "help": "Calculé automatiquement à partir du tableau de la Section III. Non saisissable."
+        },
+        {
+          "code": "Q2_20_H",
+          "number": "2.20",
+          "label": "Jeunes apprentis accompagnés par le FAFPA — Homme",
+          "type": "integer",
+          "required": true,
+          "min": 0,
+          "max": 999,
+          "group": "2.20 Jeunes apprentis accompagnés par le FAFPA"
+        },
+        {
+          "code": "Q2_20_F",
+          "number": "2.20",
+          "label": "Jeunes apprentis accompagnés par le FAFPA — Femme",
+          "type": "integer",
+          "required": true,
+          "min": 0,
+          "max": 999,
+          "group": "2.20 Jeunes apprentis accompagnés par le FAFPA"
+        }
+      ]
+    },
+    {
+      "code": "S3",
+      "number": "III",
+      "title": "Informations relatives aux maîtres artisans/formateurs",
+      "items": [
+        {
+          "code": "trainers",
+          "number": "3",
+          "label": "Maîtres artisans / formateurs",
+          "type": "roster",
+          "min_rows": 0,
+          "max_rows": 99,
+          "row_label": "Formateur {_line}",
+          "columns": [
+            {
+              "code": "full_name",
+              "label": "Nom et prénom",
+              "type": "text",
+              "required": true,
+              "min_length": 2,
+              "max_length": 150
+            },
+            {
+              "code": "sex",
+              "label": "Sexe",
+              "type": "single",
+              "required": true,
+              "options": [
+                {
+                  "code": "M",
+                  "label": "Homme"
+                },
+                {
+                  "code": "F",
+                  "label": "Femme"
+                }
+              ]
+            },
+            {
+              "code": "grade",
+              "label": "Grade",
+              "type": "single",
+              "required": true,
+              "options": [
+                {
+                  "code": "MAITRE_ARTISAN",
+                  "label": "Maître artisan"
+                },
+                {
+                  "code": "FORMATEUR",
+                  "label": "Formateur"
+                }
+              ]
+            },
+            {
+              "code": "initial_training",
+              "label": "Formation initiale",
+              "type": "yesno",
+              "required": true
+            },
+            {
+              "code": "continuing_trainings_count",
+              "label": "Nombre de formations continues suivies",
+              "type": "integer",
+              "required": true,
+              "min": 0,
+              "max": 99
+            },
+            {
+              "code": "certified",
+              "label": "La qualification est-elle certifiée ?",
+              "type": "yesno",
+              "required": true
+            },
+            {
+              "code": "cert_name",
+              "label": "Nom du dernier certificat obtenu",
+              "type": "text",
+              "required": true,
+              "max_length": 150,
+              "visible_if": {
+                "==": [
+                  {
+                    "var": "certified"
+                  },
+                  true
+                ]
+              }
+            },
+            {
+              "code": "cert_level",
+              "label": "Niveau du dernier certificat",
+              "type": "text",
+              "required": true,
+              "max_length": 100,
+              "visible_if": {
+                "==": [
+                  {
+                    "var": "certified"
+                  },
+                  true
+                ]
+              }
+            },
+            {
+              "code": "cert_body",
+              "label": "Nom de la structure certifiante",
+              "type": "text",
+              "required": true,
+              "max_length": 150,
+              "visible_if": {
+                "==": [
+                  {
+                    "var": "certified"
+                  },
+                  true
+                ]
+              }
+            },
+            {
+              "code": "cert_year",
+              "label": "Année de certification",
+              "type": "integer",
+              "required": true,
+              "min": 1950,
+              "max": 2100,
+              "visible_if": {
+                "==": [
+                  {
+                    "var": "certified"
+                  },
+                  true
+                ]
+              }
+            },
+            {
+              "code": "nationality",
+              "label": "Nationalité",
+              "type": "single",
+              "required": true,
+              "options": [
+                {
+                  "code": "NIGERIEN",
+                  "label": "Nigérien"
+                },
+                {
+                  "code": "UEMOA",
+                  "label": "UEMOA"
+                },
+                {
+                  "code": "AUTRE",
+                  "label": "Autre"
+                }
+              ]
+            },
+            {
+              "code": "pedagogical_followup",
+              "label": "A-t-il reçu un suivi technico-pédagogique ?",
+              "type": "yesno",
+              "required": true
+            }
+          ],
+          "row_rules": [
+            {
+              "code": "R_TRAINER_CERT_YEAR_FUTURE",
+              "severity": "warning",
+              "targets": [
+                "cert_year"
+              ],
+              "when": {
+                "and": [
+                  {
+                    "==": [
+                      {
+                        "var": "certified"
+                      },
+                      true
+                    ]
+                  },
+                  {
+                    "!!": [
+                      {
+                        "var": "cert_year"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "assert": {
+                "<=": [
+                  {
+                    "var": "cert_year"
+                  },
+                  {
+                    "var": "_root._ctx.current_year"
+                  }
+                ]
+              },
+              "message": "Formateur {_line} : l'année de certification ({cert_year}) ne peut pas être dans le futur."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "S4",
+      "number": "IV",
+      "title": "Apprentis dans les différents secteurs",
+      "items": [
+        {
+          "code": "sectors.s1.trades",
+          "number": "4.1",
+          "label": "Secteur Primaire/Agricole — métiers",
+          "type": "roster",
+          "group": "4.1 Secteur Primaire/Agricole",
+          "sector": "s1",
+          "sector_id": 1,
+          "min_rows": 0,
+          "max_rows": 50,
+          "row_label": "Métier {_line}",
+          "unique": [
+            "trade",
+            "trade_other",
+            "duration"
+          ],
+          "columns": [
+            {
+              "code": "trade",
+              "label": "Métier",
+              "type": "single",
+              "required": true,
+              "options_source": "trades.1",
+              "help": "Choisir dans la liste ; « AUTRE » si le métier ne figure pas dans la liste."
+            },
+            {
+              "code": "trade_other",
+              "label": "Autre métier : préciser",
+              "type": "text",
+              "required": true,
+              "max_length": 150,
+              "visible_if": {
+                "==": [
+                  {
+                    "var": "trade"
+                  },
+                  "AUTRE"
+                ]
+              }
+            },
+            {
+              "code": "duration",
+              "label": "Durée d'apprentissage",
+              "type": "single",
+              "required": true,
+              "options": [
+                {
+                  "code": "LE3",
+                  "label": "≤ 3 mois"
+                },
+                {
+                  "code": "M4_9",
+                  "label": "4 à 9 mois"
+                },
+                {
+                  "code": "GT9",
+                  "label": "> 9 mois"
+                }
+              ]
+            },
+            {
+              "code": "p1_m",
+              "label": "Promotion I — Hommes",
+              "type": "integer",
+              "required": true,
+              "min": 0,
+              "max": 999
+            },
+            {
+              "code": "p1_f",
+              "label": "Promotion I — Femmes",
+              "type": "integer",
+              "required": true,
+              "min": 0,
+              "max": 999
+            },
+            {
+              "code": "p2_m",
+              "label": "Promotion II — Hommes",
+              "type": "integer",
+              "required": true,
+              "min": 0,
+              "max": 999
+            },
+            {
+              "code": "p2_f",
+              "label": "Promotion II — Femmes",
+              "type": "integer",
+              "required": true,
+              "min": 0,
+              "max": 999
+            },
+            {
+              "code": "p3_m",
+              "label": "Promotion III — Hommes",
+              "type": "integer",
+              "required": true,
+              "min": 0,
+              "max": 999
+            },
+            {
+              "code": "p3_f",
+              "label": "Promotion III — Femmes",
+              "type": "integer",
+              "required": true,
+              "min": 0,
+              "max": 999
+            }
+          ],
+          "row_rules": [
+            {
+              "code": "R_TRADE_ALL_ZERO_s1",
+              "severity": "warning",
+              "targets": [
+                "p1_m"
+              ],
+              "assert": {
+                ">": [
+                  {
+                    "+": [
+                      {
+                        "var": "p1_m"
+                      },
+                      {
+                        "var": "p1_f"
+                      },
+                      {
+                        "var": "p2_m"
+                      },
+                      {
+                        "var": "p2_f"
+                      },
+                      {
+                        "var": "p3_m"
+                      },
+                      {
+                        "var": "p3_f"
+                      }
+                    ]
+                  },
+                  0
+                ]
+              },
+              "message": "Secteur Primaire/Agricole, métier {_line} : tous les effectifs sont à 0. Vérifier ou supprimer la ligne."
+            },
+            {
+              "code": "R_TRADE_SHORT_MULTI_PROMO_s1",
+              "severity": "warning",
+              "targets": [
+                "p2_m"
+              ],
+              "when": {
+                "==": [
+                  {
+                    "var": "duration"
+                  },
+                  "LE3"
+                ]
+              },
+              "assert": {
+                "==": [
+                  {
+                    "+": [
+                      {
+                        "var": "p2_m"
+                      },
+                      {
+                        "var": "p2_f"
+                      },
+                      {
+                        "var": "p3_m"
+                      },
+                      {
+                        "var": "p3_f"
+                      }
+                    ]
+                  },
+                  0
+                ]
+              },
+              "message": "Secteur Primaire/Agricole, métier {_line} : formation de 3 mois au plus avec des apprentis en promotion II ou III. Vérifier."
+            }
+          ]
+        },
+        {
+          "code": "sectors.s1.specials",
+          "number": "4.1",
+          "label": "Secteur Primaire/Agricole — dont apprentis vulnérables",
+          "type": "grid",
+          "required": true,
+          "group": "4.1 Secteur Primaire/Agricole",
+          "rows": [
+            {
+              "code": "HANDICAPES",
+              "label": "Dont handicapés"
+            },
+            {
+              "code": "REFUGIES",
+              "label": "Dont réfugiés"
+            },
+            {
+              "code": "RETOURNES",
+              "label": "Dont retournés"
+            },
+            {
+              "code": "DEPLACES",
+              "label": "Dont déplacés"
+            }
+          ],
+          "columns": [
+            {
+              "code": "p1_m",
+              "label": "Promotion I — Hommes"
+            },
+            {
+              "code": "p1_f",
+              "label": "Promotion I — Femmes"
+            },
+            {
+              "code": "p2_m",
+              "label": "Promotion II — Hommes"
+            },
+            {
+              "code": "p2_f",
+              "label": "Promotion II — Femmes"
+            },
+            {
+              "code": "p3_m",
+              "label": "Promotion III — Hommes"
+            },
+            {
+              "code": "p3_f",
+              "label": "Promotion III — Femmes"
+            }
+          ],
+          "cell": {
+            "type": "integer",
+            "min": 0,
+            "max": 999
+          },
+          "help": "Réfugiés : parents/tuteurs venant de pays touchés par des catastrophes ou des conflits, vivant dans des camps. Déplacés : parents/tuteurs nigériens ayant quitté leur localité. Retournés : parents/tuteurs nigériens revenus après l'accalmie."
+        },
+        {
+          "code": "sectors.s2.trades",
+          "number": "4.2",
+          "label": "Secteur Secondaire/Industriel — métiers",
+          "type": "roster",
+          "group": "4.2 Secteur Secondaire/Industriel",
+          "sector": "s2",
+          "sector_id": 2,
+          "min_rows": 0,
+          "max_rows": 50,
+          "row_label": "Métier {_line}",
+          "unique": [
+            "trade",
+            "trade_other",
+            "duration"
+          ],
+          "columns": [
+            {
+              "code": "trade",
+              "label": "Métier",
+              "type": "single",
+              "required": true,
+              "options_source": "trades.2",
+              "help": "Choisir dans la liste ; « AUTRE » si le métier ne figure pas dans la liste."
+            },
+            {
+              "code": "trade_other",
+              "label": "Autre métier : préciser",
+              "type": "text",
+              "required": true,
+              "max_length": 150,
+              "visible_if": {
+                "==": [
+                  {
+                    "var": "trade"
+                  },
+                  "AUTRE"
+                ]
+              }
+            },
+            {
+              "code": "duration",
+              "label": "Durée d'apprentissage",
+              "type": "single",
+              "required": true,
+              "options": [
+                {
+                  "code": "LE3",
+                  "label": "≤ 3 mois"
+                },
+                {
+                  "code": "M4_9",
+                  "label": "4 à 9 mois"
+                },
+                {
+                  "code": "GT9",
+                  "label": "> 9 mois"
+                }
+              ]
+            },
+            {
+              "code": "p1_m",
+              "label": "Promotion I — Hommes",
+              "type": "integer",
+              "required": true,
+              "min": 0,
+              "max": 999
+            },
+            {
+              "code": "p1_f",
+              "label": "Promotion I — Femmes",
+              "type": "integer",
+              "required": true,
+              "min": 0,
+              "max": 999
+            },
+            {
+              "code": "p2_m",
+              "label": "Promotion II — Hommes",
+              "type": "integer",
+              "required": true,
+              "min": 0,
+              "max": 999
+            },
+            {
+              "code": "p2_f",
+              "label": "Promotion II — Femmes",
+              "type": "integer",
+              "required": true,
+              "min": 0,
+              "max": 999
+            },
+            {
+              "code": "p3_m",
+              "label": "Promotion III — Hommes",
+              "type": "integer",
+              "required": true,
+              "min": 0,
+              "max": 999
+            },
+            {
+              "code": "p3_f",
+              "label": "Promotion III — Femmes",
+              "type": "integer",
+              "required": true,
+              "min": 0,
+              "max": 999
+            }
+          ],
+          "row_rules": [
+            {
+              "code": "R_TRADE_ALL_ZERO_s2",
+              "severity": "warning",
+              "targets": [
+                "p1_m"
+              ],
+              "assert": {
+                ">": [
+                  {
+                    "+": [
+                      {
+                        "var": "p1_m"
+                      },
+                      {
+                        "var": "p1_f"
+                      },
+                      {
+                        "var": "p2_m"
+                      },
+                      {
+                        "var": "p2_f"
+                      },
+                      {
+                        "var": "p3_m"
+                      },
+                      {
+                        "var": "p3_f"
+                      }
+                    ]
+                  },
+                  0
+                ]
+              },
+              "message": "Secteur Secondaire/Industriel, métier {_line} : tous les effectifs sont à 0. Vérifier ou supprimer la ligne."
+            },
+            {
+              "code": "R_TRADE_SHORT_MULTI_PROMO_s2",
+              "severity": "warning",
+              "targets": [
+                "p2_m"
+              ],
+              "when": {
+                "==": [
+                  {
+                    "var": "duration"
+                  },
+                  "LE3"
+                ]
+              },
+              "assert": {
+                "==": [
+                  {
+                    "+": [
+                      {
+                        "var": "p2_m"
+                      },
+                      {
+                        "var": "p2_f"
+                      },
+                      {
+                        "var": "p3_m"
+                      },
+                      {
+                        "var": "p3_f"
+                      }
+                    ]
+                  },
+                  0
+                ]
+              },
+              "message": "Secteur Secondaire/Industriel, métier {_line} : formation de 3 mois au plus avec des apprentis en promotion II ou III. Vérifier."
+            }
+          ]
+        },
+        {
+          "code": "sectors.s2.specials",
+          "number": "4.2",
+          "label": "Secteur Secondaire/Industriel — dont apprentis vulnérables",
+          "type": "grid",
+          "required": true,
+          "group": "4.2 Secteur Secondaire/Industriel",
+          "rows": [
+            {
+              "code": "HANDICAPES",
+              "label": "Dont handicapés"
+            },
+            {
+              "code": "REFUGIES",
+              "label": "Dont réfugiés"
+            },
+            {
+              "code": "RETOURNES",
+              "label": "Dont retournés"
+            },
+            {
+              "code": "DEPLACES",
+              "label": "Dont déplacés"
+            }
+          ],
+          "columns": [
+            {
+              "code": "p1_m",
+              "label": "Promotion I — Hommes"
+            },
+            {
+              "code": "p1_f",
+              "label": "Promotion I — Femmes"
+            },
+            {
+              "code": "p2_m",
+              "label": "Promotion II — Hommes"
+            },
+            {
+              "code": "p2_f",
+              "label": "Promotion II — Femmes"
+            },
+            {
+              "code": "p3_m",
+              "label": "Promotion III — Hommes"
+            },
+            {
+              "code": "p3_f",
+              "label": "Promotion III — Femmes"
+            }
+          ],
+          "cell": {
+            "type": "integer",
+            "min": 0,
+            "max": 999
+          },
+          "help": "Réfugiés : parents/tuteurs venant de pays touchés par des catastrophes ou des conflits, vivant dans des camps. Déplacés : parents/tuteurs nigériens ayant quitté leur localité. Retournés : parents/tuteurs nigériens revenus après l'accalmie."
+        },
+        {
+          "code": "sectors.s3.trades",
+          "number": "4.3",
+          "label": "Secteur Tertiaire/Service — métiers",
+          "type": "roster",
+          "group": "4.3 Secteur Tertiaire/Service",
+          "sector": "s3",
+          "sector_id": 3,
+          "min_rows": 0,
+          "max_rows": 50,
+          "row_label": "Métier {_line}",
+          "unique": [
+            "trade",
+            "trade_other",
+            "duration"
+          ],
+          "columns": [
+            {
+              "code": "trade",
+              "label": "Métier",
+              "type": "single",
+              "required": true,
+              "options_source": "trades.3",
+              "help": "Choisir dans la liste ; « AUTRE » si le métier ne figure pas dans la liste."
+            },
+            {
+              "code": "trade_other",
+              "label": "Autre métier : préciser",
+              "type": "text",
+              "required": true,
+              "max_length": 150,
+              "visible_if": {
+                "==": [
+                  {
+                    "var": "trade"
+                  },
+                  "AUTRE"
+                ]
+              }
+            },
+            {
+              "code": "duration",
+              "label": "Durée d'apprentissage",
+              "type": "single",
+              "required": true,
+              "options": [
+                {
+                  "code": "LE3",
+                  "label": "≤ 3 mois"
+                },
+                {
+                  "code": "M4_9",
+                  "label": "4 à 9 mois"
+                },
+                {
+                  "code": "GT9",
+                  "label": "> 9 mois"
+                }
+              ]
+            },
+            {
+              "code": "p1_m",
+              "label": "Promotion I — Hommes",
+              "type": "integer",
+              "required": true,
+              "min": 0,
+              "max": 999
+            },
+            {
+              "code": "p1_f",
+              "label": "Promotion I — Femmes",
+              "type": "integer",
+              "required": true,
+              "min": 0,
+              "max": 999
+            },
+            {
+              "code": "p2_m",
+              "label": "Promotion II — Hommes",
+              "type": "integer",
+              "required": true,
+              "min": 0,
+              "max": 999
+            },
+            {
+              "code": "p2_f",
+              "label": "Promotion II — Femmes",
+              "type": "integer",
+              "required": true,
+              "min": 0,
+              "max": 999
+            },
+            {
+              "code": "p3_m",
+              "label": "Promotion III — Hommes",
+              "type": "integer",
+              "required": true,
+              "min": 0,
+              "max": 999
+            },
+            {
+              "code": "p3_f",
+              "label": "Promotion III — Femmes",
+              "type": "integer",
+              "required": true,
+              "min": 0,
+              "max": 999
+            }
+          ],
+          "row_rules": [
+            {
+              "code": "R_TRADE_ALL_ZERO_s3",
+              "severity": "warning",
+              "targets": [
+                "p1_m"
+              ],
+              "assert": {
+                ">": [
+                  {
+                    "+": [
+                      {
+                        "var": "p1_m"
+                      },
+                      {
+                        "var": "p1_f"
+                      },
+                      {
+                        "var": "p2_m"
+                      },
+                      {
+                        "var": "p2_f"
+                      },
+                      {
+                        "var": "p3_m"
+                      },
+                      {
+                        "var": "p3_f"
+                      }
+                    ]
+                  },
+                  0
+                ]
+              },
+              "message": "Secteur Tertiaire/Service, métier {_line} : tous les effectifs sont à 0. Vérifier ou supprimer la ligne."
+            },
+            {
+              "code": "R_TRADE_SHORT_MULTI_PROMO_s3",
+              "severity": "warning",
+              "targets": [
+                "p2_m"
+              ],
+              "when": {
+                "==": [
+                  {
+                    "var": "duration"
+                  },
+                  "LE3"
+                ]
+              },
+              "assert": {
+                "==": [
+                  {
+                    "+": [
+                      {
+                        "var": "p2_m"
+                      },
+                      {
+                        "var": "p2_f"
+                      },
+                      {
+                        "var": "p3_m"
+                      },
+                      {
+                        "var": "p3_f"
+                      }
+                    ]
+                  },
+                  0
+                ]
+              },
+              "message": "Secteur Tertiaire/Service, métier {_line} : formation de 3 mois au plus avec des apprentis en promotion II ou III. Vérifier."
+            }
+          ]
+        },
+        {
+          "code": "sectors.s3.specials",
+          "number": "4.3",
+          "label": "Secteur Tertiaire/Service — dont apprentis vulnérables",
+          "type": "grid",
+          "required": true,
+          "group": "4.3 Secteur Tertiaire/Service",
+          "rows": [
+            {
+              "code": "HANDICAPES",
+              "label": "Dont handicapés"
+            },
+            {
+              "code": "REFUGIES",
+              "label": "Dont réfugiés"
+            },
+            {
+              "code": "RETOURNES",
+              "label": "Dont retournés"
+            },
+            {
+              "code": "DEPLACES",
+              "label": "Dont déplacés"
+            }
+          ],
+          "columns": [
+            {
+              "code": "p1_m",
+              "label": "Promotion I — Hommes"
+            },
+            {
+              "code": "p1_f",
+              "label": "Promotion I — Femmes"
+            },
+            {
+              "code": "p2_m",
+              "label": "Promotion II — Hommes"
+            },
+            {
+              "code": "p2_f",
+              "label": "Promotion II — Femmes"
+            },
+            {
+              "code": "p3_m",
+              "label": "Promotion III — Hommes"
+            },
+            {
+              "code": "p3_f",
+              "label": "Promotion III — Femmes"
+            }
+          ],
+          "cell": {
+            "type": "integer",
+            "min": 0,
+            "max": 999
+          },
+          "help": "Réfugiés : parents/tuteurs venant de pays touchés par des catastrophes ou des conflits, vivant dans des camps. Déplacés : parents/tuteurs nigériens ayant quitté leur localité. Retournés : parents/tuteurs nigériens revenus après l'accalmie."
+        }
+      ]
+    },
+    {
+      "code": "S5",
+      "number": "V",
+      "title": "Observations et identification",
+      "items": [
+        {
+          "code": "Q5_OBS",
+          "number": "V",
+          "label": "Observations éventuelles",
+          "type": "text",
+          "required": false,
+          "max_length": 2000,
+          "multiline": true
+        },
+        {
+          "code": "Q5_DATE",
+          "number": "V",
+          "label": "Date de remplissage",
+          "type": "date",
+          "required": true,
+          "prefill": "ctx.today"
+        },
+        {
+          "code": "Q5_REP_NOM",
+          "number": "V",
+          "label": "Nom et prénom du répondant",
+          "type": "text",
+          "required": true,
+          "min_length": 2,
+          "max_length": 150
+        },
+        {
+          "code": "Q5_REP_TEL",
+          "number": "V",
+          "label": "Numéro de téléphone du répondant",
+          "type": "phone",
+          "required": true
+        },
+        {
+          "code": "Q5_CHEF_NOM",
+          "number": "V",
+          "label": "Nom et prénom du chef de la structure",
+          "type": "text",
+          "required": true,
+          "min_length": 2,
+          "max_length": 150
+        },
+        {
+          "code": "Q5_CHEF_TEL",
+          "number": "V",
+          "label": "Numéro de téléphone du chef",
+          "type": "phone",
+          "required": false
+        },
+        {
+          "code": "Q5_PAPER_SIGNED",
+          "number": "V",
+          "label": "La fiche papier a été signée et cachetée par le répondant et le chef de la structure",
+          "type": "yesno",
+          "required": true
+        },
+        {
+          "code": "Q5_ENQ",
+          "number": "V",
+          "label": "Nom et prénom de l'enquêteur",
+          "type": "auto",
+          "source": "agent.full_name"
+        },
+        {
+          "code": "Q5_SUP",
+          "number": "V",
+          "label": "Nom et prénom du superviseur",
+          "type": "auto",
+          "source": "supervisor.full_name"
+        }
+      ]
+    }
+  ],
+  "computed": [
+    {
+      "code": "IV_DUR.LE3.s1.M",
+      "expr": {
+        "reduce": [
+          {
+            "filter": [
+              {
+                "var": "sectors.s1.trades"
+              },
+              {
+                "==": [
+                  {
+                    "var": "duration"
+                  },
+                  "LE3"
+                ]
+              }
+            ]
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              {
+                "+": [
+                  {
+                    "var": "current.p1_m"
+                  },
+                  {
+                    "var": "current.p2_m"
+                  },
+                  {
+                    "var": "current.p3_m"
+                  }
+                ]
+              }
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "IV_DUR.LE3.s1.F",
+      "expr": {
+        "reduce": [
+          {
+            "filter": [
+              {
+                "var": "sectors.s1.trades"
+              },
+              {
+                "==": [
+                  {
+                    "var": "duration"
+                  },
+                  "LE3"
+                ]
+              }
+            ]
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              {
+                "+": [
+                  {
+                    "var": "current.p1_f"
+                  },
+                  {
+                    "var": "current.p2_f"
+                  },
+                  {
+                    "var": "current.p3_f"
+                  }
+                ]
+              }
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "IV_DUR.LE3.s1.T",
+      "expr": {
+        "+": [
+          {
+            "var": "IV_DUR.LE3.s1.M"
+          },
+          {
+            "var": "IV_DUR.LE3.s1.F"
+          }
+        ]
+      }
+    },
+    {
+      "code": "IV_DUR.LE3.s2.M",
+      "expr": {
+        "reduce": [
+          {
+            "filter": [
+              {
+                "var": "sectors.s2.trades"
+              },
+              {
+                "==": [
+                  {
+                    "var": "duration"
+                  },
+                  "LE3"
+                ]
+              }
+            ]
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              {
+                "+": [
+                  {
+                    "var": "current.p1_m"
+                  },
+                  {
+                    "var": "current.p2_m"
+                  },
+                  {
+                    "var": "current.p3_m"
+                  }
+                ]
+              }
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "IV_DUR.LE3.s2.F",
+      "expr": {
+        "reduce": [
+          {
+            "filter": [
+              {
+                "var": "sectors.s2.trades"
+              },
+              {
+                "==": [
+                  {
+                    "var": "duration"
+                  },
+                  "LE3"
+                ]
+              }
+            ]
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              {
+                "+": [
+                  {
+                    "var": "current.p1_f"
+                  },
+                  {
+                    "var": "current.p2_f"
+                  },
+                  {
+                    "var": "current.p3_f"
+                  }
+                ]
+              }
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "IV_DUR.LE3.s2.T",
+      "expr": {
+        "+": [
+          {
+            "var": "IV_DUR.LE3.s2.M"
+          },
+          {
+            "var": "IV_DUR.LE3.s2.F"
+          }
+        ]
+      }
+    },
+    {
+      "code": "IV_DUR.LE3.s3.M",
+      "expr": {
+        "reduce": [
+          {
+            "filter": [
+              {
+                "var": "sectors.s3.trades"
+              },
+              {
+                "==": [
+                  {
+                    "var": "duration"
+                  },
+                  "LE3"
+                ]
+              }
+            ]
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              {
+                "+": [
+                  {
+                    "var": "current.p1_m"
+                  },
+                  {
+                    "var": "current.p2_m"
+                  },
+                  {
+                    "var": "current.p3_m"
+                  }
+                ]
+              }
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "IV_DUR.LE3.s3.F",
+      "expr": {
+        "reduce": [
+          {
+            "filter": [
+              {
+                "var": "sectors.s3.trades"
+              },
+              {
+                "==": [
+                  {
+                    "var": "duration"
+                  },
+                  "LE3"
+                ]
+              }
+            ]
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              {
+                "+": [
+                  {
+                    "var": "current.p1_f"
+                  },
+                  {
+                    "var": "current.p2_f"
+                  },
+                  {
+                    "var": "current.p3_f"
+                  }
+                ]
+              }
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "IV_DUR.LE3.s3.T",
+      "expr": {
+        "+": [
+          {
+            "var": "IV_DUR.LE3.s3.M"
+          },
+          {
+            "var": "IV_DUR.LE3.s3.F"
+          }
+        ]
+      }
+    },
+    {
+      "code": "IV_DUR.M4_9.s1.M",
+      "expr": {
+        "reduce": [
+          {
+            "filter": [
+              {
+                "var": "sectors.s1.trades"
+              },
+              {
+                "==": [
+                  {
+                    "var": "duration"
+                  },
+                  "M4_9"
+                ]
+              }
+            ]
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              {
+                "+": [
+                  {
+                    "var": "current.p1_m"
+                  },
+                  {
+                    "var": "current.p2_m"
+                  },
+                  {
+                    "var": "current.p3_m"
+                  }
+                ]
+              }
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "IV_DUR.M4_9.s1.F",
+      "expr": {
+        "reduce": [
+          {
+            "filter": [
+              {
+                "var": "sectors.s1.trades"
+              },
+              {
+                "==": [
+                  {
+                    "var": "duration"
+                  },
+                  "M4_9"
+                ]
+              }
+            ]
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              {
+                "+": [
+                  {
+                    "var": "current.p1_f"
+                  },
+                  {
+                    "var": "current.p2_f"
+                  },
+                  {
+                    "var": "current.p3_f"
+                  }
+                ]
+              }
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "IV_DUR.M4_9.s1.T",
+      "expr": {
+        "+": [
+          {
+            "var": "IV_DUR.M4_9.s1.M"
+          },
+          {
+            "var": "IV_DUR.M4_9.s1.F"
+          }
+        ]
+      }
+    },
+    {
+      "code": "IV_DUR.M4_9.s2.M",
+      "expr": {
+        "reduce": [
+          {
+            "filter": [
+              {
+                "var": "sectors.s2.trades"
+              },
+              {
+                "==": [
+                  {
+                    "var": "duration"
+                  },
+                  "M4_9"
+                ]
+              }
+            ]
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              {
+                "+": [
+                  {
+                    "var": "current.p1_m"
+                  },
+                  {
+                    "var": "current.p2_m"
+                  },
+                  {
+                    "var": "current.p3_m"
+                  }
+                ]
+              }
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "IV_DUR.M4_9.s2.F",
+      "expr": {
+        "reduce": [
+          {
+            "filter": [
+              {
+                "var": "sectors.s2.trades"
+              },
+              {
+                "==": [
+                  {
+                    "var": "duration"
+                  },
+                  "M4_9"
+                ]
+              }
+            ]
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              {
+                "+": [
+                  {
+                    "var": "current.p1_f"
+                  },
+                  {
+                    "var": "current.p2_f"
+                  },
+                  {
+                    "var": "current.p3_f"
+                  }
+                ]
+              }
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "IV_DUR.M4_9.s2.T",
+      "expr": {
+        "+": [
+          {
+            "var": "IV_DUR.M4_9.s2.M"
+          },
+          {
+            "var": "IV_DUR.M4_9.s2.F"
+          }
+        ]
+      }
+    },
+    {
+      "code": "IV_DUR.M4_9.s3.M",
+      "expr": {
+        "reduce": [
+          {
+            "filter": [
+              {
+                "var": "sectors.s3.trades"
+              },
+              {
+                "==": [
+                  {
+                    "var": "duration"
+                  },
+                  "M4_9"
+                ]
+              }
+            ]
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              {
+                "+": [
+                  {
+                    "var": "current.p1_m"
+                  },
+                  {
+                    "var": "current.p2_m"
+                  },
+                  {
+                    "var": "current.p3_m"
+                  }
+                ]
+              }
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "IV_DUR.M4_9.s3.F",
+      "expr": {
+        "reduce": [
+          {
+            "filter": [
+              {
+                "var": "sectors.s3.trades"
+              },
+              {
+                "==": [
+                  {
+                    "var": "duration"
+                  },
+                  "M4_9"
+                ]
+              }
+            ]
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              {
+                "+": [
+                  {
+                    "var": "current.p1_f"
+                  },
+                  {
+                    "var": "current.p2_f"
+                  },
+                  {
+                    "var": "current.p3_f"
+                  }
+                ]
+              }
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "IV_DUR.M4_9.s3.T",
+      "expr": {
+        "+": [
+          {
+            "var": "IV_DUR.M4_9.s3.M"
+          },
+          {
+            "var": "IV_DUR.M4_9.s3.F"
+          }
+        ]
+      }
+    },
+    {
+      "code": "IV_DUR.GT9.s1.M",
+      "expr": {
+        "reduce": [
+          {
+            "filter": [
+              {
+                "var": "sectors.s1.trades"
+              },
+              {
+                "==": [
+                  {
+                    "var": "duration"
+                  },
+                  "GT9"
+                ]
+              }
+            ]
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              {
+                "+": [
+                  {
+                    "var": "current.p1_m"
+                  },
+                  {
+                    "var": "current.p2_m"
+                  },
+                  {
+                    "var": "current.p3_m"
+                  }
+                ]
+              }
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "IV_DUR.GT9.s1.F",
+      "expr": {
+        "reduce": [
+          {
+            "filter": [
+              {
+                "var": "sectors.s1.trades"
+              },
+              {
+                "==": [
+                  {
+                    "var": "duration"
+                  },
+                  "GT9"
+                ]
+              }
+            ]
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              {
+                "+": [
+                  {
+                    "var": "current.p1_f"
+                  },
+                  {
+                    "var": "current.p2_f"
+                  },
+                  {
+                    "var": "current.p3_f"
+                  }
+                ]
+              }
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "IV_DUR.GT9.s1.T",
+      "expr": {
+        "+": [
+          {
+            "var": "IV_DUR.GT9.s1.M"
+          },
+          {
+            "var": "IV_DUR.GT9.s1.F"
+          }
+        ]
+      }
+    },
+    {
+      "code": "IV_DUR.GT9.s2.M",
+      "expr": {
+        "reduce": [
+          {
+            "filter": [
+              {
+                "var": "sectors.s2.trades"
+              },
+              {
+                "==": [
+                  {
+                    "var": "duration"
+                  },
+                  "GT9"
+                ]
+              }
+            ]
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              {
+                "+": [
+                  {
+                    "var": "current.p1_m"
+                  },
+                  {
+                    "var": "current.p2_m"
+                  },
+                  {
+                    "var": "current.p3_m"
+                  }
+                ]
+              }
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "IV_DUR.GT9.s2.F",
+      "expr": {
+        "reduce": [
+          {
+            "filter": [
+              {
+                "var": "sectors.s2.trades"
+              },
+              {
+                "==": [
+                  {
+                    "var": "duration"
+                  },
+                  "GT9"
+                ]
+              }
+            ]
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              {
+                "+": [
+                  {
+                    "var": "current.p1_f"
+                  },
+                  {
+                    "var": "current.p2_f"
+                  },
+                  {
+                    "var": "current.p3_f"
+                  }
+                ]
+              }
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "IV_DUR.GT9.s2.T",
+      "expr": {
+        "+": [
+          {
+            "var": "IV_DUR.GT9.s2.M"
+          },
+          {
+            "var": "IV_DUR.GT9.s2.F"
+          }
+        ]
+      }
+    },
+    {
+      "code": "IV_DUR.GT9.s3.M",
+      "expr": {
+        "reduce": [
+          {
+            "filter": [
+              {
+                "var": "sectors.s3.trades"
+              },
+              {
+                "==": [
+                  {
+                    "var": "duration"
+                  },
+                  "GT9"
+                ]
+              }
+            ]
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              {
+                "+": [
+                  {
+                    "var": "current.p1_m"
+                  },
+                  {
+                    "var": "current.p2_m"
+                  },
+                  {
+                    "var": "current.p3_m"
+                  }
+                ]
+              }
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "IV_DUR.GT9.s3.F",
+      "expr": {
+        "reduce": [
+          {
+            "filter": [
+              {
+                "var": "sectors.s3.trades"
+              },
+              {
+                "==": [
+                  {
+                    "var": "duration"
+                  },
+                  "GT9"
+                ]
+              }
+            ]
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              {
+                "+": [
+                  {
+                    "var": "current.p1_f"
+                  },
+                  {
+                    "var": "current.p2_f"
+                  },
+                  {
+                    "var": "current.p3_f"
+                  }
+                ]
+              }
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "IV_DUR.GT9.s3.T",
+      "expr": {
+        "+": [
+          {
+            "var": "IV_DUR.GT9.s3.M"
+          },
+          {
+            "var": "IV_DUR.GT9.s3.F"
+          }
+        ]
+      }
+    },
+    {
+      "code": "IV.s1.total.p1_m",
+      "expr": {
+        "reduce": [
+          {
+            "var": "sectors.s1.trades"
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              {
+                "var": "current.p1_m"
+              }
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "IV.s1.total.p1_f",
+      "expr": {
+        "reduce": [
+          {
+            "var": "sectors.s1.trades"
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              {
+                "var": "current.p1_f"
+              }
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "IV.s1.total.p2_m",
+      "expr": {
+        "reduce": [
+          {
+            "var": "sectors.s1.trades"
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              {
+                "var": "current.p2_m"
+              }
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "IV.s1.total.p2_f",
+      "expr": {
+        "reduce": [
+          {
+            "var": "sectors.s1.trades"
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              {
+                "var": "current.p2_f"
+              }
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "IV.s1.total.p3_m",
+      "expr": {
+        "reduce": [
+          {
+            "var": "sectors.s1.trades"
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              {
+                "var": "current.p3_m"
+              }
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "IV.s1.total.p3_f",
+      "expr": {
+        "reduce": [
+          {
+            "var": "sectors.s1.trades"
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              {
+                "var": "current.p3_f"
+              }
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "IV.s2.total.p1_m",
+      "expr": {
+        "reduce": [
+          {
+            "var": "sectors.s2.trades"
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              {
+                "var": "current.p1_m"
+              }
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "IV.s2.total.p1_f",
+      "expr": {
+        "reduce": [
+          {
+            "var": "sectors.s2.trades"
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              {
+                "var": "current.p1_f"
+              }
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "IV.s2.total.p2_m",
+      "expr": {
+        "reduce": [
+          {
+            "var": "sectors.s2.trades"
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              {
+                "var": "current.p2_m"
+              }
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "IV.s2.total.p2_f",
+      "expr": {
+        "reduce": [
+          {
+            "var": "sectors.s2.trades"
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              {
+                "var": "current.p2_f"
+              }
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "IV.s2.total.p3_m",
+      "expr": {
+        "reduce": [
+          {
+            "var": "sectors.s2.trades"
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              {
+                "var": "current.p3_m"
+              }
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "IV.s2.total.p3_f",
+      "expr": {
+        "reduce": [
+          {
+            "var": "sectors.s2.trades"
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              {
+                "var": "current.p3_f"
+              }
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "IV.s3.total.p1_m",
+      "expr": {
+        "reduce": [
+          {
+            "var": "sectors.s3.trades"
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              {
+                "var": "current.p1_m"
+              }
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "IV.s3.total.p1_f",
+      "expr": {
+        "reduce": [
+          {
+            "var": "sectors.s3.trades"
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              {
+                "var": "current.p1_f"
+              }
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "IV.s3.total.p2_m",
+      "expr": {
+        "reduce": [
+          {
+            "var": "sectors.s3.trades"
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              {
+                "var": "current.p2_m"
+              }
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "IV.s3.total.p2_f",
+      "expr": {
+        "reduce": [
+          {
+            "var": "sectors.s3.trades"
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              {
+                "var": "current.p2_f"
+              }
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "IV.s3.total.p3_m",
+      "expr": {
+        "reduce": [
+          {
+            "var": "sectors.s3.trades"
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              {
+                "var": "current.p3_m"
+              }
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "IV.s3.total.p3_f",
+      "expr": {
+        "reduce": [
+          {
+            "var": "sectors.s3.trades"
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              {
+                "var": "current.p3_f"
+              }
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "APPRENTICES_TOTAL",
+      "expr": {
+        "+": [
+          {
+            "var": "IV_DUR.LE3.s1.T"
+          },
+          {
+            "var": "IV_DUR.LE3.s2.T"
+          },
+          {
+            "var": "IV_DUR.LE3.s3.T"
+          },
+          {
+            "var": "IV_DUR.M4_9.s1.T"
+          },
+          {
+            "var": "IV_DUR.M4_9.s2.T"
+          },
+          {
+            "var": "IV_DUR.M4_9.s3.T"
+          },
+          {
+            "var": "IV_DUR.GT9.s1.T"
+          },
+          {
+            "var": "IV_DUR.GT9.s2.T"
+          },
+          {
+            "var": "IV_DUR.GT9.s3.T"
+          }
+        ]
+      }
+    },
+    {
+      "code": "Q2_19.M",
+      "expr": {
+        "reduce": [
+          {
+            "filter": [
+              {
+                "var": "trainers"
+              },
+              {
+                "==": [
+                  {
+                    "var": "sex"
+                  },
+                  "M"
+                ]
+              }
+            ]
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              1
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "Q2_19.F",
+      "expr": {
+        "reduce": [
+          {
+            "filter": [
+              {
+                "var": "trainers"
+              },
+              {
+                "==": [
+                  {
+                    "var": "sex"
+                  },
+                  "F"
+                ]
+              }
+            ]
+          },
+          {
+            "+": [
+              {
+                "var": "accumulator"
+              },
+              1
+            ]
+          },
+          0
+        ]
+      }
+    },
+    {
+      "code": "Q2_19.T",
+      "expr": {
+        "+": [
+          {
+            "var": "Q2_19.M"
+          },
+          {
+            "var": "Q2_19.F"
+          }
+        ]
+      }
+    },
+    {
+      "code": "Q2_20_T",
+      "expr": {
+        "+": [
+          {
+            "var": "Q2_20_H"
+          },
+          {
+            "var": "Q2_20_F"
+          }
+        ]
+      }
+    },
+    {
+      "code": "Q2_2_INSCRITS_TOTAL",
+      "expr": {
+        "+": [
+          {
+            "var": "accompanied.LE3.INSCRITS.M"
+          },
+          {
+            "var": "accompanied.LE3.INSCRITS.F"
+          },
+          {
+            "var": "accompanied.M4_9.INSCRITS.M"
+          },
+          {
+            "var": "accompanied.M4_9.INSCRITS.F"
+          },
+          {
+            "var": "accompanied.GT9.INSCRITS.M"
+          },
+          {
+            "var": "accompanied.GT9.INSCRITS.F"
+          }
+        ]
+      }
+    }
+  ],
+  "rules": [
+    {
+      "code": "R_DATE_FUTURE_Q1_4",
+      "severity": "warning",
+      "targets": [
+        "Q1_4"
+      ],
+      "when": {
+        "!!": [
+          {
+            "var": "Q1_4"
+          }
+        ]
+      },
+      "assert": {
+        "<=": [
+          {
+            "var": "Q1_4"
+          },
+          {
+            "var": "_ctx.today"
+          }
+        ]
+      },
+      "message": "La date d'autorisation ne peut pas être dans le futur."
+    },
+    {
+      "code": "R_DATE_FUTURE_Q1_5",
+      "severity": "warning",
+      "targets": [
+        "Q1_5"
+      ],
+      "when": {
+        "!!": [
+          {
+            "var": "Q1_5"
+          }
+        ]
+      },
+      "assert": {
+        "<=": [
+          {
+            "var": "Q1_5"
+          },
+          {
+            "var": "_ctx.today"
+          }
+        ]
+      },
+      "message": "La date d'ouverture ne peut pas être dans le futur."
+    },
+    {
+      "code": "R_DATE_FUTURE_Q5_DATE",
+      "severity": "warning",
+      "targets": [
+        "Q5_DATE"
+      ],
+      "when": {
+        "!!": [
+          {
+            "var": "Q5_DATE"
+          }
+        ]
+      },
+      "assert": {
+        "<=": [
+          {
+            "var": "Q5_DATE"
+          },
+          {
+            "var": "_ctx.today"
+          }
+        ]
+      },
+      "message": "La date de remplissage ne peut pas être dans le futur."
+    },
+    {
+      "code": "R_DATE_OPEN_BEFORE_AUTH",
+      "severity": "warning",
+      "targets": [
+        "Q1_5",
+        "Q1_4"
+      ],
+      "when": {
+        "and": [
+          {
+            "!!": [
+              {
+                "var": "Q1_4"
+              }
+            ]
+          },
+          {
+            "!!": [
+              {
+                "var": "Q1_5"
+              }
+            ]
+          }
+        ]
+      },
+      "assert": {
+        ">=": [
+          {
+            "var": "Q1_5"
+          },
+          {
+            "var": "Q1_4"
+          }
+        ]
+      },
+      "message": "La date d'ouverture est antérieure à la date d'autorisation. Vérifier (cas possible de régularisation)."
+    },
+    {
+      "code": "R_DATE_FILL_BEFORE_CAMPAIGN",
+      "severity": "warning",
+      "targets": [
+        "Q5_DATE"
+      ],
+      "when": {
+        "and": [
+          {
+            "!!": [
+              {
+                "var": "Q5_DATE"
+              }
+            ]
+          },
+          {
+            "!!": [
+              {
+                "var": "_ctx.campaign_opens_on"
+              }
+            ]
+          }
+        ]
+      },
+      "assert": {
+        ">=": [
+          {
+            "var": "Q5_DATE"
+          },
+          {
+            "var": "_ctx.campaign_opens_on"
+          }
+        ]
+      },
+      "message": "La date de remplissage est antérieure à l'ouverture de la campagne. Vérifier la date de la tablette."
+    },
+    {
+      "code": "R_LATRINES_a_LE_TOTAL",
+      "severity": "warning",
+      "targets": [
+        "Q2_11_2_a",
+        "Q2_11_1"
+      ],
+      "when": {
+        "==": [
+          {
+            "var": "Q2_11"
+          },
+          true
+        ]
+      },
+      "assert": {
+        "<=": [
+          {
+            "var": "Q2_11_2_a"
+          },
+          {
+            "var": "Q2_11_1"
+          }
+        ]
+      },
+      "message": "Latrines fonctionnelles pour les apprenants ({Q2_11_2_a}) supérieures au nombre total de latrines ({Q2_11_1})."
+    },
+    {
+      "code": "R_LATRINES_b_LE_TOTAL",
+      "severity": "warning",
+      "targets": [
+        "Q2_11_2_b",
+        "Q2_11_1"
+      ],
+      "when": {
+        "==": [
+          {
+            "var": "Q2_11"
+          },
+          true
+        ]
+      },
+      "assert": {
+        "<=": [
+          {
+            "var": "Q2_11_2_b"
+          },
+          {
+            "var": "Q2_11_1"
+          }
+        ]
+      },
+      "message": "Latrines fonctionnelles pour les filles ({Q2_11_2_b}) supérieures au nombre total de latrines ({Q2_11_1})."
+    },
+    {
+      "code": "R_LATRINES_c_LE_TOTAL",
+      "severity": "warning",
+      "targets": [
+        "Q2_11_2_c",
+        "Q2_11_1"
+      ],
+      "when": {
+        "==": [
+          {
+            "var": "Q2_11"
+          },
+          true
+        ]
+      },
+      "assert": {
+        "<=": [
+          {
+            "var": "Q2_11_2_c"
+          },
+          {
+            "var": "Q2_11_1"
+          }
+        ]
+      },
+      "message": "Latrines fonctionnelles pour les personnel ({Q2_11_2_c}) supérieures au nombre total de latrines ({Q2_11_1})."
+    },
+    {
+      "code": "R_LATRINES_d_LE_TOTAL",
+      "severity": "warning",
+      "targets": [
+        "Q2_11_2_d",
+        "Q2_11_1"
+      ],
+      "when": {
+        "==": [
+          {
+            "var": "Q2_11"
+          },
+          true
+        ]
+      },
+      "assert": {
+        "<=": [
+          {
+            "var": "Q2_11_2_d"
+          },
+          {
+            "var": "Q2_11_1"
+          }
+        ]
+      },
+      "message": "Latrines fonctionnelles pour les handicapés ({Q2_11_2_d}) supérieures au nombre total de latrines ({Q2_11_1})."
+    },
+    {
+      "code": "R_LATRINES_SUM",
+      "severity": "warning",
+      "targets": [
+        "Q2_11_2_a",
+        "Q2_11_1"
+      ],
+      "when": {
+        "==": [
+          {
+            "var": "Q2_11"
+          },
+          true
+        ]
+      },
+      "assert": {
+        "<=": [
+          {
+            "+": [
+              {
+                "var": "Q2_11_2_a"
+              },
+              {
+                "var": "Q2_11_2_b"
+              },
+              {
+                "var": "Q2_11_2_c"
+              },
+              {
+                "var": "Q2_11_2_d"
+              }
+            ]
+          },
+          {
+            "var": "Q2_11_1"
+          }
+        ]
+      },
+      "message": "La somme des latrines par catégorie dépasse le total ({Q2_11_1}). Acceptable seulement si des latrines sont comptées dans plusieurs catégories."
+    },
+    {
+      "code": "R_ACC_PLACES_LE_INSCRITS_LE3_M",
+      "severity": "warning",
+      "targets": [
+        "accompanied.LE3.PLACES.M",
+        "accompanied.LE3.INSCRITS.M"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "accompanied.LE3.PLACES.M"
+          },
+          {
+            "var": "accompanied.LE3.INSCRITS.M"
+          }
+        ]
+      },
+      "message": "2.2, durée ≤ 3 mois, Masculin : jeunes placés ({accompanied.LE3.PLACES.M}) supérieurs aux jeunes inscrits ({accompanied.LE3.INSCRITS.M})."
+    },
+    {
+      "code": "R_ACC_OUTILLES_LE_INSCRITS_LE3_M",
+      "severity": "warning",
+      "targets": [
+        "accompanied.LE3.OUTILLES.M",
+        "accompanied.LE3.INSCRITS.M"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "accompanied.LE3.OUTILLES.M"
+          },
+          {
+            "var": "accompanied.LE3.INSCRITS.M"
+          }
+        ]
+      },
+      "message": "2.2, durée ≤ 3 mois, Masculin : jeunes outillés ({accompanied.LE3.OUTILLES.M}) supérieurs aux jeunes inscrits ({accompanied.LE3.INSCRITS.M})."
+    },
+    {
+      "code": "R_ACC_SUM_LE3_M",
+      "severity": "warning",
+      "targets": [
+        "accompanied.LE3.PLACES.M",
+        "accompanied.LE3.INSCRITS.M"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "+": [
+              {
+                "var": "accompanied.LE3.PLACES.M"
+              },
+              {
+                "var": "accompanied.LE3.OUTILLES.M"
+              }
+            ]
+          },
+          {
+            "var": "accompanied.LE3.INSCRITS.M"
+          }
+        ]
+      },
+      "message": "2.2, durée ≤ 3 mois, Masculin : placés + outillés dépassent les inscrits. Acceptable seulement si un même jeune est à la fois placé et outillé."
+    },
+    {
+      "code": "R_ACC_PLACES_LE_INSCRITS_LE3_F",
+      "severity": "warning",
+      "targets": [
+        "accompanied.LE3.PLACES.F",
+        "accompanied.LE3.INSCRITS.F"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "accompanied.LE3.PLACES.F"
+          },
+          {
+            "var": "accompanied.LE3.INSCRITS.F"
+          }
+        ]
+      },
+      "message": "2.2, durée ≤ 3 mois, Féminin : jeunes placés ({accompanied.LE3.PLACES.F}) supérieurs aux jeunes inscrits ({accompanied.LE3.INSCRITS.F})."
+    },
+    {
+      "code": "R_ACC_OUTILLES_LE_INSCRITS_LE3_F",
+      "severity": "warning",
+      "targets": [
+        "accompanied.LE3.OUTILLES.F",
+        "accompanied.LE3.INSCRITS.F"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "accompanied.LE3.OUTILLES.F"
+          },
+          {
+            "var": "accompanied.LE3.INSCRITS.F"
+          }
+        ]
+      },
+      "message": "2.2, durée ≤ 3 mois, Féminin : jeunes outillés ({accompanied.LE3.OUTILLES.F}) supérieurs aux jeunes inscrits ({accompanied.LE3.INSCRITS.F})."
+    },
+    {
+      "code": "R_ACC_SUM_LE3_F",
+      "severity": "warning",
+      "targets": [
+        "accompanied.LE3.PLACES.F",
+        "accompanied.LE3.INSCRITS.F"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "+": [
+              {
+                "var": "accompanied.LE3.PLACES.F"
+              },
+              {
+                "var": "accompanied.LE3.OUTILLES.F"
+              }
+            ]
+          },
+          {
+            "var": "accompanied.LE3.INSCRITS.F"
+          }
+        ]
+      },
+      "message": "2.2, durée ≤ 3 mois, Féminin : placés + outillés dépassent les inscrits. Acceptable seulement si un même jeune est à la fois placé et outillé."
+    },
+    {
+      "code": "R_ACC_PLACES_LE_INSCRITS_M4_9_M",
+      "severity": "warning",
+      "targets": [
+        "accompanied.M4_9.PLACES.M",
+        "accompanied.M4_9.INSCRITS.M"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "accompanied.M4_9.PLACES.M"
+          },
+          {
+            "var": "accompanied.M4_9.INSCRITS.M"
+          }
+        ]
+      },
+      "message": "2.2, durée 4 à 9 mois, Masculin : jeunes placés ({accompanied.M4_9.PLACES.M}) supérieurs aux jeunes inscrits ({accompanied.M4_9.INSCRITS.M})."
+    },
+    {
+      "code": "R_ACC_OUTILLES_LE_INSCRITS_M4_9_M",
+      "severity": "warning",
+      "targets": [
+        "accompanied.M4_9.OUTILLES.M",
+        "accompanied.M4_9.INSCRITS.M"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "accompanied.M4_9.OUTILLES.M"
+          },
+          {
+            "var": "accompanied.M4_9.INSCRITS.M"
+          }
+        ]
+      },
+      "message": "2.2, durée 4 à 9 mois, Masculin : jeunes outillés ({accompanied.M4_9.OUTILLES.M}) supérieurs aux jeunes inscrits ({accompanied.M4_9.INSCRITS.M})."
+    },
+    {
+      "code": "R_ACC_SUM_M4_9_M",
+      "severity": "warning",
+      "targets": [
+        "accompanied.M4_9.PLACES.M",
+        "accompanied.M4_9.INSCRITS.M"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "+": [
+              {
+                "var": "accompanied.M4_9.PLACES.M"
+              },
+              {
+                "var": "accompanied.M4_9.OUTILLES.M"
+              }
+            ]
+          },
+          {
+            "var": "accompanied.M4_9.INSCRITS.M"
+          }
+        ]
+      },
+      "message": "2.2, durée 4 à 9 mois, Masculin : placés + outillés dépassent les inscrits. Acceptable seulement si un même jeune est à la fois placé et outillé."
+    },
+    {
+      "code": "R_ACC_PLACES_LE_INSCRITS_M4_9_F",
+      "severity": "warning",
+      "targets": [
+        "accompanied.M4_9.PLACES.F",
+        "accompanied.M4_9.INSCRITS.F"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "accompanied.M4_9.PLACES.F"
+          },
+          {
+            "var": "accompanied.M4_9.INSCRITS.F"
+          }
+        ]
+      },
+      "message": "2.2, durée 4 à 9 mois, Féminin : jeunes placés ({accompanied.M4_9.PLACES.F}) supérieurs aux jeunes inscrits ({accompanied.M4_9.INSCRITS.F})."
+    },
+    {
+      "code": "R_ACC_OUTILLES_LE_INSCRITS_M4_9_F",
+      "severity": "warning",
+      "targets": [
+        "accompanied.M4_9.OUTILLES.F",
+        "accompanied.M4_9.INSCRITS.F"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "accompanied.M4_9.OUTILLES.F"
+          },
+          {
+            "var": "accompanied.M4_9.INSCRITS.F"
+          }
+        ]
+      },
+      "message": "2.2, durée 4 à 9 mois, Féminin : jeunes outillés ({accompanied.M4_9.OUTILLES.F}) supérieurs aux jeunes inscrits ({accompanied.M4_9.INSCRITS.F})."
+    },
+    {
+      "code": "R_ACC_SUM_M4_9_F",
+      "severity": "warning",
+      "targets": [
+        "accompanied.M4_9.PLACES.F",
+        "accompanied.M4_9.INSCRITS.F"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "+": [
+              {
+                "var": "accompanied.M4_9.PLACES.F"
+              },
+              {
+                "var": "accompanied.M4_9.OUTILLES.F"
+              }
+            ]
+          },
+          {
+            "var": "accompanied.M4_9.INSCRITS.F"
+          }
+        ]
+      },
+      "message": "2.2, durée 4 à 9 mois, Féminin : placés + outillés dépassent les inscrits. Acceptable seulement si un même jeune est à la fois placé et outillé."
+    },
+    {
+      "code": "R_ACC_PLACES_LE_INSCRITS_GT9_M",
+      "severity": "warning",
+      "targets": [
+        "accompanied.GT9.PLACES.M",
+        "accompanied.GT9.INSCRITS.M"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "accompanied.GT9.PLACES.M"
+          },
+          {
+            "var": "accompanied.GT9.INSCRITS.M"
+          }
+        ]
+      },
+      "message": "2.2, durée > 9 mois, Masculin : jeunes placés ({accompanied.GT9.PLACES.M}) supérieurs aux jeunes inscrits ({accompanied.GT9.INSCRITS.M})."
+    },
+    {
+      "code": "R_ACC_OUTILLES_LE_INSCRITS_GT9_M",
+      "severity": "warning",
+      "targets": [
+        "accompanied.GT9.OUTILLES.M",
+        "accompanied.GT9.INSCRITS.M"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "accompanied.GT9.OUTILLES.M"
+          },
+          {
+            "var": "accompanied.GT9.INSCRITS.M"
+          }
+        ]
+      },
+      "message": "2.2, durée > 9 mois, Masculin : jeunes outillés ({accompanied.GT9.OUTILLES.M}) supérieurs aux jeunes inscrits ({accompanied.GT9.INSCRITS.M})."
+    },
+    {
+      "code": "R_ACC_SUM_GT9_M",
+      "severity": "warning",
+      "targets": [
+        "accompanied.GT9.PLACES.M",
+        "accompanied.GT9.INSCRITS.M"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "+": [
+              {
+                "var": "accompanied.GT9.PLACES.M"
+              },
+              {
+                "var": "accompanied.GT9.OUTILLES.M"
+              }
+            ]
+          },
+          {
+            "var": "accompanied.GT9.INSCRITS.M"
+          }
+        ]
+      },
+      "message": "2.2, durée > 9 mois, Masculin : placés + outillés dépassent les inscrits. Acceptable seulement si un même jeune est à la fois placé et outillé."
+    },
+    {
+      "code": "R_ACC_PLACES_LE_INSCRITS_GT9_F",
+      "severity": "warning",
+      "targets": [
+        "accompanied.GT9.PLACES.F",
+        "accompanied.GT9.INSCRITS.F"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "accompanied.GT9.PLACES.F"
+          },
+          {
+            "var": "accompanied.GT9.INSCRITS.F"
+          }
+        ]
+      },
+      "message": "2.2, durée > 9 mois, Féminin : jeunes placés ({accompanied.GT9.PLACES.F}) supérieurs aux jeunes inscrits ({accompanied.GT9.INSCRITS.F})."
+    },
+    {
+      "code": "R_ACC_OUTILLES_LE_INSCRITS_GT9_F",
+      "severity": "warning",
+      "targets": [
+        "accompanied.GT9.OUTILLES.F",
+        "accompanied.GT9.INSCRITS.F"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "accompanied.GT9.OUTILLES.F"
+          },
+          {
+            "var": "accompanied.GT9.INSCRITS.F"
+          }
+        ]
+      },
+      "message": "2.2, durée > 9 mois, Féminin : jeunes outillés ({accompanied.GT9.OUTILLES.F}) supérieurs aux jeunes inscrits ({accompanied.GT9.INSCRITS.F})."
+    },
+    {
+      "code": "R_ACC_SUM_GT9_F",
+      "severity": "warning",
+      "targets": [
+        "accompanied.GT9.PLACES.F",
+        "accompanied.GT9.INSCRITS.F"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "+": [
+              {
+                "var": "accompanied.GT9.PLACES.F"
+              },
+              {
+                "var": "accompanied.GT9.OUTILLES.F"
+              }
+            ]
+          },
+          {
+            "var": "accompanied.GT9.INSCRITS.F"
+          }
+        ]
+      },
+      "message": "2.2, durée > 9 mois, Féminin : placés + outillés dépassent les inscrits. Acceptable seulement si un même jeune est à la fois placé et outillé."
+    },
+    {
+      "code": "R_SPECIAL_s1_HANDICAPES_p1_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s1.specials.HANDICAPES.p1_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s1.specials.HANDICAPES.p1_m"
+          },
+          {
+            "var": "IV.s1.total.p1_m"
+          }
+        ]
+      },
+      "message": "Secteur Primaire/Agricole, Promotion I — Hommes : « dont handicapés » ({sectors.s1.specials.HANDICAPES.p1_m}) supérieur au total des apprentis ({IV.s1.total.p1_m})."
+    },
+    {
+      "code": "R_SPECIAL_s1_REFUGIES_p1_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s1.specials.REFUGIES.p1_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s1.specials.REFUGIES.p1_m"
+          },
+          {
+            "var": "IV.s1.total.p1_m"
+          }
+        ]
+      },
+      "message": "Secteur Primaire/Agricole, Promotion I — Hommes : « dont réfugiés » ({sectors.s1.specials.REFUGIES.p1_m}) supérieur au total des apprentis ({IV.s1.total.p1_m})."
+    },
+    {
+      "code": "R_SPECIAL_s1_RETOURNES_p1_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s1.specials.RETOURNES.p1_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s1.specials.RETOURNES.p1_m"
+          },
+          {
+            "var": "IV.s1.total.p1_m"
+          }
+        ]
+      },
+      "message": "Secteur Primaire/Agricole, Promotion I — Hommes : « dont retournés » ({sectors.s1.specials.RETOURNES.p1_m}) supérieur au total des apprentis ({IV.s1.total.p1_m})."
+    },
+    {
+      "code": "R_SPECIAL_s1_DEPLACES_p1_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s1.specials.DEPLACES.p1_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s1.specials.DEPLACES.p1_m"
+          },
+          {
+            "var": "IV.s1.total.p1_m"
+          }
+        ]
+      },
+      "message": "Secteur Primaire/Agricole, Promotion I — Hommes : « dont déplacés » ({sectors.s1.specials.DEPLACES.p1_m}) supérieur au total des apprentis ({IV.s1.total.p1_m})."
+    },
+    {
+      "code": "R_SPECIAL_s1_STATUS_SUM_p1_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s1.specials.REFUGIES.p1_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "+": [
+              {
+                "var": "sectors.s1.specials.REFUGIES.p1_m"
+              },
+              {
+                "var": "sectors.s1.specials.RETOURNES.p1_m"
+              },
+              {
+                "var": "sectors.s1.specials.DEPLACES.p1_m"
+              }
+            ]
+          },
+          {
+            "var": "IV.s1.total.p1_m"
+          }
+        ]
+      },
+      "message": "Secteur Primaire/Agricole, Promotion I — Hommes : réfugiés + retournés + déplacés dépassent le total des apprentis ({IV.s1.total.p1_m}). Ces catégories sont normalement exclusives."
+    },
+    {
+      "code": "R_SPECIAL_s1_HANDICAPES_p1_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s1.specials.HANDICAPES.p1_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s1.specials.HANDICAPES.p1_f"
+          },
+          {
+            "var": "IV.s1.total.p1_f"
+          }
+        ]
+      },
+      "message": "Secteur Primaire/Agricole, Promotion I — Femmes : « dont handicapés » ({sectors.s1.specials.HANDICAPES.p1_f}) supérieur au total des apprentis ({IV.s1.total.p1_f})."
+    },
+    {
+      "code": "R_SPECIAL_s1_REFUGIES_p1_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s1.specials.REFUGIES.p1_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s1.specials.REFUGIES.p1_f"
+          },
+          {
+            "var": "IV.s1.total.p1_f"
+          }
+        ]
+      },
+      "message": "Secteur Primaire/Agricole, Promotion I — Femmes : « dont réfugiés » ({sectors.s1.specials.REFUGIES.p1_f}) supérieur au total des apprentis ({IV.s1.total.p1_f})."
+    },
+    {
+      "code": "R_SPECIAL_s1_RETOURNES_p1_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s1.specials.RETOURNES.p1_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s1.specials.RETOURNES.p1_f"
+          },
+          {
+            "var": "IV.s1.total.p1_f"
+          }
+        ]
+      },
+      "message": "Secteur Primaire/Agricole, Promotion I — Femmes : « dont retournés » ({sectors.s1.specials.RETOURNES.p1_f}) supérieur au total des apprentis ({IV.s1.total.p1_f})."
+    },
+    {
+      "code": "R_SPECIAL_s1_DEPLACES_p1_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s1.specials.DEPLACES.p1_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s1.specials.DEPLACES.p1_f"
+          },
+          {
+            "var": "IV.s1.total.p1_f"
+          }
+        ]
+      },
+      "message": "Secteur Primaire/Agricole, Promotion I — Femmes : « dont déplacés » ({sectors.s1.specials.DEPLACES.p1_f}) supérieur au total des apprentis ({IV.s1.total.p1_f})."
+    },
+    {
+      "code": "R_SPECIAL_s1_STATUS_SUM_p1_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s1.specials.REFUGIES.p1_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "+": [
+              {
+                "var": "sectors.s1.specials.REFUGIES.p1_f"
+              },
+              {
+                "var": "sectors.s1.specials.RETOURNES.p1_f"
+              },
+              {
+                "var": "sectors.s1.specials.DEPLACES.p1_f"
+              }
+            ]
+          },
+          {
+            "var": "IV.s1.total.p1_f"
+          }
+        ]
+      },
+      "message": "Secteur Primaire/Agricole, Promotion I — Femmes : réfugiés + retournés + déplacés dépassent le total des apprentis ({IV.s1.total.p1_f}). Ces catégories sont normalement exclusives."
+    },
+    {
+      "code": "R_SPECIAL_s1_HANDICAPES_p2_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s1.specials.HANDICAPES.p2_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s1.specials.HANDICAPES.p2_m"
+          },
+          {
+            "var": "IV.s1.total.p2_m"
+          }
+        ]
+      },
+      "message": "Secteur Primaire/Agricole, Promotion II — Hommes : « dont handicapés » ({sectors.s1.specials.HANDICAPES.p2_m}) supérieur au total des apprentis ({IV.s1.total.p2_m})."
+    },
+    {
+      "code": "R_SPECIAL_s1_REFUGIES_p2_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s1.specials.REFUGIES.p2_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s1.specials.REFUGIES.p2_m"
+          },
+          {
+            "var": "IV.s1.total.p2_m"
+          }
+        ]
+      },
+      "message": "Secteur Primaire/Agricole, Promotion II — Hommes : « dont réfugiés » ({sectors.s1.specials.REFUGIES.p2_m}) supérieur au total des apprentis ({IV.s1.total.p2_m})."
+    },
+    {
+      "code": "R_SPECIAL_s1_RETOURNES_p2_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s1.specials.RETOURNES.p2_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s1.specials.RETOURNES.p2_m"
+          },
+          {
+            "var": "IV.s1.total.p2_m"
+          }
+        ]
+      },
+      "message": "Secteur Primaire/Agricole, Promotion II — Hommes : « dont retournés » ({sectors.s1.specials.RETOURNES.p2_m}) supérieur au total des apprentis ({IV.s1.total.p2_m})."
+    },
+    {
+      "code": "R_SPECIAL_s1_DEPLACES_p2_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s1.specials.DEPLACES.p2_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s1.specials.DEPLACES.p2_m"
+          },
+          {
+            "var": "IV.s1.total.p2_m"
+          }
+        ]
+      },
+      "message": "Secteur Primaire/Agricole, Promotion II — Hommes : « dont déplacés » ({sectors.s1.specials.DEPLACES.p2_m}) supérieur au total des apprentis ({IV.s1.total.p2_m})."
+    },
+    {
+      "code": "R_SPECIAL_s1_STATUS_SUM_p2_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s1.specials.REFUGIES.p2_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "+": [
+              {
+                "var": "sectors.s1.specials.REFUGIES.p2_m"
+              },
+              {
+                "var": "sectors.s1.specials.RETOURNES.p2_m"
+              },
+              {
+                "var": "sectors.s1.specials.DEPLACES.p2_m"
+              }
+            ]
+          },
+          {
+            "var": "IV.s1.total.p2_m"
+          }
+        ]
+      },
+      "message": "Secteur Primaire/Agricole, Promotion II — Hommes : réfugiés + retournés + déplacés dépassent le total des apprentis ({IV.s1.total.p2_m}). Ces catégories sont normalement exclusives."
+    },
+    {
+      "code": "R_SPECIAL_s1_HANDICAPES_p2_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s1.specials.HANDICAPES.p2_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s1.specials.HANDICAPES.p2_f"
+          },
+          {
+            "var": "IV.s1.total.p2_f"
+          }
+        ]
+      },
+      "message": "Secteur Primaire/Agricole, Promotion II — Femmes : « dont handicapés » ({sectors.s1.specials.HANDICAPES.p2_f}) supérieur au total des apprentis ({IV.s1.total.p2_f})."
+    },
+    {
+      "code": "R_SPECIAL_s1_REFUGIES_p2_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s1.specials.REFUGIES.p2_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s1.specials.REFUGIES.p2_f"
+          },
+          {
+            "var": "IV.s1.total.p2_f"
+          }
+        ]
+      },
+      "message": "Secteur Primaire/Agricole, Promotion II — Femmes : « dont réfugiés » ({sectors.s1.specials.REFUGIES.p2_f}) supérieur au total des apprentis ({IV.s1.total.p2_f})."
+    },
+    {
+      "code": "R_SPECIAL_s1_RETOURNES_p2_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s1.specials.RETOURNES.p2_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s1.specials.RETOURNES.p2_f"
+          },
+          {
+            "var": "IV.s1.total.p2_f"
+          }
+        ]
+      },
+      "message": "Secteur Primaire/Agricole, Promotion II — Femmes : « dont retournés » ({sectors.s1.specials.RETOURNES.p2_f}) supérieur au total des apprentis ({IV.s1.total.p2_f})."
+    },
+    {
+      "code": "R_SPECIAL_s1_DEPLACES_p2_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s1.specials.DEPLACES.p2_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s1.specials.DEPLACES.p2_f"
+          },
+          {
+            "var": "IV.s1.total.p2_f"
+          }
+        ]
+      },
+      "message": "Secteur Primaire/Agricole, Promotion II — Femmes : « dont déplacés » ({sectors.s1.specials.DEPLACES.p2_f}) supérieur au total des apprentis ({IV.s1.total.p2_f})."
+    },
+    {
+      "code": "R_SPECIAL_s1_STATUS_SUM_p2_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s1.specials.REFUGIES.p2_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "+": [
+              {
+                "var": "sectors.s1.specials.REFUGIES.p2_f"
+              },
+              {
+                "var": "sectors.s1.specials.RETOURNES.p2_f"
+              },
+              {
+                "var": "sectors.s1.specials.DEPLACES.p2_f"
+              }
+            ]
+          },
+          {
+            "var": "IV.s1.total.p2_f"
+          }
+        ]
+      },
+      "message": "Secteur Primaire/Agricole, Promotion II — Femmes : réfugiés + retournés + déplacés dépassent le total des apprentis ({IV.s1.total.p2_f}). Ces catégories sont normalement exclusives."
+    },
+    {
+      "code": "R_SPECIAL_s1_HANDICAPES_p3_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s1.specials.HANDICAPES.p3_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s1.specials.HANDICAPES.p3_m"
+          },
+          {
+            "var": "IV.s1.total.p3_m"
+          }
+        ]
+      },
+      "message": "Secteur Primaire/Agricole, Promotion III — Hommes : « dont handicapés » ({sectors.s1.specials.HANDICAPES.p3_m}) supérieur au total des apprentis ({IV.s1.total.p3_m})."
+    },
+    {
+      "code": "R_SPECIAL_s1_REFUGIES_p3_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s1.specials.REFUGIES.p3_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s1.specials.REFUGIES.p3_m"
+          },
+          {
+            "var": "IV.s1.total.p3_m"
+          }
+        ]
+      },
+      "message": "Secteur Primaire/Agricole, Promotion III — Hommes : « dont réfugiés » ({sectors.s1.specials.REFUGIES.p3_m}) supérieur au total des apprentis ({IV.s1.total.p3_m})."
+    },
+    {
+      "code": "R_SPECIAL_s1_RETOURNES_p3_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s1.specials.RETOURNES.p3_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s1.specials.RETOURNES.p3_m"
+          },
+          {
+            "var": "IV.s1.total.p3_m"
+          }
+        ]
+      },
+      "message": "Secteur Primaire/Agricole, Promotion III — Hommes : « dont retournés » ({sectors.s1.specials.RETOURNES.p3_m}) supérieur au total des apprentis ({IV.s1.total.p3_m})."
+    },
+    {
+      "code": "R_SPECIAL_s1_DEPLACES_p3_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s1.specials.DEPLACES.p3_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s1.specials.DEPLACES.p3_m"
+          },
+          {
+            "var": "IV.s1.total.p3_m"
+          }
+        ]
+      },
+      "message": "Secteur Primaire/Agricole, Promotion III — Hommes : « dont déplacés » ({sectors.s1.specials.DEPLACES.p3_m}) supérieur au total des apprentis ({IV.s1.total.p3_m})."
+    },
+    {
+      "code": "R_SPECIAL_s1_STATUS_SUM_p3_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s1.specials.REFUGIES.p3_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "+": [
+              {
+                "var": "sectors.s1.specials.REFUGIES.p3_m"
+              },
+              {
+                "var": "sectors.s1.specials.RETOURNES.p3_m"
+              },
+              {
+                "var": "sectors.s1.specials.DEPLACES.p3_m"
+              }
+            ]
+          },
+          {
+            "var": "IV.s1.total.p3_m"
+          }
+        ]
+      },
+      "message": "Secteur Primaire/Agricole, Promotion III — Hommes : réfugiés + retournés + déplacés dépassent le total des apprentis ({IV.s1.total.p3_m}). Ces catégories sont normalement exclusives."
+    },
+    {
+      "code": "R_SPECIAL_s1_HANDICAPES_p3_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s1.specials.HANDICAPES.p3_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s1.specials.HANDICAPES.p3_f"
+          },
+          {
+            "var": "IV.s1.total.p3_f"
+          }
+        ]
+      },
+      "message": "Secteur Primaire/Agricole, Promotion III — Femmes : « dont handicapés » ({sectors.s1.specials.HANDICAPES.p3_f}) supérieur au total des apprentis ({IV.s1.total.p3_f})."
+    },
+    {
+      "code": "R_SPECIAL_s1_REFUGIES_p3_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s1.specials.REFUGIES.p3_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s1.specials.REFUGIES.p3_f"
+          },
+          {
+            "var": "IV.s1.total.p3_f"
+          }
+        ]
+      },
+      "message": "Secteur Primaire/Agricole, Promotion III — Femmes : « dont réfugiés » ({sectors.s1.specials.REFUGIES.p3_f}) supérieur au total des apprentis ({IV.s1.total.p3_f})."
+    },
+    {
+      "code": "R_SPECIAL_s1_RETOURNES_p3_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s1.specials.RETOURNES.p3_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s1.specials.RETOURNES.p3_f"
+          },
+          {
+            "var": "IV.s1.total.p3_f"
+          }
+        ]
+      },
+      "message": "Secteur Primaire/Agricole, Promotion III — Femmes : « dont retournés » ({sectors.s1.specials.RETOURNES.p3_f}) supérieur au total des apprentis ({IV.s1.total.p3_f})."
+    },
+    {
+      "code": "R_SPECIAL_s1_DEPLACES_p3_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s1.specials.DEPLACES.p3_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s1.specials.DEPLACES.p3_f"
+          },
+          {
+            "var": "IV.s1.total.p3_f"
+          }
+        ]
+      },
+      "message": "Secteur Primaire/Agricole, Promotion III — Femmes : « dont déplacés » ({sectors.s1.specials.DEPLACES.p3_f}) supérieur au total des apprentis ({IV.s1.total.p3_f})."
+    },
+    {
+      "code": "R_SPECIAL_s1_STATUS_SUM_p3_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s1.specials.REFUGIES.p3_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "+": [
+              {
+                "var": "sectors.s1.specials.REFUGIES.p3_f"
+              },
+              {
+                "var": "sectors.s1.specials.RETOURNES.p3_f"
+              },
+              {
+                "var": "sectors.s1.specials.DEPLACES.p3_f"
+              }
+            ]
+          },
+          {
+            "var": "IV.s1.total.p3_f"
+          }
+        ]
+      },
+      "message": "Secteur Primaire/Agricole, Promotion III — Femmes : réfugiés + retournés + déplacés dépassent le total des apprentis ({IV.s1.total.p3_f}). Ces catégories sont normalement exclusives."
+    },
+    {
+      "code": "R_SPECIAL_s2_HANDICAPES_p1_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s2.specials.HANDICAPES.p1_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s2.specials.HANDICAPES.p1_m"
+          },
+          {
+            "var": "IV.s2.total.p1_m"
+          }
+        ]
+      },
+      "message": "Secteur Secondaire/Industriel, Promotion I — Hommes : « dont handicapés » ({sectors.s2.specials.HANDICAPES.p1_m}) supérieur au total des apprentis ({IV.s2.total.p1_m})."
+    },
+    {
+      "code": "R_SPECIAL_s2_REFUGIES_p1_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s2.specials.REFUGIES.p1_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s2.specials.REFUGIES.p1_m"
+          },
+          {
+            "var": "IV.s2.total.p1_m"
+          }
+        ]
+      },
+      "message": "Secteur Secondaire/Industriel, Promotion I — Hommes : « dont réfugiés » ({sectors.s2.specials.REFUGIES.p1_m}) supérieur au total des apprentis ({IV.s2.total.p1_m})."
+    },
+    {
+      "code": "R_SPECIAL_s2_RETOURNES_p1_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s2.specials.RETOURNES.p1_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s2.specials.RETOURNES.p1_m"
+          },
+          {
+            "var": "IV.s2.total.p1_m"
+          }
+        ]
+      },
+      "message": "Secteur Secondaire/Industriel, Promotion I — Hommes : « dont retournés » ({sectors.s2.specials.RETOURNES.p1_m}) supérieur au total des apprentis ({IV.s2.total.p1_m})."
+    },
+    {
+      "code": "R_SPECIAL_s2_DEPLACES_p1_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s2.specials.DEPLACES.p1_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s2.specials.DEPLACES.p1_m"
+          },
+          {
+            "var": "IV.s2.total.p1_m"
+          }
+        ]
+      },
+      "message": "Secteur Secondaire/Industriel, Promotion I — Hommes : « dont déplacés » ({sectors.s2.specials.DEPLACES.p1_m}) supérieur au total des apprentis ({IV.s2.total.p1_m})."
+    },
+    {
+      "code": "R_SPECIAL_s2_STATUS_SUM_p1_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s2.specials.REFUGIES.p1_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "+": [
+              {
+                "var": "sectors.s2.specials.REFUGIES.p1_m"
+              },
+              {
+                "var": "sectors.s2.specials.RETOURNES.p1_m"
+              },
+              {
+                "var": "sectors.s2.specials.DEPLACES.p1_m"
+              }
+            ]
+          },
+          {
+            "var": "IV.s2.total.p1_m"
+          }
+        ]
+      },
+      "message": "Secteur Secondaire/Industriel, Promotion I — Hommes : réfugiés + retournés + déplacés dépassent le total des apprentis ({IV.s2.total.p1_m}). Ces catégories sont normalement exclusives."
+    },
+    {
+      "code": "R_SPECIAL_s2_HANDICAPES_p1_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s2.specials.HANDICAPES.p1_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s2.specials.HANDICAPES.p1_f"
+          },
+          {
+            "var": "IV.s2.total.p1_f"
+          }
+        ]
+      },
+      "message": "Secteur Secondaire/Industriel, Promotion I — Femmes : « dont handicapés » ({sectors.s2.specials.HANDICAPES.p1_f}) supérieur au total des apprentis ({IV.s2.total.p1_f})."
+    },
+    {
+      "code": "R_SPECIAL_s2_REFUGIES_p1_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s2.specials.REFUGIES.p1_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s2.specials.REFUGIES.p1_f"
+          },
+          {
+            "var": "IV.s2.total.p1_f"
+          }
+        ]
+      },
+      "message": "Secteur Secondaire/Industriel, Promotion I — Femmes : « dont réfugiés » ({sectors.s2.specials.REFUGIES.p1_f}) supérieur au total des apprentis ({IV.s2.total.p1_f})."
+    },
+    {
+      "code": "R_SPECIAL_s2_RETOURNES_p1_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s2.specials.RETOURNES.p1_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s2.specials.RETOURNES.p1_f"
+          },
+          {
+            "var": "IV.s2.total.p1_f"
+          }
+        ]
+      },
+      "message": "Secteur Secondaire/Industriel, Promotion I — Femmes : « dont retournés » ({sectors.s2.specials.RETOURNES.p1_f}) supérieur au total des apprentis ({IV.s2.total.p1_f})."
+    },
+    {
+      "code": "R_SPECIAL_s2_DEPLACES_p1_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s2.specials.DEPLACES.p1_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s2.specials.DEPLACES.p1_f"
+          },
+          {
+            "var": "IV.s2.total.p1_f"
+          }
+        ]
+      },
+      "message": "Secteur Secondaire/Industriel, Promotion I — Femmes : « dont déplacés » ({sectors.s2.specials.DEPLACES.p1_f}) supérieur au total des apprentis ({IV.s2.total.p1_f})."
+    },
+    {
+      "code": "R_SPECIAL_s2_STATUS_SUM_p1_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s2.specials.REFUGIES.p1_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "+": [
+              {
+                "var": "sectors.s2.specials.REFUGIES.p1_f"
+              },
+              {
+                "var": "sectors.s2.specials.RETOURNES.p1_f"
+              },
+              {
+                "var": "sectors.s2.specials.DEPLACES.p1_f"
+              }
+            ]
+          },
+          {
+            "var": "IV.s2.total.p1_f"
+          }
+        ]
+      },
+      "message": "Secteur Secondaire/Industriel, Promotion I — Femmes : réfugiés + retournés + déplacés dépassent le total des apprentis ({IV.s2.total.p1_f}). Ces catégories sont normalement exclusives."
+    },
+    {
+      "code": "R_SPECIAL_s2_HANDICAPES_p2_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s2.specials.HANDICAPES.p2_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s2.specials.HANDICAPES.p2_m"
+          },
+          {
+            "var": "IV.s2.total.p2_m"
+          }
+        ]
+      },
+      "message": "Secteur Secondaire/Industriel, Promotion II — Hommes : « dont handicapés » ({sectors.s2.specials.HANDICAPES.p2_m}) supérieur au total des apprentis ({IV.s2.total.p2_m})."
+    },
+    {
+      "code": "R_SPECIAL_s2_REFUGIES_p2_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s2.specials.REFUGIES.p2_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s2.specials.REFUGIES.p2_m"
+          },
+          {
+            "var": "IV.s2.total.p2_m"
+          }
+        ]
+      },
+      "message": "Secteur Secondaire/Industriel, Promotion II — Hommes : « dont réfugiés » ({sectors.s2.specials.REFUGIES.p2_m}) supérieur au total des apprentis ({IV.s2.total.p2_m})."
+    },
+    {
+      "code": "R_SPECIAL_s2_RETOURNES_p2_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s2.specials.RETOURNES.p2_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s2.specials.RETOURNES.p2_m"
+          },
+          {
+            "var": "IV.s2.total.p2_m"
+          }
+        ]
+      },
+      "message": "Secteur Secondaire/Industriel, Promotion II — Hommes : « dont retournés » ({sectors.s2.specials.RETOURNES.p2_m}) supérieur au total des apprentis ({IV.s2.total.p2_m})."
+    },
+    {
+      "code": "R_SPECIAL_s2_DEPLACES_p2_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s2.specials.DEPLACES.p2_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s2.specials.DEPLACES.p2_m"
+          },
+          {
+            "var": "IV.s2.total.p2_m"
+          }
+        ]
+      },
+      "message": "Secteur Secondaire/Industriel, Promotion II — Hommes : « dont déplacés » ({sectors.s2.specials.DEPLACES.p2_m}) supérieur au total des apprentis ({IV.s2.total.p2_m})."
+    },
+    {
+      "code": "R_SPECIAL_s2_STATUS_SUM_p2_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s2.specials.REFUGIES.p2_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "+": [
+              {
+                "var": "sectors.s2.specials.REFUGIES.p2_m"
+              },
+              {
+                "var": "sectors.s2.specials.RETOURNES.p2_m"
+              },
+              {
+                "var": "sectors.s2.specials.DEPLACES.p2_m"
+              }
+            ]
+          },
+          {
+            "var": "IV.s2.total.p2_m"
+          }
+        ]
+      },
+      "message": "Secteur Secondaire/Industriel, Promotion II — Hommes : réfugiés + retournés + déplacés dépassent le total des apprentis ({IV.s2.total.p2_m}). Ces catégories sont normalement exclusives."
+    },
+    {
+      "code": "R_SPECIAL_s2_HANDICAPES_p2_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s2.specials.HANDICAPES.p2_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s2.specials.HANDICAPES.p2_f"
+          },
+          {
+            "var": "IV.s2.total.p2_f"
+          }
+        ]
+      },
+      "message": "Secteur Secondaire/Industriel, Promotion II — Femmes : « dont handicapés » ({sectors.s2.specials.HANDICAPES.p2_f}) supérieur au total des apprentis ({IV.s2.total.p2_f})."
+    },
+    {
+      "code": "R_SPECIAL_s2_REFUGIES_p2_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s2.specials.REFUGIES.p2_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s2.specials.REFUGIES.p2_f"
+          },
+          {
+            "var": "IV.s2.total.p2_f"
+          }
+        ]
+      },
+      "message": "Secteur Secondaire/Industriel, Promotion II — Femmes : « dont réfugiés » ({sectors.s2.specials.REFUGIES.p2_f}) supérieur au total des apprentis ({IV.s2.total.p2_f})."
+    },
+    {
+      "code": "R_SPECIAL_s2_RETOURNES_p2_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s2.specials.RETOURNES.p2_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s2.specials.RETOURNES.p2_f"
+          },
+          {
+            "var": "IV.s2.total.p2_f"
+          }
+        ]
+      },
+      "message": "Secteur Secondaire/Industriel, Promotion II — Femmes : « dont retournés » ({sectors.s2.specials.RETOURNES.p2_f}) supérieur au total des apprentis ({IV.s2.total.p2_f})."
+    },
+    {
+      "code": "R_SPECIAL_s2_DEPLACES_p2_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s2.specials.DEPLACES.p2_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s2.specials.DEPLACES.p2_f"
+          },
+          {
+            "var": "IV.s2.total.p2_f"
+          }
+        ]
+      },
+      "message": "Secteur Secondaire/Industriel, Promotion II — Femmes : « dont déplacés » ({sectors.s2.specials.DEPLACES.p2_f}) supérieur au total des apprentis ({IV.s2.total.p2_f})."
+    },
+    {
+      "code": "R_SPECIAL_s2_STATUS_SUM_p2_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s2.specials.REFUGIES.p2_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "+": [
+              {
+                "var": "sectors.s2.specials.REFUGIES.p2_f"
+              },
+              {
+                "var": "sectors.s2.specials.RETOURNES.p2_f"
+              },
+              {
+                "var": "sectors.s2.specials.DEPLACES.p2_f"
+              }
+            ]
+          },
+          {
+            "var": "IV.s2.total.p2_f"
+          }
+        ]
+      },
+      "message": "Secteur Secondaire/Industriel, Promotion II — Femmes : réfugiés + retournés + déplacés dépassent le total des apprentis ({IV.s2.total.p2_f}). Ces catégories sont normalement exclusives."
+    },
+    {
+      "code": "R_SPECIAL_s2_HANDICAPES_p3_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s2.specials.HANDICAPES.p3_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s2.specials.HANDICAPES.p3_m"
+          },
+          {
+            "var": "IV.s2.total.p3_m"
+          }
+        ]
+      },
+      "message": "Secteur Secondaire/Industriel, Promotion III — Hommes : « dont handicapés » ({sectors.s2.specials.HANDICAPES.p3_m}) supérieur au total des apprentis ({IV.s2.total.p3_m})."
+    },
+    {
+      "code": "R_SPECIAL_s2_REFUGIES_p3_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s2.specials.REFUGIES.p3_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s2.specials.REFUGIES.p3_m"
+          },
+          {
+            "var": "IV.s2.total.p3_m"
+          }
+        ]
+      },
+      "message": "Secteur Secondaire/Industriel, Promotion III — Hommes : « dont réfugiés » ({sectors.s2.specials.REFUGIES.p3_m}) supérieur au total des apprentis ({IV.s2.total.p3_m})."
+    },
+    {
+      "code": "R_SPECIAL_s2_RETOURNES_p3_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s2.specials.RETOURNES.p3_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s2.specials.RETOURNES.p3_m"
+          },
+          {
+            "var": "IV.s2.total.p3_m"
+          }
+        ]
+      },
+      "message": "Secteur Secondaire/Industriel, Promotion III — Hommes : « dont retournés » ({sectors.s2.specials.RETOURNES.p3_m}) supérieur au total des apprentis ({IV.s2.total.p3_m})."
+    },
+    {
+      "code": "R_SPECIAL_s2_DEPLACES_p3_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s2.specials.DEPLACES.p3_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s2.specials.DEPLACES.p3_m"
+          },
+          {
+            "var": "IV.s2.total.p3_m"
+          }
+        ]
+      },
+      "message": "Secteur Secondaire/Industriel, Promotion III — Hommes : « dont déplacés » ({sectors.s2.specials.DEPLACES.p3_m}) supérieur au total des apprentis ({IV.s2.total.p3_m})."
+    },
+    {
+      "code": "R_SPECIAL_s2_STATUS_SUM_p3_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s2.specials.REFUGIES.p3_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "+": [
+              {
+                "var": "sectors.s2.specials.REFUGIES.p3_m"
+              },
+              {
+                "var": "sectors.s2.specials.RETOURNES.p3_m"
+              },
+              {
+                "var": "sectors.s2.specials.DEPLACES.p3_m"
+              }
+            ]
+          },
+          {
+            "var": "IV.s2.total.p3_m"
+          }
+        ]
+      },
+      "message": "Secteur Secondaire/Industriel, Promotion III — Hommes : réfugiés + retournés + déplacés dépassent le total des apprentis ({IV.s2.total.p3_m}). Ces catégories sont normalement exclusives."
+    },
+    {
+      "code": "R_SPECIAL_s2_HANDICAPES_p3_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s2.specials.HANDICAPES.p3_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s2.specials.HANDICAPES.p3_f"
+          },
+          {
+            "var": "IV.s2.total.p3_f"
+          }
+        ]
+      },
+      "message": "Secteur Secondaire/Industriel, Promotion III — Femmes : « dont handicapés » ({sectors.s2.specials.HANDICAPES.p3_f}) supérieur au total des apprentis ({IV.s2.total.p3_f})."
+    },
+    {
+      "code": "R_SPECIAL_s2_REFUGIES_p3_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s2.specials.REFUGIES.p3_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s2.specials.REFUGIES.p3_f"
+          },
+          {
+            "var": "IV.s2.total.p3_f"
+          }
+        ]
+      },
+      "message": "Secteur Secondaire/Industriel, Promotion III — Femmes : « dont réfugiés » ({sectors.s2.specials.REFUGIES.p3_f}) supérieur au total des apprentis ({IV.s2.total.p3_f})."
+    },
+    {
+      "code": "R_SPECIAL_s2_RETOURNES_p3_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s2.specials.RETOURNES.p3_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s2.specials.RETOURNES.p3_f"
+          },
+          {
+            "var": "IV.s2.total.p3_f"
+          }
+        ]
+      },
+      "message": "Secteur Secondaire/Industriel, Promotion III — Femmes : « dont retournés » ({sectors.s2.specials.RETOURNES.p3_f}) supérieur au total des apprentis ({IV.s2.total.p3_f})."
+    },
+    {
+      "code": "R_SPECIAL_s2_DEPLACES_p3_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s2.specials.DEPLACES.p3_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s2.specials.DEPLACES.p3_f"
+          },
+          {
+            "var": "IV.s2.total.p3_f"
+          }
+        ]
+      },
+      "message": "Secteur Secondaire/Industriel, Promotion III — Femmes : « dont déplacés » ({sectors.s2.specials.DEPLACES.p3_f}) supérieur au total des apprentis ({IV.s2.total.p3_f})."
+    },
+    {
+      "code": "R_SPECIAL_s2_STATUS_SUM_p3_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s2.specials.REFUGIES.p3_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "+": [
+              {
+                "var": "sectors.s2.specials.REFUGIES.p3_f"
+              },
+              {
+                "var": "sectors.s2.specials.RETOURNES.p3_f"
+              },
+              {
+                "var": "sectors.s2.specials.DEPLACES.p3_f"
+              }
+            ]
+          },
+          {
+            "var": "IV.s2.total.p3_f"
+          }
+        ]
+      },
+      "message": "Secteur Secondaire/Industriel, Promotion III — Femmes : réfugiés + retournés + déplacés dépassent le total des apprentis ({IV.s2.total.p3_f}). Ces catégories sont normalement exclusives."
+    },
+    {
+      "code": "R_SPECIAL_s3_HANDICAPES_p1_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s3.specials.HANDICAPES.p1_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s3.specials.HANDICAPES.p1_m"
+          },
+          {
+            "var": "IV.s3.total.p1_m"
+          }
+        ]
+      },
+      "message": "Secteur Tertiaire/Service, Promotion I — Hommes : « dont handicapés » ({sectors.s3.specials.HANDICAPES.p1_m}) supérieur au total des apprentis ({IV.s3.total.p1_m})."
+    },
+    {
+      "code": "R_SPECIAL_s3_REFUGIES_p1_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s3.specials.REFUGIES.p1_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s3.specials.REFUGIES.p1_m"
+          },
+          {
+            "var": "IV.s3.total.p1_m"
+          }
+        ]
+      },
+      "message": "Secteur Tertiaire/Service, Promotion I — Hommes : « dont réfugiés » ({sectors.s3.specials.REFUGIES.p1_m}) supérieur au total des apprentis ({IV.s3.total.p1_m})."
+    },
+    {
+      "code": "R_SPECIAL_s3_RETOURNES_p1_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s3.specials.RETOURNES.p1_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s3.specials.RETOURNES.p1_m"
+          },
+          {
+            "var": "IV.s3.total.p1_m"
+          }
+        ]
+      },
+      "message": "Secteur Tertiaire/Service, Promotion I — Hommes : « dont retournés » ({sectors.s3.specials.RETOURNES.p1_m}) supérieur au total des apprentis ({IV.s3.total.p1_m})."
+    },
+    {
+      "code": "R_SPECIAL_s3_DEPLACES_p1_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s3.specials.DEPLACES.p1_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s3.specials.DEPLACES.p1_m"
+          },
+          {
+            "var": "IV.s3.total.p1_m"
+          }
+        ]
+      },
+      "message": "Secteur Tertiaire/Service, Promotion I — Hommes : « dont déplacés » ({sectors.s3.specials.DEPLACES.p1_m}) supérieur au total des apprentis ({IV.s3.total.p1_m})."
+    },
+    {
+      "code": "R_SPECIAL_s3_STATUS_SUM_p1_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s3.specials.REFUGIES.p1_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "+": [
+              {
+                "var": "sectors.s3.specials.REFUGIES.p1_m"
+              },
+              {
+                "var": "sectors.s3.specials.RETOURNES.p1_m"
+              },
+              {
+                "var": "sectors.s3.specials.DEPLACES.p1_m"
+              }
+            ]
+          },
+          {
+            "var": "IV.s3.total.p1_m"
+          }
+        ]
+      },
+      "message": "Secteur Tertiaire/Service, Promotion I — Hommes : réfugiés + retournés + déplacés dépassent le total des apprentis ({IV.s3.total.p1_m}). Ces catégories sont normalement exclusives."
+    },
+    {
+      "code": "R_SPECIAL_s3_HANDICAPES_p1_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s3.specials.HANDICAPES.p1_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s3.specials.HANDICAPES.p1_f"
+          },
+          {
+            "var": "IV.s3.total.p1_f"
+          }
+        ]
+      },
+      "message": "Secteur Tertiaire/Service, Promotion I — Femmes : « dont handicapés » ({sectors.s3.specials.HANDICAPES.p1_f}) supérieur au total des apprentis ({IV.s3.total.p1_f})."
+    },
+    {
+      "code": "R_SPECIAL_s3_REFUGIES_p1_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s3.specials.REFUGIES.p1_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s3.specials.REFUGIES.p1_f"
+          },
+          {
+            "var": "IV.s3.total.p1_f"
+          }
+        ]
+      },
+      "message": "Secteur Tertiaire/Service, Promotion I — Femmes : « dont réfugiés » ({sectors.s3.specials.REFUGIES.p1_f}) supérieur au total des apprentis ({IV.s3.total.p1_f})."
+    },
+    {
+      "code": "R_SPECIAL_s3_RETOURNES_p1_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s3.specials.RETOURNES.p1_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s3.specials.RETOURNES.p1_f"
+          },
+          {
+            "var": "IV.s3.total.p1_f"
+          }
+        ]
+      },
+      "message": "Secteur Tertiaire/Service, Promotion I — Femmes : « dont retournés » ({sectors.s3.specials.RETOURNES.p1_f}) supérieur au total des apprentis ({IV.s3.total.p1_f})."
+    },
+    {
+      "code": "R_SPECIAL_s3_DEPLACES_p1_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s3.specials.DEPLACES.p1_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s3.specials.DEPLACES.p1_f"
+          },
+          {
+            "var": "IV.s3.total.p1_f"
+          }
+        ]
+      },
+      "message": "Secteur Tertiaire/Service, Promotion I — Femmes : « dont déplacés » ({sectors.s3.specials.DEPLACES.p1_f}) supérieur au total des apprentis ({IV.s3.total.p1_f})."
+    },
+    {
+      "code": "R_SPECIAL_s3_STATUS_SUM_p1_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s3.specials.REFUGIES.p1_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "+": [
+              {
+                "var": "sectors.s3.specials.REFUGIES.p1_f"
+              },
+              {
+                "var": "sectors.s3.specials.RETOURNES.p1_f"
+              },
+              {
+                "var": "sectors.s3.specials.DEPLACES.p1_f"
+              }
+            ]
+          },
+          {
+            "var": "IV.s3.total.p1_f"
+          }
+        ]
+      },
+      "message": "Secteur Tertiaire/Service, Promotion I — Femmes : réfugiés + retournés + déplacés dépassent le total des apprentis ({IV.s3.total.p1_f}). Ces catégories sont normalement exclusives."
+    },
+    {
+      "code": "R_SPECIAL_s3_HANDICAPES_p2_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s3.specials.HANDICAPES.p2_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s3.specials.HANDICAPES.p2_m"
+          },
+          {
+            "var": "IV.s3.total.p2_m"
+          }
+        ]
+      },
+      "message": "Secteur Tertiaire/Service, Promotion II — Hommes : « dont handicapés » ({sectors.s3.specials.HANDICAPES.p2_m}) supérieur au total des apprentis ({IV.s3.total.p2_m})."
+    },
+    {
+      "code": "R_SPECIAL_s3_REFUGIES_p2_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s3.specials.REFUGIES.p2_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s3.specials.REFUGIES.p2_m"
+          },
+          {
+            "var": "IV.s3.total.p2_m"
+          }
+        ]
+      },
+      "message": "Secteur Tertiaire/Service, Promotion II — Hommes : « dont réfugiés » ({sectors.s3.specials.REFUGIES.p2_m}) supérieur au total des apprentis ({IV.s3.total.p2_m})."
+    },
+    {
+      "code": "R_SPECIAL_s3_RETOURNES_p2_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s3.specials.RETOURNES.p2_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s3.specials.RETOURNES.p2_m"
+          },
+          {
+            "var": "IV.s3.total.p2_m"
+          }
+        ]
+      },
+      "message": "Secteur Tertiaire/Service, Promotion II — Hommes : « dont retournés » ({sectors.s3.specials.RETOURNES.p2_m}) supérieur au total des apprentis ({IV.s3.total.p2_m})."
+    },
+    {
+      "code": "R_SPECIAL_s3_DEPLACES_p2_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s3.specials.DEPLACES.p2_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s3.specials.DEPLACES.p2_m"
+          },
+          {
+            "var": "IV.s3.total.p2_m"
+          }
+        ]
+      },
+      "message": "Secteur Tertiaire/Service, Promotion II — Hommes : « dont déplacés » ({sectors.s3.specials.DEPLACES.p2_m}) supérieur au total des apprentis ({IV.s3.total.p2_m})."
+    },
+    {
+      "code": "R_SPECIAL_s3_STATUS_SUM_p2_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s3.specials.REFUGIES.p2_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "+": [
+              {
+                "var": "sectors.s3.specials.REFUGIES.p2_m"
+              },
+              {
+                "var": "sectors.s3.specials.RETOURNES.p2_m"
+              },
+              {
+                "var": "sectors.s3.specials.DEPLACES.p2_m"
+              }
+            ]
+          },
+          {
+            "var": "IV.s3.total.p2_m"
+          }
+        ]
+      },
+      "message": "Secteur Tertiaire/Service, Promotion II — Hommes : réfugiés + retournés + déplacés dépassent le total des apprentis ({IV.s3.total.p2_m}). Ces catégories sont normalement exclusives."
+    },
+    {
+      "code": "R_SPECIAL_s3_HANDICAPES_p2_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s3.specials.HANDICAPES.p2_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s3.specials.HANDICAPES.p2_f"
+          },
+          {
+            "var": "IV.s3.total.p2_f"
+          }
+        ]
+      },
+      "message": "Secteur Tertiaire/Service, Promotion II — Femmes : « dont handicapés » ({sectors.s3.specials.HANDICAPES.p2_f}) supérieur au total des apprentis ({IV.s3.total.p2_f})."
+    },
+    {
+      "code": "R_SPECIAL_s3_REFUGIES_p2_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s3.specials.REFUGIES.p2_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s3.specials.REFUGIES.p2_f"
+          },
+          {
+            "var": "IV.s3.total.p2_f"
+          }
+        ]
+      },
+      "message": "Secteur Tertiaire/Service, Promotion II — Femmes : « dont réfugiés » ({sectors.s3.specials.REFUGIES.p2_f}) supérieur au total des apprentis ({IV.s3.total.p2_f})."
+    },
+    {
+      "code": "R_SPECIAL_s3_RETOURNES_p2_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s3.specials.RETOURNES.p2_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s3.specials.RETOURNES.p2_f"
+          },
+          {
+            "var": "IV.s3.total.p2_f"
+          }
+        ]
+      },
+      "message": "Secteur Tertiaire/Service, Promotion II — Femmes : « dont retournés » ({sectors.s3.specials.RETOURNES.p2_f}) supérieur au total des apprentis ({IV.s3.total.p2_f})."
+    },
+    {
+      "code": "R_SPECIAL_s3_DEPLACES_p2_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s3.specials.DEPLACES.p2_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s3.specials.DEPLACES.p2_f"
+          },
+          {
+            "var": "IV.s3.total.p2_f"
+          }
+        ]
+      },
+      "message": "Secteur Tertiaire/Service, Promotion II — Femmes : « dont déplacés » ({sectors.s3.specials.DEPLACES.p2_f}) supérieur au total des apprentis ({IV.s3.total.p2_f})."
+    },
+    {
+      "code": "R_SPECIAL_s3_STATUS_SUM_p2_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s3.specials.REFUGIES.p2_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "+": [
+              {
+                "var": "sectors.s3.specials.REFUGIES.p2_f"
+              },
+              {
+                "var": "sectors.s3.specials.RETOURNES.p2_f"
+              },
+              {
+                "var": "sectors.s3.specials.DEPLACES.p2_f"
+              }
+            ]
+          },
+          {
+            "var": "IV.s3.total.p2_f"
+          }
+        ]
+      },
+      "message": "Secteur Tertiaire/Service, Promotion II — Femmes : réfugiés + retournés + déplacés dépassent le total des apprentis ({IV.s3.total.p2_f}). Ces catégories sont normalement exclusives."
+    },
+    {
+      "code": "R_SPECIAL_s3_HANDICAPES_p3_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s3.specials.HANDICAPES.p3_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s3.specials.HANDICAPES.p3_m"
+          },
+          {
+            "var": "IV.s3.total.p3_m"
+          }
+        ]
+      },
+      "message": "Secteur Tertiaire/Service, Promotion III — Hommes : « dont handicapés » ({sectors.s3.specials.HANDICAPES.p3_m}) supérieur au total des apprentis ({IV.s3.total.p3_m})."
+    },
+    {
+      "code": "R_SPECIAL_s3_REFUGIES_p3_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s3.specials.REFUGIES.p3_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s3.specials.REFUGIES.p3_m"
+          },
+          {
+            "var": "IV.s3.total.p3_m"
+          }
+        ]
+      },
+      "message": "Secteur Tertiaire/Service, Promotion III — Hommes : « dont réfugiés » ({sectors.s3.specials.REFUGIES.p3_m}) supérieur au total des apprentis ({IV.s3.total.p3_m})."
+    },
+    {
+      "code": "R_SPECIAL_s3_RETOURNES_p3_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s3.specials.RETOURNES.p3_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s3.specials.RETOURNES.p3_m"
+          },
+          {
+            "var": "IV.s3.total.p3_m"
+          }
+        ]
+      },
+      "message": "Secteur Tertiaire/Service, Promotion III — Hommes : « dont retournés » ({sectors.s3.specials.RETOURNES.p3_m}) supérieur au total des apprentis ({IV.s3.total.p3_m})."
+    },
+    {
+      "code": "R_SPECIAL_s3_DEPLACES_p3_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s3.specials.DEPLACES.p3_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s3.specials.DEPLACES.p3_m"
+          },
+          {
+            "var": "IV.s3.total.p3_m"
+          }
+        ]
+      },
+      "message": "Secteur Tertiaire/Service, Promotion III — Hommes : « dont déplacés » ({sectors.s3.specials.DEPLACES.p3_m}) supérieur au total des apprentis ({IV.s3.total.p3_m})."
+    },
+    {
+      "code": "R_SPECIAL_s3_STATUS_SUM_p3_m",
+      "severity": "warning",
+      "targets": [
+        "sectors.s3.specials.REFUGIES.p3_m"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "+": [
+              {
+                "var": "sectors.s3.specials.REFUGIES.p3_m"
+              },
+              {
+                "var": "sectors.s3.specials.RETOURNES.p3_m"
+              },
+              {
+                "var": "sectors.s3.specials.DEPLACES.p3_m"
+              }
+            ]
+          },
+          {
+            "var": "IV.s3.total.p3_m"
+          }
+        ]
+      },
+      "message": "Secteur Tertiaire/Service, Promotion III — Hommes : réfugiés + retournés + déplacés dépassent le total des apprentis ({IV.s3.total.p3_m}). Ces catégories sont normalement exclusives."
+    },
+    {
+      "code": "R_SPECIAL_s3_HANDICAPES_p3_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s3.specials.HANDICAPES.p3_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s3.specials.HANDICAPES.p3_f"
+          },
+          {
+            "var": "IV.s3.total.p3_f"
+          }
+        ]
+      },
+      "message": "Secteur Tertiaire/Service, Promotion III — Femmes : « dont handicapés » ({sectors.s3.specials.HANDICAPES.p3_f}) supérieur au total des apprentis ({IV.s3.total.p3_f})."
+    },
+    {
+      "code": "R_SPECIAL_s3_REFUGIES_p3_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s3.specials.REFUGIES.p3_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s3.specials.REFUGIES.p3_f"
+          },
+          {
+            "var": "IV.s3.total.p3_f"
+          }
+        ]
+      },
+      "message": "Secteur Tertiaire/Service, Promotion III — Femmes : « dont réfugiés » ({sectors.s3.specials.REFUGIES.p3_f}) supérieur au total des apprentis ({IV.s3.total.p3_f})."
+    },
+    {
+      "code": "R_SPECIAL_s3_RETOURNES_p3_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s3.specials.RETOURNES.p3_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s3.specials.RETOURNES.p3_f"
+          },
+          {
+            "var": "IV.s3.total.p3_f"
+          }
+        ]
+      },
+      "message": "Secteur Tertiaire/Service, Promotion III — Femmes : « dont retournés » ({sectors.s3.specials.RETOURNES.p3_f}) supérieur au total des apprentis ({IV.s3.total.p3_f})."
+    },
+    {
+      "code": "R_SPECIAL_s3_DEPLACES_p3_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s3.specials.DEPLACES.p3_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "sectors.s3.specials.DEPLACES.p3_f"
+          },
+          {
+            "var": "IV.s3.total.p3_f"
+          }
+        ]
+      },
+      "message": "Secteur Tertiaire/Service, Promotion III — Femmes : « dont déplacés » ({sectors.s3.specials.DEPLACES.p3_f}) supérieur au total des apprentis ({IV.s3.total.p3_f})."
+    },
+    {
+      "code": "R_SPECIAL_s3_STATUS_SUM_p3_f",
+      "severity": "warning",
+      "targets": [
+        "sectors.s3.specials.REFUGIES.p3_f"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "+": [
+              {
+                "var": "sectors.s3.specials.REFUGIES.p3_f"
+              },
+              {
+                "var": "sectors.s3.specials.RETOURNES.p3_f"
+              },
+              {
+                "var": "sectors.s3.specials.DEPLACES.p3_f"
+              }
+            ]
+          },
+          {
+            "var": "IV.s3.total.p3_f"
+          }
+        ]
+      },
+      "message": "Secteur Tertiaire/Service, Promotion III — Femmes : réfugiés + retournés + déplacés dépassent le total des apprentis ({IV.s3.total.p3_f}). Ces catégories sont normalement exclusives."
+    },
+    {
+      "code": "R_NO_APPRENTICE",
+      "severity": "warning",
+      "targets": [
+        "sectors.s1.trades"
+      ],
+      "when": {
+        "!": [
+          {
+            "!!": [
+              {
+                "var": "Q5_OBS"
+              }
+            ]
+          }
+        ]
+      },
+      "assert": {
+        ">": [
+          {
+            "var": "APPRENTICES_TOTAL"
+          },
+          0
+        ]
+      },
+      "message": "Aucun apprenti n'est déclaré dans les trois secteurs. Saisir les métiers et effectifs, ou expliquer la situation dans les observations."
+    },
+    {
+      "code": "R_APPRENTICES_WITHOUT_TRAINER",
+      "severity": "warning",
+      "targets": [
+        "trainers"
+      ],
+      "when": {
+        ">": [
+          {
+            "var": "APPRENTICES_TOTAL"
+          },
+          0
+        ]
+      },
+      "assert": {
+        ">": [
+          {
+            "var": "Q2_19.T"
+          },
+          0
+        ]
+      },
+      "message": "Des apprentis sont déclarés mais aucun maître artisan/formateur n'est saisi en Section III."
+    },
+    {
+      "code": "R_RATIO_APPRENTICES_TRAINER",
+      "severity": "warning",
+      "targets": [
+        "trainers"
+      ],
+      "when": {
+        "and": [
+          {
+            ">": [
+              {
+                "var": "Q2_19.T"
+              },
+              0
+            ]
+          },
+          {
+            "!!": [
+              {
+                "var": "_ctx.max_apprentices_per_trainer"
+              }
+            ]
+          }
+        ]
+      },
+      "assert": {
+        "<=": [
+          {
+            "var": "APPRENTICES_TOTAL"
+          },
+          {
+            "*": [
+              {
+                "var": "Q2_19.T"
+              },
+              {
+                "var": "_ctx.max_apprentices_per_trainer"
+              }
+            ]
+          }
+        ]
+      },
+      "message": "Plus de {_ctx.max_apprentices_per_trainer} apprentis par formateur ({APPRENTICES_TOTAL} apprentis, {Q2_19.T} formateurs). Vérifier les effectifs."
+    },
+    {
+      "code": "R_FAFPA_GT_ACCOMPANIED",
+      "severity": "warning",
+      "targets": [
+        "Q2_20_H"
+      ],
+      "assert": {
+        "<=": [
+          {
+            "var": "Q2_20_T"
+          },
+          {
+            "var": "Q2_2_INSCRITS_TOTAL"
+          }
+        ]
+      },
+      "message": "Les jeunes accompagnés par le FAFPA ({Q2_20_T}) dépassent le total des jeunes inscrits en 2.2 ({Q2_2_INSCRITS_TOTAL}). Vérifier."
+    },
+    {
+      "code": "R_GPS_ACCURACY",
+      "severity": "warning",
+      "targets": [
+        "GPS"
+      ],
+      "when": {
+        "and": [
+          {
+            "==": [
+              {
+                "var": "GPS.status"
+              },
+              "OK"
+            ]
+          },
+          {
+            "!!": [
+              {
+                "var": "GPS.accuracy_m"
+              }
+            ]
+          }
+        ]
+      },
+      "assert": {
+        "<=": [
+          {
+            "var": "GPS.accuracy_m"
+          },
+          50
+        ]
+      },
+      "message": "Précision GPS faible ({GPS.accuracy_m} m). Reprendre la mesure à découvert si possible."
+    },
+    {
+      "code": "R_GPS_FAR_FROM_COMMUNE",
+      "severity": "warning",
+      "targets": [
+        "GPS"
+      ],
+      "when": {
+        "and": [
+          {
+            "!!": [
+              {
+                "var": "_ctx.gps_distance_km"
+              }
+            ]
+          },
+          {
+            "!!": [
+              {
+                "var": "_ctx.gps_max_km"
+              }
+            ]
+          }
+        ]
+      },
+      "assert": {
+        "<=": [
+          {
+            "var": "_ctx.gps_distance_km"
+          },
+          {
+            "var": "_ctx.gps_max_km"
+          }
+        ]
+      },
+      "message": "La position GPS est à {_ctx.gps_distance_km} km du centre de la commune déclarée. Vérifier la commune ou reprendre la mesure."
+    },
+    {
+      "code": "R_Q2_1_VS_IV_LE3_s1_M",
+      "severity": "warning",
+      "targets": [
+        "Q2_1.LE3.s1.M"
+      ],
+      "when": {
+        "or": [
+          {
+            "!!": [
+              {
+                "var": "Q2_1.LE3.s1.M"
+              }
+            ]
+          },
+          {
+            ">": [
+              {
+                "var": "IV_DUR.LE3.s1.M"
+              },
+              0
+            ]
+          }
+        ]
+      },
+      "assert": {
+        "==": [
+          {
+            "var": [
+              "Q2_1.LE3.s1.M",
+              0
+            ]
+          },
+          {
+            "var": [
+              "IV_DUR.LE3.s1.M",
+              0
+            ]
+          }
+        ]
+      },
+      "message": "Incohérence 2.1 (≤ 3 mois, secteur Primaire/Agricole, masculin) : 2.1 = {Q2_1.LE3.s1.M}, Section IV (métiers) = {IV_DUR.LE3.s1.M}. Vérifier et corriger l'un ou l'autre."
+    },
+    {
+      "code": "R_Q2_1_VS_IV_LE3_s1_F",
+      "severity": "warning",
+      "targets": [
+        "Q2_1.LE3.s1.F"
+      ],
+      "when": {
+        "or": [
+          {
+            "!!": [
+              {
+                "var": "Q2_1.LE3.s1.F"
+              }
+            ]
+          },
+          {
+            ">": [
+              {
+                "var": "IV_DUR.LE3.s1.F"
+              },
+              0
+            ]
+          }
+        ]
+      },
+      "assert": {
+        "==": [
+          {
+            "var": [
+              "Q2_1.LE3.s1.F",
+              0
+            ]
+          },
+          {
+            "var": [
+              "IV_DUR.LE3.s1.F",
+              0
+            ]
+          }
+        ]
+      },
+      "message": "Incohérence 2.1 (≤ 3 mois, secteur Primaire/Agricole, féminin) : 2.1 = {Q2_1.LE3.s1.F}, Section IV (métiers) = {IV_DUR.LE3.s1.F}. Vérifier et corriger l'un ou l'autre."
+    },
+    {
+      "code": "R_Q2_1_VS_IV_LE3_s2_M",
+      "severity": "warning",
+      "targets": [
+        "Q2_1.LE3.s2.M"
+      ],
+      "when": {
+        "or": [
+          {
+            "!!": [
+              {
+                "var": "Q2_1.LE3.s2.M"
+              }
+            ]
+          },
+          {
+            ">": [
+              {
+                "var": "IV_DUR.LE3.s2.M"
+              },
+              0
+            ]
+          }
+        ]
+      },
+      "assert": {
+        "==": [
+          {
+            "var": [
+              "Q2_1.LE3.s2.M",
+              0
+            ]
+          },
+          {
+            "var": [
+              "IV_DUR.LE3.s2.M",
+              0
+            ]
+          }
+        ]
+      },
+      "message": "Incohérence 2.1 (≤ 3 mois, secteur Secondaire/Industriel, masculin) : 2.1 = {Q2_1.LE3.s2.M}, Section IV (métiers) = {IV_DUR.LE3.s2.M}. Vérifier et corriger l'un ou l'autre."
+    },
+    {
+      "code": "R_Q2_1_VS_IV_LE3_s2_F",
+      "severity": "warning",
+      "targets": [
+        "Q2_1.LE3.s2.F"
+      ],
+      "when": {
+        "or": [
+          {
+            "!!": [
+              {
+                "var": "Q2_1.LE3.s2.F"
+              }
+            ]
+          },
+          {
+            ">": [
+              {
+                "var": "IV_DUR.LE3.s2.F"
+              },
+              0
+            ]
+          }
+        ]
+      },
+      "assert": {
+        "==": [
+          {
+            "var": [
+              "Q2_1.LE3.s2.F",
+              0
+            ]
+          },
+          {
+            "var": [
+              "IV_DUR.LE3.s2.F",
+              0
+            ]
+          }
+        ]
+      },
+      "message": "Incohérence 2.1 (≤ 3 mois, secteur Secondaire/Industriel, féminin) : 2.1 = {Q2_1.LE3.s2.F}, Section IV (métiers) = {IV_DUR.LE3.s2.F}. Vérifier et corriger l'un ou l'autre."
+    },
+    {
+      "code": "R_Q2_1_VS_IV_LE3_s3_M",
+      "severity": "warning",
+      "targets": [
+        "Q2_1.LE3.s3.M"
+      ],
+      "when": {
+        "or": [
+          {
+            "!!": [
+              {
+                "var": "Q2_1.LE3.s3.M"
+              }
+            ]
+          },
+          {
+            ">": [
+              {
+                "var": "IV_DUR.LE3.s3.M"
+              },
+              0
+            ]
+          }
+        ]
+      },
+      "assert": {
+        "==": [
+          {
+            "var": [
+              "Q2_1.LE3.s3.M",
+              0
+            ]
+          },
+          {
+            "var": [
+              "IV_DUR.LE3.s3.M",
+              0
+            ]
+          }
+        ]
+      },
+      "message": "Incohérence 2.1 (≤ 3 mois, secteur Tertiaire/Service, masculin) : 2.1 = {Q2_1.LE3.s3.M}, Section IV (métiers) = {IV_DUR.LE3.s3.M}. Vérifier et corriger l'un ou l'autre."
+    },
+    {
+      "code": "R_Q2_1_VS_IV_LE3_s3_F",
+      "severity": "warning",
+      "targets": [
+        "Q2_1.LE3.s3.F"
+      ],
+      "when": {
+        "or": [
+          {
+            "!!": [
+              {
+                "var": "Q2_1.LE3.s3.F"
+              }
+            ]
+          },
+          {
+            ">": [
+              {
+                "var": "IV_DUR.LE3.s3.F"
+              },
+              0
+            ]
+          }
+        ]
+      },
+      "assert": {
+        "==": [
+          {
+            "var": [
+              "Q2_1.LE3.s3.F",
+              0
+            ]
+          },
+          {
+            "var": [
+              "IV_DUR.LE3.s3.F",
+              0
+            ]
+          }
+        ]
+      },
+      "message": "Incohérence 2.1 (≤ 3 mois, secteur Tertiaire/Service, féminin) : 2.1 = {Q2_1.LE3.s3.F}, Section IV (métiers) = {IV_DUR.LE3.s3.F}. Vérifier et corriger l'un ou l'autre."
+    },
+    {
+      "code": "R_Q2_1_VS_IV_M4_9_s1_M",
+      "severity": "warning",
+      "targets": [
+        "Q2_1.M4_9.s1.M"
+      ],
+      "when": {
+        "or": [
+          {
+            "!!": [
+              {
+                "var": "Q2_1.M4_9.s1.M"
+              }
+            ]
+          },
+          {
+            ">": [
+              {
+                "var": "IV_DUR.M4_9.s1.M"
+              },
+              0
+            ]
+          }
+        ]
+      },
+      "assert": {
+        "==": [
+          {
+            "var": [
+              "Q2_1.M4_9.s1.M",
+              0
+            ]
+          },
+          {
+            "var": [
+              "IV_DUR.M4_9.s1.M",
+              0
+            ]
+          }
+        ]
+      },
+      "message": "Incohérence 2.1 (4 à 9 mois, secteur Primaire/Agricole, masculin) : 2.1 = {Q2_1.M4_9.s1.M}, Section IV (métiers) = {IV_DUR.M4_9.s1.M}. Vérifier et corriger l'un ou l'autre."
+    },
+    {
+      "code": "R_Q2_1_VS_IV_M4_9_s1_F",
+      "severity": "warning",
+      "targets": [
+        "Q2_1.M4_9.s1.F"
+      ],
+      "when": {
+        "or": [
+          {
+            "!!": [
+              {
+                "var": "Q2_1.M4_9.s1.F"
+              }
+            ]
+          },
+          {
+            ">": [
+              {
+                "var": "IV_DUR.M4_9.s1.F"
+              },
+              0
+            ]
+          }
+        ]
+      },
+      "assert": {
+        "==": [
+          {
+            "var": [
+              "Q2_1.M4_9.s1.F",
+              0
+            ]
+          },
+          {
+            "var": [
+              "IV_DUR.M4_9.s1.F",
+              0
+            ]
+          }
+        ]
+      },
+      "message": "Incohérence 2.1 (4 à 9 mois, secteur Primaire/Agricole, féminin) : 2.1 = {Q2_1.M4_9.s1.F}, Section IV (métiers) = {IV_DUR.M4_9.s1.F}. Vérifier et corriger l'un ou l'autre."
+    },
+    {
+      "code": "R_Q2_1_VS_IV_M4_9_s2_M",
+      "severity": "warning",
+      "targets": [
+        "Q2_1.M4_9.s2.M"
+      ],
+      "when": {
+        "or": [
+          {
+            "!!": [
+              {
+                "var": "Q2_1.M4_9.s2.M"
+              }
+            ]
+          },
+          {
+            ">": [
+              {
+                "var": "IV_DUR.M4_9.s2.M"
+              },
+              0
+            ]
+          }
+        ]
+      },
+      "assert": {
+        "==": [
+          {
+            "var": [
+              "Q2_1.M4_9.s2.M",
+              0
+            ]
+          },
+          {
+            "var": [
+              "IV_DUR.M4_9.s2.M",
+              0
+            ]
+          }
+        ]
+      },
+      "message": "Incohérence 2.1 (4 à 9 mois, secteur Secondaire/Industriel, masculin) : 2.1 = {Q2_1.M4_9.s2.M}, Section IV (métiers) = {IV_DUR.M4_9.s2.M}. Vérifier et corriger l'un ou l'autre."
+    },
+    {
+      "code": "R_Q2_1_VS_IV_M4_9_s2_F",
+      "severity": "warning",
+      "targets": [
+        "Q2_1.M4_9.s2.F"
+      ],
+      "when": {
+        "or": [
+          {
+            "!!": [
+              {
+                "var": "Q2_1.M4_9.s2.F"
+              }
+            ]
+          },
+          {
+            ">": [
+              {
+                "var": "IV_DUR.M4_9.s2.F"
+              },
+              0
+            ]
+          }
+        ]
+      },
+      "assert": {
+        "==": [
+          {
+            "var": [
+              "Q2_1.M4_9.s2.F",
+              0
+            ]
+          },
+          {
+            "var": [
+              "IV_DUR.M4_9.s2.F",
+              0
+            ]
+          }
+        ]
+      },
+      "message": "Incohérence 2.1 (4 à 9 mois, secteur Secondaire/Industriel, féminin) : 2.1 = {Q2_1.M4_9.s2.F}, Section IV (métiers) = {IV_DUR.M4_9.s2.F}. Vérifier et corriger l'un ou l'autre."
+    },
+    {
+      "code": "R_Q2_1_VS_IV_M4_9_s3_M",
+      "severity": "warning",
+      "targets": [
+        "Q2_1.M4_9.s3.M"
+      ],
+      "when": {
+        "or": [
+          {
+            "!!": [
+              {
+                "var": "Q2_1.M4_9.s3.M"
+              }
+            ]
+          },
+          {
+            ">": [
+              {
+                "var": "IV_DUR.M4_9.s3.M"
+              },
+              0
+            ]
+          }
+        ]
+      },
+      "assert": {
+        "==": [
+          {
+            "var": [
+              "Q2_1.M4_9.s3.M",
+              0
+            ]
+          },
+          {
+            "var": [
+              "IV_DUR.M4_9.s3.M",
+              0
+            ]
+          }
+        ]
+      },
+      "message": "Incohérence 2.1 (4 à 9 mois, secteur Tertiaire/Service, masculin) : 2.1 = {Q2_1.M4_9.s3.M}, Section IV (métiers) = {IV_DUR.M4_9.s3.M}. Vérifier et corriger l'un ou l'autre."
+    },
+    {
+      "code": "R_Q2_1_VS_IV_M4_9_s3_F",
+      "severity": "warning",
+      "targets": [
+        "Q2_1.M4_9.s3.F"
+      ],
+      "when": {
+        "or": [
+          {
+            "!!": [
+              {
+                "var": "Q2_1.M4_9.s3.F"
+              }
+            ]
+          },
+          {
+            ">": [
+              {
+                "var": "IV_DUR.M4_9.s3.F"
+              },
+              0
+            ]
+          }
+        ]
+      },
+      "assert": {
+        "==": [
+          {
+            "var": [
+              "Q2_1.M4_9.s3.F",
+              0
+            ]
+          },
+          {
+            "var": [
+              "IV_DUR.M4_9.s3.F",
+              0
+            ]
+          }
+        ]
+      },
+      "message": "Incohérence 2.1 (4 à 9 mois, secteur Tertiaire/Service, féminin) : 2.1 = {Q2_1.M4_9.s3.F}, Section IV (métiers) = {IV_DUR.M4_9.s3.F}. Vérifier et corriger l'un ou l'autre."
+    },
+    {
+      "code": "R_Q2_1_VS_IV_GT9_s1_M",
+      "severity": "warning",
+      "targets": [
+        "Q2_1.GT9.s1.M"
+      ],
+      "when": {
+        "or": [
+          {
+            "!!": [
+              {
+                "var": "Q2_1.GT9.s1.M"
+              }
+            ]
+          },
+          {
+            ">": [
+              {
+                "var": "IV_DUR.GT9.s1.M"
+              },
+              0
+            ]
+          }
+        ]
+      },
+      "assert": {
+        "==": [
+          {
+            "var": [
+              "Q2_1.GT9.s1.M",
+              0
+            ]
+          },
+          {
+            "var": [
+              "IV_DUR.GT9.s1.M",
+              0
+            ]
+          }
+        ]
+      },
+      "message": "Incohérence 2.1 (> 9 mois, secteur Primaire/Agricole, masculin) : 2.1 = {Q2_1.GT9.s1.M}, Section IV (métiers) = {IV_DUR.GT9.s1.M}. Vérifier et corriger l'un ou l'autre."
+    },
+    {
+      "code": "R_Q2_1_VS_IV_GT9_s1_F",
+      "severity": "warning",
+      "targets": [
+        "Q2_1.GT9.s1.F"
+      ],
+      "when": {
+        "or": [
+          {
+            "!!": [
+              {
+                "var": "Q2_1.GT9.s1.F"
+              }
+            ]
+          },
+          {
+            ">": [
+              {
+                "var": "IV_DUR.GT9.s1.F"
+              },
+              0
+            ]
+          }
+        ]
+      },
+      "assert": {
+        "==": [
+          {
+            "var": [
+              "Q2_1.GT9.s1.F",
+              0
+            ]
+          },
+          {
+            "var": [
+              "IV_DUR.GT9.s1.F",
+              0
+            ]
+          }
+        ]
+      },
+      "message": "Incohérence 2.1 (> 9 mois, secteur Primaire/Agricole, féminin) : 2.1 = {Q2_1.GT9.s1.F}, Section IV (métiers) = {IV_DUR.GT9.s1.F}. Vérifier et corriger l'un ou l'autre."
+    },
+    {
+      "code": "R_Q2_1_VS_IV_GT9_s2_M",
+      "severity": "warning",
+      "targets": [
+        "Q2_1.GT9.s2.M"
+      ],
+      "when": {
+        "or": [
+          {
+            "!!": [
+              {
+                "var": "Q2_1.GT9.s2.M"
+              }
+            ]
+          },
+          {
+            ">": [
+              {
+                "var": "IV_DUR.GT9.s2.M"
+              },
+              0
+            ]
+          }
+        ]
+      },
+      "assert": {
+        "==": [
+          {
+            "var": [
+              "Q2_1.GT9.s2.M",
+              0
+            ]
+          },
+          {
+            "var": [
+              "IV_DUR.GT9.s2.M",
+              0
+            ]
+          }
+        ]
+      },
+      "message": "Incohérence 2.1 (> 9 mois, secteur Secondaire/Industriel, masculin) : 2.1 = {Q2_1.GT9.s2.M}, Section IV (métiers) = {IV_DUR.GT9.s2.M}. Vérifier et corriger l'un ou l'autre."
+    },
+    {
+      "code": "R_Q2_1_VS_IV_GT9_s2_F",
+      "severity": "warning",
+      "targets": [
+        "Q2_1.GT9.s2.F"
+      ],
+      "when": {
+        "or": [
+          {
+            "!!": [
+              {
+                "var": "Q2_1.GT9.s2.F"
+              }
+            ]
+          },
+          {
+            ">": [
+              {
+                "var": "IV_DUR.GT9.s2.F"
+              },
+              0
+            ]
+          }
+        ]
+      },
+      "assert": {
+        "==": [
+          {
+            "var": [
+              "Q2_1.GT9.s2.F",
+              0
+            ]
+          },
+          {
+            "var": [
+              "IV_DUR.GT9.s2.F",
+              0
+            ]
+          }
+        ]
+      },
+      "message": "Incohérence 2.1 (> 9 mois, secteur Secondaire/Industriel, féminin) : 2.1 = {Q2_1.GT9.s2.F}, Section IV (métiers) = {IV_DUR.GT9.s2.F}. Vérifier et corriger l'un ou l'autre."
+    },
+    {
+      "code": "R_Q2_1_VS_IV_GT9_s3_M",
+      "severity": "warning",
+      "targets": [
+        "Q2_1.GT9.s3.M"
+      ],
+      "when": {
+        "or": [
+          {
+            "!!": [
+              {
+                "var": "Q2_1.GT9.s3.M"
+              }
+            ]
+          },
+          {
+            ">": [
+              {
+                "var": "IV_DUR.GT9.s3.M"
+              },
+              0
+            ]
+          }
+        ]
+      },
+      "assert": {
+        "==": [
+          {
+            "var": [
+              "Q2_1.GT9.s3.M",
+              0
+            ]
+          },
+          {
+            "var": [
+              "IV_DUR.GT9.s3.M",
+              0
+            ]
+          }
+        ]
+      },
+      "message": "Incohérence 2.1 (> 9 mois, secteur Tertiaire/Service, masculin) : 2.1 = {Q2_1.GT9.s3.M}, Section IV (métiers) = {IV_DUR.GT9.s3.M}. Vérifier et corriger l'un ou l'autre."
+    },
+    {
+      "code": "R_Q2_1_VS_IV_GT9_s3_F",
+      "severity": "warning",
+      "targets": [
+        "Q2_1.GT9.s3.F"
+      ],
+      "when": {
+        "or": [
+          {
+            "!!": [
+              {
+                "var": "Q2_1.GT9.s3.F"
+              }
+            ]
+          },
+          {
+            ">": [
+              {
+                "var": "IV_DUR.GT9.s3.F"
+              },
+              0
+            ]
+          }
+        ]
+      },
+      "assert": {
+        "==": [
+          {
+            "var": [
+              "Q2_1.GT9.s3.F",
+              0
+            ]
+          },
+          {
+            "var": [
+              "IV_DUR.GT9.s3.F",
+              0
+            ]
+          }
+        ]
+      },
+      "message": "Incohérence 2.1 (> 9 mois, secteur Tertiaire/Service, féminin) : 2.1 = {Q2_1.GT9.s3.F}, Section IV (métiers) = {IV_DUR.GT9.s3.F}. Vérifier et corriger l'un ou l'autre."
+    }
+  ],
+  "changes": [
+    "2.1 : effectifs saisis librement (n'est plus calculé) ; écart avec les totaux de la Section IV signalé par un avertissement non bloquant.",
+    "Variables calculées depuis la Section IV renommées IV_DUR.<durée>.<secteur>.<sexe> (APPRENTICES_TOTAL inchangé).",
+    "Saisie sans blocage : toutes les règles de cohérence (dates, latrines, jeunes accompagnés, « dont » spéciaux, aucun apprenti, année de certification) deviennent des avertissements, à vérifier par le contrôleur."
+  ]
+}

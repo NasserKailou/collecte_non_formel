@@ -1,0 +1,17 @@
+[2026-11-15T21:48:34+01:00] GET /api/v1/me — PDOException: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée in C:\xamppSites\htdocs\non_formel\backend\src\Core\Database.php:30
+#0 C:\xamppSites\htdocs\non_formel\backend\src\Core\Database.php(30): PDO->__construct('mysql:host=127....', 'root', Object(SensitiveParameterValue), Array)
+#1 C:\xamppSites\htdocs\non_formel\backend\src\Core\Database.php(45): App\Core\Database->pdo()
+#2 C:\xamppSites\htdocs\non_formel\backend\src\Modules\Auth\AuthService.php(171): App\Core\Database->fetchOne('SELECT t.id AS ...', Array)
+#3 C:\xamppSites\htdocs\non_formel\backend\src\Core\App.php(106): App\Modules\Auth\AuthService->authenticate('e903a0178db5b5e...')
+#4 C:\xamppSites\htdocs\non_formel\backend\src\Core\App.php(55): App\Core\App->dispatch(Object(App\Http\Request))
+#5 C:\xamppSites\htdocs\non_formel\backend\public\index.php(14): App\Core\App->handle(Object(App\Http\Request))
+#6 {main}
+[2026-11-15T21:48:38+01:00] POST /api/v1/auth/login — PDOException: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée in C:\xamppSites\htdocs\non_formel\backend\src\Core\Database.php:30
+#0 C:\xamppSites\htdocs\non_formel\backend\src\Core\Database.php(30): PDO->__construct('mysql:host=127....', 'root', Object(SensitiveParameterValue), Array)
+#1 C:\xamppSites\htdocs\non_formel\backend\src\Core\Database.php(61): App\Core\Database->pdo()
+#2 C:\xamppSites\htdocs\non_formel\backend\src\Modules\Auth\AuthService.php(86): App\Core\Database->fetchValue('SELECT COUNT(*)...', Array)
+#3 C:\xamppSites\htdocs\non_formel\backend\config\routes.php(47): App\Modules\Auth\AuthService->login('ADM-DEMO', 'AdminDemo2026x', NULL, '::1', 'Mozilla/5.0 (Wi...')
+#4 C:\xamppSites\htdocs\non_formel\backend\src\Core\App.php(122): {closure}(Object(App\Http\Request), Array, NULL)
+#5 C:\xamppSites\htdocs\non_formel\backend\src\Core\App.php(55): App\Core\App->dispatch(Object(App\Http\Request))
+#6 C:\xamppSites\htdocs\non_formel\backend\public\index.php(14): App\Core\App->handle(Object(App\Http\Request))
+#7 {main}

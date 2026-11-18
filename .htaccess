@@ -1,0 +1,11 @@
+# Sécurité : le projet est placé sous htdocs (environnement XAMPP de développement).
+# Tout est interdit par défaut ; seul backend/public/ est rouvert (voir backend/public/.htaccess).
+# Exception : les adresses d'entrée /non_formel/ et /non_formel/backend/ redirigent vers le back-office
+# (aucun fichier n'est servi depuis ces dossiers).
+# En production, la racine web doit pointer directement sur backend/public/.
+Options -Indexes
+# Seules les adresses d'entrée sont autorisées ici (tout le reste est refusé) ;
+# backend/public/.htaccess rouvre son propre dossier.
+Require expr "%{REQUEST_URI} =~ m#^/non_formel(/backend)?/?$#"
+RewriteEngine On
+RewriteRule ^(backend/?)?$ /non_formel/backend/public/app/ [R=302,L]

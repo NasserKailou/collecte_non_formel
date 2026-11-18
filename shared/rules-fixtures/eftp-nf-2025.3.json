@@ -1,0 +1,541 @@
+{
+    "definition": "shared\/questionnaire\/eftp-nf-2025.3.json",
+    "comment": "Version 2025.3 : saisie sans blocage. Seules les valeurs impossibles (type, modalité, bornes, date, doublon) bloquent ; toutes les règles de cohérence sont des avertissements.",
+    "base": {
+        "Q1_1": "Atelier de couture Al Baraka",
+        "Q1_2": "1234567890",
+        "Q1_3": true,
+        "Q1_3_1": "Ministère de l'Enseignement et de la Formation Techniques et Professionnels",
+        "Q1_3_2": "Autorisation d'ouverture",
+        "Q1_3_3": "N° 0042\/MEFTP\/2015",
+        "Q1_4": "2015-03-01",
+        "Q1_5": "2015-09",
+        "Q1_6_4": "Quartier Talladjé",
+        "Q1_7": "a",
+        "Q1_8": "b",
+        "Q1_9": "c",
+        "Q1_10": [
+            "g",
+            "c"
+        ],
+        "Q1_11": "b",
+        "Q1_12": true,
+        "Q1_14": true,
+        "Q1_14_1": [
+            "a",
+            "d"
+        ],
+        "GPS": {
+            "lat": 13.5137,
+            "lng": 2.1098,
+            "accuracy_m": 6,
+            "captured_at": "2026-02-10T09:14:00+01:00",
+            "status": "OK",
+            "note": null
+        },
+        "accompanied": {
+            "LE3": {
+                "INSCRITS": {
+                    "M": 4,
+                    "F": 6
+                },
+                "PLACES": {
+                    "M": 1,
+                    "F": 2
+                },
+                "OUTILLES": {
+                    "M": 1,
+                    "F": 1
+                }
+            },
+            "M4_9": {
+                "INSCRITS": {
+                    "M": 2,
+                    "F": 3
+                },
+                "PLACES": {
+                    "M": 0,
+                    "F": 0
+                },
+                "OUTILLES": {
+                    "M": 1,
+                    "F": 1
+                }
+            },
+            "GT9": {
+                "INSCRITS": {
+                    "M": 0,
+                    "F": 0
+                },
+                "PLACES": {
+                    "M": 0,
+                    "F": 0
+                },
+                "OUTILLES": {
+                    "M": 0,
+                    "F": 0
+                }
+            }
+        },
+        "Q2_3": true,
+        "Q2_3_1": "b",
+        "Q2_4": false,
+        "Q2_5": true,
+        "Q2_6": false,
+        "Q2_7": true,
+        "Q2_8": false,
+        "Q2_9": false,
+        "Q2_10": true,
+        "Q2_11": true,
+        "Q2_11_1": 3,
+        "Q2_11_2_a": 2,
+        "Q2_11_2_b": 1,
+        "Q2_11_2_c": 0,
+        "Q2_11_2_d": 0,
+        "Q2_12": false,
+        "Q2_13": true,
+        "Q2_13_1": [
+            "c"
+        ],
+        "Q2_13_2": [
+            "b",
+            "c"
+        ],
+        "Q2_14": false,
+        "Q2_15": false,
+        "Q2_16": true,
+        "Q2_17": true,
+        "Q2_18": false,
+        "Q2_20_H": 2,
+        "Q2_20_F": 3,
+        "trainers": [
+            {
+                "full_name": "Moussa Abdou",
+                "sex": "M",
+                "grade": "MAITRE_ARTISAN",
+                "initial_training": false,
+                "continuing_trainings_count": 2,
+                "certified": true,
+                "cert_name": "CQP Couture",
+                "cert_level": "CQP",
+                "cert_body": "FAFPA",
+                "cert_year": 2019,
+                "nationality": "NIGERIEN",
+                "pedagogical_followup": true
+            },
+            {
+                "full_name": "Aïchatou Issa",
+                "sex": "F",
+                "grade": "FORMATEUR",
+                "initial_training": true,
+                "continuing_trainings_count": 0,
+                "certified": false,
+                "nationality": "UEMOA",
+                "pedagogical_followup": false
+            }
+        ],
+        "sectors": {
+            "s1": {
+                "trades": [],
+                "specials": {
+                    "HANDICAPES": {
+                        "p1_m": 0,
+                        "p1_f": 0,
+                        "p2_m": 0,
+                        "p2_f": 0,
+                        "p3_m": 0,
+                        "p3_f": 0
+                    },
+                    "REFUGIES": {
+                        "p1_m": 0,
+                        "p1_f": 0,
+                        "p2_m": 0,
+                        "p2_f": 0,
+                        "p3_m": 0,
+                        "p3_f": 0
+                    },
+                    "RETOURNES": {
+                        "p1_m": 0,
+                        "p1_f": 0,
+                        "p2_m": 0,
+                        "p2_f": 0,
+                        "p3_m": 0,
+                        "p3_f": 0
+                    },
+                    "DEPLACES": {
+                        "p1_m": 0,
+                        "p1_f": 0,
+                        "p2_m": 0,
+                        "p2_f": 0,
+                        "p3_m": 0,
+                        "p3_f": 0
+                    }
+                }
+            },
+            "s2": {
+                "trades": [],
+                "specials": {
+                    "HANDICAPES": {
+                        "p1_m": 0,
+                        "p1_f": 0,
+                        "p2_m": 0,
+                        "p2_f": 0,
+                        "p3_m": 0,
+                        "p3_f": 0
+                    },
+                    "REFUGIES": {
+                        "p1_m": 0,
+                        "p1_f": 0,
+                        "p2_m": 0,
+                        "p2_f": 0,
+                        "p3_m": 0,
+                        "p3_f": 0
+                    },
+                    "RETOURNES": {
+                        "p1_m": 0,
+                        "p1_f": 0,
+                        "p2_m": 0,
+                        "p2_f": 0,
+                        "p3_m": 0,
+                        "p3_f": 0
+                    },
+                    "DEPLACES": {
+                        "p1_m": 0,
+                        "p1_f": 0,
+                        "p2_m": 0,
+                        "p2_f": 0,
+                        "p3_m": 0,
+                        "p3_f": 0
+                    }
+                }
+            },
+            "s3": {
+                "trades": [
+                    {
+                        "trade": 41,
+                        "duration": "M4_9",
+                        "p1_m": 3,
+                        "p1_f": 12,
+                        "p2_m": 1,
+                        "p2_f": 8,
+                        "p3_m": 0,
+                        "p3_f": 0
+                    },
+                    {
+                        "trade": "AUTRE",
+                        "trade_other": "Teinture traditionnelle",
+                        "duration": "LE3",
+                        "p1_m": 0,
+                        "p1_f": 6,
+                        "p2_m": 0,
+                        "p2_f": 0,
+                        "p3_m": 0,
+                        "p3_f": 0
+                    }
+                ],
+                "specials": {
+                    "HANDICAPES": {
+                        "p1_m": 0,
+                        "p1_f": 1,
+                        "p2_m": 0,
+                        "p2_f": 0,
+                        "p3_m": 0,
+                        "p3_f": 0
+                    },
+                    "REFUGIES": {
+                        "p1_m": 0,
+                        "p1_f": 0,
+                        "p2_m": 0,
+                        "p2_f": 0,
+                        "p3_m": 0,
+                        "p3_f": 0
+                    },
+                    "RETOURNES": {
+                        "p1_m": 0,
+                        "p1_f": 2,
+                        "p2_m": 0,
+                        "p2_f": 0,
+                        "p3_m": 0,
+                        "p3_f": 0
+                    },
+                    "DEPLACES": {
+                        "p1_m": 0,
+                        "p1_f": 0,
+                        "p2_m": 0,
+                        "p2_f": 1,
+                        "p3_m": 0,
+                        "p3_f": 0
+                    }
+                }
+            }
+        },
+        "Q5_DATE": "2026-02-10",
+        "Q5_REP_NOM": "Halima Souley",
+        "Q5_REP_TEL": "96123456",
+        "Q5_CHEF_NOM": "Abdou Moussa",
+        "Q5_CHEF_TEL": "90112233",
+        "Q5_PAPER_SIGNED": true,
+        "_ctx": {
+            "today": "2026-02-15",
+            "current_year": 2026,
+            "campaign_opens_on": "2026-01-05",
+            "gps_distance_km": 2.3,
+            "gps_max_km": 15,
+            "max_apprentices_per_trainer": 60,
+            "options": {
+                "trades.1": [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7,
+                    "AUTRE"
+                ],
+                "trades.2": [
+                    15,
+                    16,
+                    17,
+                    18,
+                    27,
+                    57,
+                    "AUTRE"
+                ],
+                "trades.3": [
+                    40,
+                    41,
+                    46,
+                    62,
+                    "AUTRE"
+                ]
+            }
+        },
+        "Q2_1": {
+            "LE3": {
+                "s1": {
+                    "M": 0,
+                    "F": 0
+                },
+                "s2": {
+                    "M": 0,
+                    "F": 0
+                },
+                "s3": {
+                    "M": 0,
+                    "F": 6
+                }
+            },
+            "M4_9": {
+                "s1": {
+                    "M": 0,
+                    "F": 0
+                },
+                "s2": {
+                    "M": 0,
+                    "F": 0
+                },
+                "s3": {
+                    "M": 4,
+                    "F": 20
+                }
+            },
+            "GT9": {
+                "s1": {
+                    "M": 0,
+                    "F": 0
+                },
+                "s2": {
+                    "M": 0,
+                    "F": 0
+                },
+                "s3": {
+                    "M": 0,
+                    "F": 0
+                }
+            }
+        }
+    },
+    "cases": [
+        {
+            "name": "Collecte de référence : aucune anomalie",
+            "patch": [],
+            "expect": {
+                "valid": true,
+                "errors": [],
+                "warnings": [],
+                "cleared": []
+            }
+        },
+        {
+            "name": "Latrines pour apprenants > total : avertissement, plus bloquant",
+            "patch": [
+                {
+                    "op": "set",
+                    "path": "Q2_11_2_a",
+                    "value": 9
+                }
+            ],
+            "expect": {
+                "valid": true,
+                "errors": [],
+                "warnings": [
+                    [
+                        "R_LATRINES_a_LE_TOTAL",
+                        "Q2_11_2_a"
+                    ],
+                    [
+                        "R_LATRINES_SUM",
+                        "Q2_11_2_a"
+                    ]
+                ],
+                "cleared": []
+            }
+        },
+        {
+            "name": "Aucun apprenti et aucune observation : avertissement",
+            "patch": [
+                {
+                    "op": "set",
+                    "path": "sectors.s3.trades",
+                    "value": []
+                }
+            ],
+            "expect": {
+                "valid": true,
+                "errors": [],
+                "warnings": [
+                    [
+                        "R_SPECIAL_s3_HANDICAPES_p1_f",
+                        "sectors.s3.specials.HANDICAPES.p1_f"
+                    ],
+                    [
+                        "R_SPECIAL_s3_RETOURNES_p1_f",
+                        "sectors.s3.specials.RETOURNES.p1_f"
+                    ],
+                    [
+                        "R_SPECIAL_s3_STATUS_SUM_p1_f",
+                        "sectors.s3.specials.REFUGIES.p1_f"
+                    ],
+                    [
+                        "R_SPECIAL_s3_DEPLACES_p2_f",
+                        "sectors.s3.specials.DEPLACES.p2_f"
+                    ],
+                    [
+                        "R_SPECIAL_s3_STATUS_SUM_p2_f",
+                        "sectors.s3.specials.REFUGIES.p2_f"
+                    ],
+                    [
+                        "R_NO_APPRENTICE",
+                        "sectors.s1.trades"
+                    ],
+                    [
+                        "R_Q2_1_VS_IV_LE3_s3_F",
+                        "Q2_1.LE3.s3.F"
+                    ],
+                    [
+                        "R_Q2_1_VS_IV_M4_9_s3_M",
+                        "Q2_1.M4_9.s3.M"
+                    ],
+                    [
+                        "R_Q2_1_VS_IV_M4_9_s3_F",
+                        "Q2_1.M4_9.s3.F"
+                    ]
+                ],
+                "cleared": []
+            }
+        },
+        {
+            "name": "Date d'autorisation dans le futur : avertissement",
+            "patch": [
+                {
+                    "op": "set",
+                    "path": "Q1_4",
+                    "value": "2099-01-01"
+                }
+            ],
+            "expect": {
+                "valid": true,
+                "errors": [],
+                "warnings": [
+                    [
+                        "R_DATE_FUTURE_Q1_4",
+                        "Q1_4"
+                    ],
+                    [
+                        "R_DATE_OPEN_BEFORE_AUTH",
+                        "Q1_5"
+                    ]
+                ],
+                "cleared": []
+            }
+        },
+        {
+            "name": "2.2 : placés > inscrits : avertissement",
+            "patch": [
+                {
+                    "op": "set",
+                    "path": "accompanied.LE3.PLACES.M",
+                    "value": 9
+                }
+            ],
+            "expect": {
+                "valid": true,
+                "errors": [],
+                "warnings": [
+                    [
+                        "R_ACC_PLACES_LE_INSCRITS_LE3_M",
+                        "accompanied.LE3.PLACES.M"
+                    ],
+                    [
+                        "R_ACC_SUM_LE3_M",
+                        "accompanied.LE3.PLACES.M"
+                    ]
+                ],
+                "cleared": []
+            }
+        },
+        {
+            "name": "Téléphone mal formé : avertissement (ne bloque plus)",
+            "patch": [
+                {
+                    "op": "set",
+                    "path": "Q5_REP_TEL",
+                    "value": "123"
+                }
+            ],
+            "expect": {
+                "valid": true,
+                "errors": [],
+                "warnings": [
+                    [
+                        "PATTERN",
+                        "Q5_REP_TEL"
+                    ]
+                ],
+                "cleared": []
+            }
+        },
+        {
+            "name": "Effectif négatif : valeur impossible, reste bloquant",
+            "patch": [
+                {
+                    "op": "set",
+                    "path": "Q2_11_1",
+                    "value": -2
+                }
+            ],
+            "expect": {
+                "valid": false,
+                "errors": [
+                    [
+                        "RANGE",
+                        "Q2_11_1"
+                    ]
+                ],
+                "warnings": [],
+                "cleared": []
+            }
+        }
+    ]
+}

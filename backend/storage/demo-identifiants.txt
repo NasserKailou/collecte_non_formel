@@ -1,0 +1,13 @@
+Comptes de DÉMONSTRATION — base de développement uniquement (13/11/2026 17:22)
+Back-office : http://localhost:8085/non_formel/  (les agents utilisent l'application mobile)
+
+Identifiant    Mot de passe         Profil
+DEMO-SUPREG    NMrK-6gKJ-5TzD       Superviseur régional (TILLABERI)
+DEMO-SUPDEP1   iMNx-bjP2-BA7S       Superviseur départemental (ABALA)
+DEMO-SUPDEP2   mmbG-QBwC-7dMm       Superviseur départemental (AYEROU)
+DEMO-AGENT1    sSnB-BmSU-X5Zd       Agent (application mobile)
+DEMO-AGENT2    GEe3-UevY-prQA       Agent (application mobile)
+DEMO-AGENT3    WbTq-EBMN-K8VK       Agent (application mobile)
+DEMO-LECTEUR   TfxJ-Wq3U-xHvb       Lecteur national
+
+Administrateur national : ADM-DEMO (mot de passe défini lors de sa création).

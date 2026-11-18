@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EFTP non formel — Back-office national</title>
+  <link rel="stylesheet" href="vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="vendor/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="vendor/dataTables.bootstrap5.min.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <!-- Écran de connexion -->
+  <main id="login-view" class="login-wrap d-none">
+    <div class="login-card card shadow-sm">
+      <div class="card-body p-4">
+        <div class="text-center mb-4">
+          <div class="brand-mark mx-auto mb-2"><i class="bi bi-tools"></i></div>
+          <h1 class="h4 mb-0">EFTP non formel</h1>
+          <p class="text-muted small mb-0">Recensement statistique — Ministère de l'Enseignement et de la Formation Techniques et Professionnels</p>
+        </div>
+        <form id="login-form" novalidate>
+          <div class="mb-3">
+            <label class="form-label" for="login-id">Matricule, téléphone ou e-mail</label>
+            <input class="form-control" id="login-id" name="identifier" autocomplete="username" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="login-pw">Mot de passe</label>
+            <input class="form-control" id="login-pw" name="password" type="password" autocomplete="current-password" required>
+          </div>
+          <div id="login-error" class="alert alert-danger small d-none" role="alert"></div>
+          <button class="btn btn-brand w-100" type="submit">Se connecter</button>
+        </form>
+        <form id="password-form" class="d-none" novalidate>
+          <div class="alert alert-warning small">Première connexion ou mot de passe réinitialisé : choisissez votre mot de passe personnel (10 caractères au moins, lettres et chiffres).</div>
+          <div class="mb-3">
+            <label class="form-label" for="pw-current">Mot de passe actuel</label>
+            <input class="form-control" id="pw-current" type="password" autocomplete="current-password" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="pw-new">Nouveau mot de passe</label>
+            <input class="form-control" id="pw-new" type="password" autocomplete="new-password" minlength="10" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="pw-confirm">Confirmer le nouveau mot de passe</label>
+            <input class="form-control" id="pw-confirm" type="password" autocomplete="new-password" minlength="10" required>
+          </div>
+          <div id="password-error" class="alert alert-danger small d-none" role="alert"></div>
+          <button class="btn btn-brand w-100" type="submit">Enregistrer le mot de passe</button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <!-- Application -->
+  <div id="app-view" class="d-none">
+    <nav class="navbar navbar-dark topbar px-3">
+      <button class="btn btn-sm btn-outline-light d-lg-none me-2" id="menu-toggle" type="button" aria-label="Menu"><i class="bi bi-list"></i></button>
+      <span class="navbar-brand mb-0 h1"><i class="bi bi-tools me-2"></i>EFTP non formel</span>
+      <div class="ms-auto d-flex align-items-center gap-3 text-white small">
+        <span id="user-label"></span>
+        <button class="btn btn-sm btn-outline-light" id="logout-btn" type="button"><i class="bi bi-box-arrow-right me-1"></i>Déconnexion</button>
+      </div>
+    </nav>
+    <div class="layout">
+      <aside class="sidebar" id="sidebar">
+        <ul class="nav flex-column" id="nav"></ul>
+      </aside>
+      <main class="content" id="content" tabindex="-1"></main>
+    </div>
+  </div>
+
+  <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toasts"></div>
+
+  <script src="vendor/jquery.min.js"></script>
+  <script src="vendor/bootstrap.bundle.min.js"></script>
+  <script src="vendor/dataTables.min.js"></script>
+  <script src="vendor/dataTables.bootstrap5.min.js"></script>
+  <script src="vendor/chart.umd.min.js"></script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
