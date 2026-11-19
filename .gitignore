@@ -1,0 +1,13 @@
+# Configuration et secrets propres au poste ou au serveur
+backend/config/local.php
+mobile/android/key.properties
+*.jks
+*.keystore
+
+# Données d'exécution (clé applicative, identifiants de démonstration, imports, exports, journaux, APK publiés)
+backend/storage/*
+!backend/storage/.gitkeep
+
+# Archives et APK produits
+dist/
+mobile/build/*

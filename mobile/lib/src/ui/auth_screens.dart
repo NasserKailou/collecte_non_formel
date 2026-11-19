@@ -64,6 +64,35 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  /// Mode Démo (formation) : accès sans compte ni réseau, dans une base séparée de la collecte réelle.
+  Future<void> _startDemo() async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (c) => AlertDialog(
+        icon: const Icon(Icons.school, color: brandOrange, size: 36),
+        title: const Text('Mode démonstration'),
+        content: const Text(
+            "Pour la formation : vous accédez à l'application sans vous connecter, avec des centres fictifs. "
+            'Vous pouvez créer un centre et remplir un questionnaire de bout en bout.\n\n'
+            'Les saisies de démonstration restent sur cette tablette, séparées de la collecte réelle, '
+            'et ne sont JAMAIS envoyées au serveur.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('Annuler')),
+          FilledButton.icon(onPressed: () => Navigator.pop(c, true), icon: const Icon(Icons.play_arrow), label: const Text('Entrer en démo')),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) return;
+    setState(() => _busy = true);
+    try {
+      await widget.app.enterDemo();
+    } catch (e) {
+      if (mounted) setState(() => _error = 'Démonstration indisponible : $e');
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final auth = widget.app.auth;
@@ -71,7 +100,8 @@ class _LoginScreenState extends State<LoginScreen> {
     final canOffline = auth.offlineUnlockAllowed;
     return Scaffold(
       body: SafeArea(
-        child: Center(
+        child: Stack(children: [
+          Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(24),
             child: ConstrainedBox(
@@ -80,11 +110,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 key: _form,
                 child: AutofillGroup(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                    const Icon(Icons.assignment, size: 56, color: brandGreenDark),
+                    Center(
+                      child: Image.asset('assets/branding/logo_mark.png', width: 88, height: 88, semanticLabel: 'Logo Collecte EFTP'),
+                    ),
                     const SizedBox(height: 8),
                     Text('Recensement EFTP non formel', textAlign: TextAlign.center, style: Theme.of(context).textTheme.headlineSmall),
                     const SizedBox(height: 4),
-                    const Text('Application de collecte des agents recenseurs', textAlign: TextAlign.center),
+                    const Text('Collecte (agents recenseurs) et supervision', textAlign: TextAlign.center),
                     const SizedBox(height: 24),
                     TextFormField(
                       controller: _id,
@@ -157,6 +189,25 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
         ),
+          Positioned(
+            top: 8,
+            right: 12,
+            child: Tooltip(
+              message: 'Mode démonstration pour la formation (sans connexion, rien n\'est envoyé)',
+              child: OutlinedButton.icon(
+                onPressed: _busy ? null : _startDemo,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: brandOrange,
+                  side: const BorderSide(color: brandOrange, width: 1.5),
+                  shape: const StadiumBorder(),
+                  minimumSize: const Size(48, 44),
+                ),
+                icon: const Icon(Icons.school),
+                label: const Text('Démo', style: TextStyle(fontWeight: FontWeight.w700)),
+              ),
+            ),
+          ),
+        ]),
       ),
     );
   }

@@ -20,6 +20,7 @@ const ROUTES = [
   { path: '/ma-saisie', title: 'Ma saisie', icon: 'pencil-square', perm: 'collection.submit', render: entry.list },
   { path: '/ma-saisie/:cs', title: 'Saisie', perm: 'collection.submit', render: entry.form, hidden: true },
   { path: '/collectes', title: 'Collectes', icon: 'clipboard-check', perm: 'collection.view', render: collections.list },
+  { path: '/collectes/:uuid/corriger', title: 'Correction', perm: 'collection.review', render: entry.correction, hidden: true },
   { path: '/collectes/:uuid', perm: 'collection.view', render: collections.detail, hidden: true },
   { path: '/statistiques', title: 'Statistiques', icon: 'bar-chart-line', perm: 'stats.view', render: stats.render },
   { path: '/carte', title: 'Carte des centres', icon: 'geo-alt', perm: 'stats.view', render: mapPage.render },

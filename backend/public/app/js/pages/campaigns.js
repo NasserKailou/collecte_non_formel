@@ -101,7 +101,7 @@ function campaignForm(years, done, c = null) {
       </div></fieldset>
       <fieldset class="form-section"><legend>3. Questionnaire et contrôle</legend>
       ${frozen ? '<p class="small text-muted mb-2"><i class="bi bi-lock me-1" aria-hidden="true"></i>Questionnaire et niveaux de validation figés depuis l\'ouverture de la campagne.</p>' : `<div class="row g-3"><div class="col-md-4"><label class="form-label" for="c-v">Version du questionnaire${REQ}</label><select class="form-select" id="c-v" name="questionnaire_version" required>${options(versions.map((v) => ({ id: v, name: v })), c?.questionnaire_version || '2025.1')}</select></div>
-      <div class="col-md-8"><label class="form-label" for="c-l">Circuit de validation${REQ}</label><select class="form-select" id="c-l" name="validation_levels" required aria-describedby="c-l-hint">${options([{ id: 2, name: 'Départementale puis régionale' }, { id: 1, name: 'Départementale seule' }], c?.validation_levels ?? 2)}</select>
+      <div class="col-md-8"><label class="form-label" for="c-l">Circuit de validation${REQ}</label><select class="form-select" id="c-l" name="validation_levels" required aria-describedby="c-l-hint">${options([{ id: 1, name: 'Un niveau : superviseur régional (recommandé)' }, { id: 2, name: 'Deux niveaux : départemental puis régional' }], c?.validation_levels ?? 1)}</select>
         <small class="form-hint" id="c-l-hint">Figé à l'ouverture de la campagne.</small></div></div>`}
       </fieldset>
       <label class="form-label" for="c-i">Consignes aux agents</label><textarea class="form-control" id="c-i" name="instructions" rows="3" maxlength="2000" aria-describedby="c-i-hint">${h(c?.instructions)}</textarea>
@@ -136,7 +136,7 @@ async function campaignCard(id, allCampaigns, onChanged) {
         <div class="col-lg-5"><ul class="list-group small">
           <li class="list-group-item">Année : ${h(c.academic_year)} — questionnaire ${h(c.questionnaire_version)}</li>
           <li class="list-group-item">Période : ${fmtDate(c.opens_on)} → ${fmtDate(c.closes_on)}</li>
-          <li class="list-group-item">Validation : ${c.validation_levels === 2 ? 'départementale puis régionale' : 'départementale seule'}</li>
+          <li class="list-group-item">Validation : ${c.validation_levels === 2 ? 'départementale puis régionale' : 'un niveau (superviseur régional)'}</li>
           <li class="list-group-item">Structures ciblées : <strong>${h(c.targeted)}</strong> — affectées : <strong>${h(c.assigned)}</strong> — non affectées : <strong>${h(c.unassigned)}</strong></li>
           ${c.instructions ? `<li class="list-group-item">Consignes : ${h(c.instructions)}</li>` : ''}
         </ul>

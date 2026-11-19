@@ -132,6 +132,60 @@ final class EntryService
         return ['uuid' => $uuid, 'saved_at' => date('c'), 'validation' => $check];
     }
 
+    /**
+     * Questionnaire d'une collecte ouvert par son superviseur (lecture, ou correction si $editable) : même forme
+     * que open(), pour réutiliser le formulaire web. Le périmètre est vérifié par l'appelant (ReviewService::get).
+     */
+    public function reviewView(string $uuid, bool $editable): array
+    {
+        $col = $this->db->fetchOne('SELECT id, uuid, status, revision, channel, campaign_structure_id FROM collections WHERE uuid = ?', [strtolower($uuid)])
+            ?? throw new HttpException(404, 'NOT_FOUND', 'Collecte introuvable.');
+        $a = $this->db->fetchOne(
+            "SELECT cs.id, c.id AS campaign_id, c.code AS campaign_code, c.name AS campaign_name, c.collection_mode,
+                    col.questionnaire_version_id, v.version_code, s.uuid, s.official_code, s.name, s.commune_id, co.department_id, d.region_id,
+                    t.code AS type_code, s.zone, s.legal_status, s.locality_label, co.name AS commune, d.name AS department, r.name AS region
+               FROM collections col JOIN campaign_structures cs ON cs.id = col.campaign_structure_id JOIN campaigns c ON c.id = cs.campaign_id
+               JOIN questionnaire_versions v ON v.id = col.questionnaire_version_id JOIN structures s ON s.id = cs.structure_id
+               JOIN structure_types t ON t.id = s.structure_type_id JOIN communes co ON co.id = s.commune_id
+               JOIN departments d ON d.id = co.department_id JOIN regions r ON r.id = d.region_id
+              WHERE col.id = ?", [$col['id']]);
+        $definition = json_decode((string) $this->db->fetchValue('SELECT definition_json FROM questionnaire_versions WHERE id = ?',
+            [$a['questionnaire_version_id']]), true, 512, JSON_THROW_ON_ERROR);
+        $payload = json_decode((string) $this->db->fetchValue(
+            'SELECT payload_json FROM collection_submissions WHERE collection_id = ? AND revision = ?', [$col['id'], $col['revision']]), true) ?? [];
+        $data = $payload['data'] ?? [];
+        $csId = (int) $col['campaign_structure_id'];
+        return [
+            'campaign_structure_id' => $csId,
+            'campaign' => ['id' => (int) $a['campaign_id'], 'code' => $a['campaign_code'], 'name' => $a['campaign_name'], 'collection_mode' => $a['collection_mode'],
+                'questionnaire_version' => $a['version_code'], 'allowed_channels' => ['WEB']],
+            'structure' => $this->structure($a),
+            'uuid' => $col['uuid'],
+            'base_revision' => (int) $col['revision'],
+            'collection' => ['status' => $col['status'], 'revision' => (int) $col['revision'], 'channel' => $col['channel'], 'review' => null],
+            'editable' => $editable,
+            'source' => 'DERNIERE_REVISION',
+            'channel' => 'WEB',
+            'paper' => null,
+            'data' => $data,
+            'definition' => $definition,
+            'trades' => $this->trades(),
+            'validation' => $this->submissions->dryRun($csId, $data),
+        ];
+    }
+
+    /** Contrôle à blanc d'une correction en cours (superviseur), sans écriture. */
+    public function reviewCheck(string $uuid, array $data): array
+    {
+        $csId = (int) ($this->db->fetchValue('SELECT campaign_structure_id FROM collections WHERE uuid = ?', [strtolower($uuid)])
+            ?? throw new HttpException(404, 'NOT_FOUND', 'Collecte introuvable.'));
+        if ($data !== [] && array_is_list($data)) {
+            throw new HttpException(422, 'VALIDATION_FAILED', 'Champ « data » (objet) attendu.');
+        }
+        unset($data['_ctx']);
+        return ['validation' => $this->submissions->dryRun($csId, $data)];
+    }
+
     public function discardDraft(int $userId, int $csId): void
     {
         $this->assertAssigned($userId, $csId);

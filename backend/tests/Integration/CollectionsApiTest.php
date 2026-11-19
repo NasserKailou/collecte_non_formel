@@ -263,6 +263,34 @@ final class CollectionsApiTest extends ApiTestCase
         $this->assertSame('VALIDEE', $this->call('POST', "/collections/{$ctx['uuid']}/validate", [], $supDep)->body['data']['status']);
     }
 
+    public function testRegionalSupervisorOpensCorrectsThenValidates(): void
+    {
+        $ctx = $this->setUpCollection(1); // circuit à un niveau : superviseur régional
+        $this->submit($ctx);
+        $u = $ctx['uuid'];
+        $supReg = $this->tokenFor($this->createUser('SUP_REG'));
+        $other = $this->tokenFor($this->createUser('SUP_REG'));
+
+        $view = $this->call('GET', "/collections/$u/edit", token: $supReg);
+        $this->assertSame(200, $view->status, json_encode($view->body, JSON_UNESCAPED_UNICODE));
+        $this->assertTrue($view->body['data']['editable']);
+        $data = $view->body['data']['data'];
+        $data['Q5_REP_NOM'] = 'Nom corrigé par le superviseur';
+        $this->assertArrayHasKey('errors', $this->call('POST', "/collections/$u/check", ['data' => $data], $supReg)->body['data']['validation']);
+
+        $fixed = $this->call('PUT', "/collections/$u/data", ['data' => $data, 'comment' => 'Nom du répondant'], $supReg);
+        $this->assertSame(200, $fixed->status, json_encode($fixed->body, JSON_UNESCAPED_UNICODE));
+        $this->assertSame(['EN_CONTROLE', 2], [$fixed->body['data']['status'], $fixed->body['data']['revision']]);
+        $this->assertSame('Nom corrigé par le superviseur', $fixed->body['data']['data']['Q5_REP_NOM']);
+        $this->assertSame($ctx['agent'], self::$db->fetchValue('SELECT u.matricule FROM collections c JOIN users u ON u.id = c.agent_id WHERE c.uuid = ?', [$u]),
+            "L'agent auteur ne change pas");
+        $this->assertSame('ALREADY_CLAIMED', $this->call('PUT', "/collections/$u/data", ['data' => $data], $other)->body['error']['code']);
+        $this->assertSame(403, $this->call('PUT', "/collections/$u/data", ['data' => $data], $ctx['token'])->status, "L'agent ne corrige pas par cette voie");
+
+        $this->assertSame('VALIDEE', $this->call('POST', "/collections/$u/validate", [], $supReg)->body['data']['status']);
+        $this->assertFalse($this->call('GET', "/collections/$u/edit", token: $supReg)->body['data']['editable'], 'Validée : lecture seule');
+    }
+
     public function testInvalidationCorrectionAndResubmission(): void
     {
         $ctx = $this->setUpCollection(1);

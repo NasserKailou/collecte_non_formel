@@ -151,9 +151,9 @@ final class CampaignService
         }
         $versionId = $this->publishedVersion($in['questionnaire_version'] ?? null, $errors);
         [$opens, $closes] = $this->dateRange($in, 'opens_on', 'closes_on', $errors, true);
-        $levels = $in['validation_levels'] ?? 2;
+        $levels = $in['validation_levels'] ?? 1;
         if (!in_array($levels, [1, 2], true)) {
-            $errors[] = ['field' => 'validation_levels', 'message' => 'Niveaux de validation : 1 (départemental) ou 2 (départemental puis régional).'];
+            $errors[] = ['field' => 'validation_levels', 'message' => 'Niveaux de validation : 1 (superviseur régional) ou 2 (départemental puis régional).'];
         }
         $instructions = $this->text($in['instructions'] ?? null, 10000, false);
         $mode = $this->collectionMode($in['collection_mode'] ?? 'TABLETTE', $errors);

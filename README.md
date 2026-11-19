@@ -44,6 +44,10 @@ Paramètres propres au poste : `backend/config/local.php` (non versionné) ou va
 
 Sécurité de l'installation de développement : le projet étant sous `htdocs`, `non_formel/.htaccess` interdit tout accès web sauf `backend/public/`. **En production, la racine web doit pointer directement sur `backend/public/`.**
 
+### Production — https://eftpnonformel.ins.ne
+
+Dossier de déploiement complet (VPS Ubuntu 24.04, Apache + PHP 8.3-FPM + MariaDB, Let's Encrypt, cron, sauvegardes, APK signé) : **[deploy/README.md](deploy/README.md)**. API de production : `https://eftpnonformel.ins.ne/api/v1` (adresse par défaut de l'application mobile).
+
 ### Lancer les tests
 
 ```bash

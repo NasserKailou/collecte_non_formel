@@ -53,6 +53,27 @@ export async function list(el) {
 
 export async function form(el, { cs }) {
   const s = (await get(`/entry/${encodeURIComponent(cs)}`)).data;
+  return renderForm(el, s, {
+    review: false,
+    back: '<a href="#/ma-saisie" class="small"><i class="bi bi-arrow-left" aria-hidden="true"></i> Ma saisie</a>',
+    savedText: 'Brouillon enregistré',
+    check: async (payload) => (await put(`/entry/${cs}/draft`, payload)).data.validation,
+  });
+}
+
+/** Superviseur : ouvre le questionnaire d'une collecte de son périmètre, le corrige et enregistre une nouvelle révision. */
+export async function correction(el, { uuid }) {
+  const s = (await get(`/collections/${encodeURIComponent(uuid)}/edit`)).data;
+  return renderForm(el, s, {
+    review: true,
+    back: `<a href="#/collectes/${h(uuid)}" class="small"><i class="bi bi-arrow-left" aria-hidden="true"></i> Retour à la fiche de contrôle</a>`,
+    savedText: 'Contrôle mis à jour',
+    check: async (payload) => (await post(`/collections/${encodeURIComponent(uuid)}/check`, { data: payload.data })).data.validation,
+  });
+}
+
+async function renderForm(el, s, mode) {
+  const cs = s.campaign_structure_id;
   const def = s.definition;
   const state = {
     data: s.data || {},
@@ -67,14 +88,15 @@ export async function form(el, { cs }) {
   const editable = s.editable;
   const allowed = s.campaign.allowed_channels.filter((c) => c !== 'MOBILE');
 
-  el.innerHTML = `<div class="page-title"><div><a href="#/ma-saisie" class="small"><i class="bi bi-arrow-left" aria-hidden="true"></i> Ma saisie</a>
+  el.innerHTML = `<div class="page-title"><div>${mode.back}
       <h1>${h(s.structure.name)} <small class="text-muted fs-6"><code>${h(s.structure.official_code || '')}</code></small></h1>
       <div class="small text-muted">${h(s.structure.region)} › ${h(s.structure.department)} › ${h(s.structure.commune)} — ${h(s.campaign.name)} — questionnaire ${h(s.campaign.questionnaire_version)}</div></div>
       <div class="d-flex flex-wrap gap-2 align-items-center"><span class="small text-muted" id="f-saved" aria-live="polite"></span>
-        ${editable ? `<button class="btn btn-outline-secondary" data-act="discard">Abandonner le brouillon</button>
-        <button class="btn btn-brand" data-act="submit"><i class="bi bi-send me-1" aria-hidden="true"></i>Soumettre</button>` : ''}</div></div>
-    ${banner(s)}
-    ${editable ? channelBlock(allowed, state) : ''}
+        ${editable && !mode.review ? `<button class="btn btn-outline-secondary" data-act="discard">Abandonner le brouillon</button>
+        <button class="btn btn-brand" data-act="submit"><i class="bi bi-send me-1" aria-hidden="true"></i>Soumettre</button>` : ''}
+        ${editable && mode.review ? '<button class="btn btn-brand" data-act="submit"><i class="bi bi-save me-1" aria-hidden="true"></i>Enregistrer la correction</button>' : ''}</div></div>
+    ${mode.review ? reviewBanner(s) : banner(s)}
+    ${editable && !mode.review ? channelBlock(allowed, state) : ''}
     <div class="row g-3">
       <div class="col-lg-3"><nav class="card"><div class="list-group list-group-flush" id="f-sections" aria-label="Sections du questionnaire"></div></nav>
         <div class="card mt-3"><div class="card-body"><h2 class="h6">Contrôle</h2><div id="f-issues" class="small" aria-live="polite"></div></div></div></div>
@@ -333,9 +355,8 @@ export async function form(el, { cs }) {
     state.saving = true;
     state.dirty = false;
     try {
-      const r = (await put(`/entry/${cs}/draft`, { data: clean(state.data), channel: state.channel, paper: state.channel === 'PAPIER' ? state.paper : null })).data;
-      state.validation = r.validation;
-      savedLabel.textContent = `Brouillon enregistré à ${new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
+      state.validation = await mode.check({ data: clean(state.data), channel: state.channel, paper: state.channel === 'PAPIER' ? state.paper : null });
+      savedLabel.textContent = `${mode.savedText} à ${new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
       refreshIssues();
     } catch (e) {
       state.dirty = true;
@@ -490,6 +511,17 @@ export async function form(el, { cs }) {
         toast(`${state.validation.errors.length} erreur(s) bloquante(s) à corriger avant de soumettre.`, 'error');
         return;
       }
+      if (mode.review) {
+        const ok = await confirmBox({ title: 'Enregistrer la correction',
+          message: "Une nouvelle révision sera enregistrée à votre nom (l'agent auteur ne change pas). La collecte reste ensuite à votre décision : la valider ou la renvoyer à l'agent.",
+          confirmLabel: 'Enregistrer' });
+        if (ok === null) return;
+        const r = (await put(`/collections/${s.uuid}/data`, { data: clean(state.data) })).data;
+        state.dirty = false;
+        toast(`Correction enregistrée (révision ${r.revision}).`);
+        window.location.hash = `#/collectes/${s.uuid}`;
+        return;
+      }
       const r = (await post(`/collections/${s.uuid}/submissions`, {
         campaign_structure_id: s.campaign_structure_id, questionnaire_version: s.campaign.questionnaire_version, base_revision: s.base_revision,
         data: clean(state.data), channel: state.channel, ...(state.channel === 'PAPIER' ? { paper: state.paper } : {}),
@@ -513,6 +545,13 @@ export async function form(el, { cs }) {
   window.addEventListener('hashchange', () => { if (state.dirty) save(); }, { once: true });
 
   drawSection();
+}
+
+function reviewBanner(s) {
+  return s.editable
+    ? `<div class="alert alert-warning"><i class="bi bi-pencil-square me-1" aria-hidden="true"></i><strong>Correction par le superviseur</strong> — révision ${h(s.collection.revision)}.
+        Les contrôles s'actualisent pendant la saisie ; rien n'est enregistré avant « Enregistrer la correction ».</div>`
+    : `<div class="alert alert-secondary">Lecture seule (révision ${h(s.collection.revision)}) : pour corriger, la collecte doit être soumise ou prise en charge par vous.</div>`;
 }
 
 function banner(s) {

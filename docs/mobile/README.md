@@ -84,4 +84,35 @@ Ajouts du 15/11/2026 :
 - **Synchronisation en arrière-plan (WorkManager) non encore faite** : la synchronisation se fait à l'ouverture, au retour du réseau, toutes les 10 minutes application ouverte, et manuellement.
 - Campagne en mode `PAPIER` : la tablette refuse de commencer une collecte (saisie dans le back-office).
 
+Production (18/11/2026) : adresse par défaut `https://eftpnonformel.ins.ne/api/v1` ; HTTPS seul en release, exceptions HTTP de développement limitées au build de débogage (`src/debug/res/xml/network_security_config.xml`) ; signature par `android/key.properties` (repli sur la clé de débogage avec avertissement). Compilation : `deploy/mobile/build-apk.ps1` — voir [deploy/README.md](../../deploy/README.md) §7.
+
 Limites connues : APK non produit sur le poste de développement (disque plein : 1,4 Go libres, compilation Gradle interrompue) ; aucun essai sur tablette réelle ; identifiant d'application provisoire `ne.eftpnf.eftp_nf_collecte`, à remplacer par l'identifiant officiel ; trafic HTTP en clair autorisé seulement vers les adresses de développement (`network_security_config.xml`, à retirer en production).
+
+## Mode Démo (formation des agents)
+
+Bouton **Démo** en haut à droite de l'écran de connexion. Il donne accès à l'application **sans compte et sans réseau**, pour former les agents de bout en bout : 5 centres fictifs à collecter, création d'un « Nouveau centre », questionnaire complet (dernière version publiée), « Terminer », puis synchronisation **simulée** (les collectes passent à « Envoyée — en contrôle »).
+
+**Séparation avec la collecte réelle** (`lib/src/demo/demo_mode.dart`) :
+
+- base locale **distincte** (`eftp_nf_demo.db`, chiffrée comme la base réelle) ; la base de collecte (`eftp_nf.db`), le compte de l'agent et ses jetons ne sont ni lus ni modifiés ;
+- **aucun appel au serveur** : en démo, `AppState.synchronize` simule l'envoi sur la tablette ; le menu n'offre ni test de connexion, ni verrouillage, ni déconnexion ;
+- bandeau orange permanent « MODE DÉMO — formation… » ; campagne « Formation — démonstration » et centres nommés « DÉMO — … » (codes `9999…`) ;
+- menu ⋮ › **Réinitialiser la démo** (efface les saisies de démonstration et repart du jeu initial) ; **Quitter la démo** (retour à l'écran de connexion ; les saisies de démo sont gardées pour la séance suivante).
+
+Le contenu (référentiels RENACOM, métiers, types de structure, questionnaire, centres fictifs) est embarqué dans `assets/demo/demo_pack.json`. Après un changement de questionnaire ou de référentiel, le régénérer puis recompiler l'APK :
+
+```bash
+php backend/bin/export-demo-pack.php     # → mobile/assets/demo/demo_pack.json
+```
+
+Test : `flutter test test/demo_mode_test.dart` (parcours complet, et vérification que la base réelle reste vide).
+
+## Logo et icône
+
+Logo et icônes générés dans la charte de la plateforme (vert `#128A3E` / `#0D6B30`, orange `#D35400`) : fiche de recensement validée et badge engrenage (formation technique et professionnelle).
+
+```bash
+cd mobile && python tool/generate_branding.py    # Pillow requis
+```
+
+Produit l'icône Android classique et l'icône adaptative (avant-plan, fond `#0D6B30`, icône monochrome Android 13+) dans `android/app/src/main/res/mipmap-*`. Il produit aussi `assets/branding/logo_mark.png` (écran de connexion), `logo_horizontal.png` (documents, présentations) et `icon_1024.png`.

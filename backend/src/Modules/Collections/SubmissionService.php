@@ -229,6 +229,60 @@ final class SubmissionService
     }
 
     /**
+     * Correction d'une collecte par son superviseur (contrôle régional) : nouvelle révision écrite au nom du
+     * superviseur (canal WEB), sans changer l'agent auteur. La collecte reste EN_CONTROLE, prise en charge par le
+     * superviseur, qui la valide ou la renvoie ensuite. Mêmes contrôles du questionnaire et mêmes champs verrouillés
+     * que la soumission. Droits, statut et verrou : vérifiés par l'appelant (ReviewService::correct, en transaction).
+     *
+     * @param array $c ligne de collections (id, revision, structure_id, campaign_id, questionnaire_version_id, version_code, campaign_structure_id)
+     * @return array{revision:int, warnings:list<array>}
+     */
+    public function applyReviewerCorrection(array $c, array $data, int $reviewerId): array
+    {
+        if ($data !== [] && array_is_list($data)) {
+            throw new HttpException(422, 'VALIDATION_FAILED', 'Champ « data » : objet attendu.');
+        }
+        unset($data['_ctx']);
+        $structure = (new StructureService($this->db))->detail((int) $c['structure_id']);
+        foreach (self::LOCKED_PREFILL as $q => $field) {
+            $data[$q] = $structure[$field];
+        }
+        [$engine, $definition] = $this->engine((int) $c['questionnaire_version_id']);
+        $gps = is_array($data['GPS'] ?? null) ? $data['GPS'] : [];
+        $distance = $this->gpsDistanceKm((int) $structure['commune_id'], $gps);
+        $opens = (string) $this->db->fetchValue('SELECT opens_on FROM campaigns WHERE id = ?', [$c['campaign_id']]);
+        $result = $engine->validate($data + ['_ctx' => $this->context($opens, $distance)]);
+        if (!$result['valid']) {
+            throw new HttpException(422, 'VALIDATION_FAILED', count($result['errors']) . " erreur(s) bloquante(s) : corriger avant d'enregistrer.",
+                ['errors' => $result['errors'], 'warnings' => $result['warnings']]);
+        }
+        $clean = $result['data'];
+        $revision = (int) $c['revision'] + 1;
+        $csId = (int) $c['campaign_structure_id'];
+        $hash = hash('sha256', self::canonicalJson(['campaign_structure_id' => $csId, 'questionnaire_version' => $c['version_code'], 'data' => $data]));
+        $fields = [
+            'revision' => $revision,
+            'locality_label' => self::str($clean['Q1_6_4'] ?? null, 150),
+            'latitude' => self::num($gps['lat'] ?? null), 'longitude' => self::num($gps['lng'] ?? null), 'gps_accuracy_m' => self::num($gps['accuracy_m'] ?? null),
+            'gps_status' => in_array($gps['status'] ?? null, ['OK', 'MANUEL', 'INDISPONIBLE', 'REFUSE'], true) ? $gps['status'] : 'INDISPONIBLE',
+            'gps_note' => self::str($gps['note'] ?? null, 255), 'gps_distance_km' => $distance === null ? null : round($distance, 2),
+            'filled_on' => is_string($clean['Q5_DATE'] ?? null) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $clean['Q5_DATE']) === 1 ? $clean['Q5_DATE'] : null,
+            'warnings_count' => min(65535, count($result['warnings'])), 'paper_form_signed' => ($clean['Q5_PAPER_SIGNED'] ?? false) === true ? 1 : 0,
+            'payload_sha256' => $hash,
+        ];
+        $this->db->execute('UPDATE collections SET ' . implode(', ', array_map(static fn($k) => "$k = ?", array_keys($fields))) . ', last_submitted_at = NOW() WHERE id = ?',
+            [...array_values($fields), $c['id']]);
+        $this->persistChildren((int) $c['id'], $clean, $result['computed'], $definition);
+        $report = ['warnings' => $result['warnings'], 'cleared' => $result['cleared'], 'locked_overrides' => [], 'corrected_by_reviewer' => $reviewerId];
+        $this->db->execute('INSERT INTO collection_submissions (collection_id, revision, payload_json, payload_sha256, validation_report, device_id, app_version, channel, submitted_by)
+                            VALUES (?, ?, ?, ?, ?, NULL, NULL, ?, ?)',
+            [$c['id'], $revision, json_encode(['campaign_structure_id' => $csId, 'questionnaire_version' => $c['version_code'], 'data' => $data],
+                JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR | JSON_PRESERVE_ZERO_FRACTION),
+                $hash, json_encode($report, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR), 'WEB', $reviewerId]);
+        return ['revision' => $revision, 'warnings' => $result['warnings']];
+    }
+
+    /**
      * Contrôle « à blanc » pour la saisie web : mêmes règles, même contexte et mêmes champs verrouillés que la
      * soumission, sans aucune écriture. L'autorisation (affectation) est vérifiée par l'appelant.
      *

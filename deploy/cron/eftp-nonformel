@@ -1,0 +1,12 @@
+# /etc/cron.d/eftp-nonformel — tâches planifiées de la plateforme EFTP non formel.
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# Exports (Excel, CSV, PDF) et purge des fichiers expirés — chaque minute, une seule instance à la fois.
+* * * * *   www-data  flock -n /tmp/eftp-worker.lock php /var/www/eftpnonformel/current/backend/bin/worker.php --once >> /var/www/eftpnonformel/shared/storage/logs/worker.log 2>&1
+
+# Sauvegarde quotidienne (base + stockage) à 02:30, conservation 14 jours.
+30 2 * * *  root      /var/www/eftpnonformel/current/deploy/scripts/backup.sh >> /var/log/eftp-backup.log 2>&1
+
+# Journaux applicatifs datés (storage/logs/app-AAAA-MM-JJ.log) : conservation 90 jours.
+15 3 * * *  root      find /var/www/eftpnonformel/shared/storage/logs -name 'app-*.log' -mtime +90 -delete

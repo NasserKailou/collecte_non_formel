@@ -133,6 +133,7 @@ export async function detail(el, { uuid }) {
     validate: '<button class="btn btn-green" data-act="validate"><i class="bi bi-check2-circle me-1"></i>Valider</button>',
     invalidate: '<button class="btn btn-outline-danger" data-act="invalidate"><i class="bi bi-x-circle me-1"></i>Invalider</button>',
     reopen: '<button class="btn btn-outline-warning" data-act="reopen">Rouvrir</button>',
+    correct: `<a class="btn btn-outline-success" href="#/collectes/${h(uuid)}/corriger"><i class="bi bi-pencil-square me-1"></i>Ouvrir et corriger</a>`,
   };
   const levelText = c.campaign.validation_levels === 2 && ['SOUMISE', 'EN_CONTROLE'].includes(c.status) ? `niveau ${c.review_level} sur 2` : '';
   const keyNumbers = [['APPRENTICES_TOTAL', 'Apprentis (Section IV)'], ['Q2_19.T', 'Maîtres artisans / formateurs'],

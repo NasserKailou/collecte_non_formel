@@ -15,16 +15,27 @@ import 'package:url_launcher/url_launcher.dart';
 import 'app_config.dart';
 import 'data/local_db.dart';
 import 'data/secure_store.dart';
+import 'demo/demo_mode.dart';
 import 'net/api_client.dart';
 import 'services/auth_service.dart';
 import 'services/collection_service.dart';
 import 'services/sync_service.dart';
 
 class AppState extends ChangeNotifier {
-  late final LocalDb db;
-  late final AuthService auth;
-  late final SyncService sync;
-  late final CollectionService collections;
+  /// Base et service de collecte EN COURS D'USAGE : ceux de la collecte réelle, ou ceux du mode Démo.
+  late LocalDb db;
+  late CollectionService collections;
+  late final AuthService auth; // toujours sur la base réelle
+  late final SyncService sync; // toujours sur la base réelle ; jamais appelé en mode Démo
+
+  late final LocalDb _realDb;
+  late final CollectionService _realCollections;
+  late final String _dataDir;
+  late final String _dbKey;
+  LocalDb? _demoDb;
+
+  /// Mode Démo (formation) : base séparée, aucun envoi au serveur. Voir demo/demo_mode.dart.
+  bool demo = false;
 
   Session? session;
   bool ready = false;
@@ -41,19 +52,24 @@ class AppState extends ChangeNotifier {
     try {
       final secrets = Secrets(KeystoreSecretStore());
       final dir = await getApplicationSupportDirectory();
-      db = LocalDb.open(p.join(dir.path, 'eftp_nf.db'), await secrets.databaseKey());
+      _dataDir = dir.path;
+      _dbKey = await secrets.databaseKey();
+      _realDb = db = LocalDb.open(p.join(dir.path, 'eftp_nf.db'), _dbKey);
       final deviceUid = await secrets.deviceUid();
       final api = ApiClient(tokens: SecretTokenProvider(secrets), deviceUid: deviceUid);
-      auth = AuthService(db: db, api: api, secrets: secrets, deviceUid: deviceUid, device: await _deviceInfo());
-      sync = SyncService(db: db, api: api);
-      collections = CollectionService(db);
+      auth = AuthService(db: _realDb, api: api, secrets: secrets, deviceUid: deviceUid, device: await _deviceInfo());
+      sync = SyncService(db: _realDb, api: api);
+      _realCollections = collections = CollectionService(_realDb);
       ready = true;
       // Connexion mémorisée : l'agent déjà connecté une fois arrive directement sur ses structures.
       final remembered = auth.restoreRemembered();
       if (remembered != null) {
         session = remembered;
-        _startAutoSync();
-        unawaited(synchronize()); // en ligne si le réseau le permet (jetons rafraîchis) ; sinon nouvel essai automatique
+        if (!remembered.isSupervisor) {
+          // (superviseur : aucune collecte à synchroniser)
+          _startAutoSync();
+          unawaited(synchronize()); // en ligne si le réseau le permet (jetons rafraîchis) ; sinon nouvel essai automatique
+        }
       }
     } catch (e) {
       fatalError = 'Démarrage impossible : $e';
@@ -73,6 +89,10 @@ class AppState extends ChangeNotifier {
 
   void signedIn(Session s) {
     session = s;
+    if (s.isSupervisor) {
+      notifyListeners(); // superviseur : écran de supervision, aucune synchronisation de collecte
+      return;
+    }
     _startAutoSync();
     notifyListeners();
     if (s.online) synchronize();
@@ -93,8 +113,70 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  // ------------------------------------------------------------- Mode Démo
+
+  String get _demoPath => p.join(_dataDir, DemoMode.fileName);
+
+  /// Entrée en mode Démo depuis l'écran de connexion : aucun compte, aucun réseau. La base réelle reste intacte.
+  Future<void> enterDemo() async {
+    if (demo || !ready) return;
+    _demoDb ??= await DemoMode.open(_demoPath, _dbKey);
+    db = _demoDb!;
+    collections = CollectionService(_demoDb!);
+    demo = true;
+    session = DemoMode.session();
+    lastSyncOk = true;
+    lastSyncMessage = "Mode démonstration : les saisies restent sur cette tablette et ne sont jamais envoyées au serveur.";
+    notifyListeners();
+  }
+
+  /// Retour à l'écran de connexion et à la base réelle. Les saisies de démonstration sont conservées pour la
+  /// séance suivante, sauf [reset].
+  Future<void> exitDemo({bool reset = false}) async {
+    if (!demo) return;
+    demo = false;
+    session = null;
+    db = _realDb;
+    collections = _realCollections;
+    lastSyncMessage = null;
+    lastSyncOk = true;
+    notifyListeners();
+    if (reset) _dropDemoDb();
+  }
+
+  /// Efface toutes les saisies de démonstration et repart du jeu initial (centres fictifs).
+  Future<void> resetDemo() async {
+    if (!demo) return;
+    ready = false; // écran d'attente : aucune vue ne lit la base pendant son remplacement
+    notifyListeners();
+    try {
+      _dropDemoDb();
+      _demoDb = await DemoMode.open(_demoPath, _dbKey);
+      db = _demoDb!;
+      collections = CollectionService(_demoDb!);
+      lastSyncMessage = 'Démonstration réinitialisée.';
+    } finally {
+      ready = true;
+      notifyListeners();
+    }
+  }
+
+  void _dropDemoDb() {
+    _demoDb?.close();
+    _demoDb = null;
+    DemoMode.delete(_demoPath);
+  }
+
   Future<SyncReport?> synchronize({bool force = false}) async {
-    if (session == null || syncing) return null;
+    if (session == null || syncing || session!.isSupervisor) return null;
+    if (demo) {
+      // Démo : envoi simulé sur la tablette, JAMAIS de requête vers le serveur.
+      final r = DemoMode.simulateSync(db);
+      lastSyncOk = true;
+      lastSyncMessage = '${r.summary()} — simulation : mode démonstration, rien n\'est envoyé au serveur.';
+      notifyListeners();
+      return r;
+    }
     syncing = true;
     notifyListeners();
     try {
@@ -154,7 +236,8 @@ class AppState extends ChangeNotifier {
   @override
   void dispose() {
     _stopAutoSync();
-    if (ready) db.close();
+    _demoDb?.close();
+    if (ready) _realDb.close();
     super.dispose();
   }
 }

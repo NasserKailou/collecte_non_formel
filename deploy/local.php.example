@@ -1,0 +1,42 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * Configuration de PRODUCTION — https://eftpnonformel.ins.ne
+ *
+ * Sur le serveur, ce fichier vit dans /var/www/eftpnonformel/shared/local.php (hors des versions déployées)
+ * et chaque version y pointe par un lien symbolique backend/config/local.php.
+ * install-server.sh le crée automatiquement en remplaçant __DB_PASS__ et __APP_KEY__ par des valeurs aléatoires.
+ *
+ * Droits : propriétaire root, groupe www-data, mode 0640. Ne jamais le versionner.
+ */
+
+return [
+    'app' => [
+        'env' => 'prod',          // interdit migrate --fresh et seed-demo.php ; masque les erreurs PHP
+        'debug' => false,
+        'base_path' => '',        // la racine du domaine pointe directement sur backend/public
+    ],
+    'db' => [
+        'host' => '127.0.0.1',
+        'port' => 3306,
+        'name' => 'eftp_nf',
+        'user' => 'eftp_nf',
+        'pass' => '__DB_PASS__',
+    ],
+    'auth' => [
+        'cookie_secure' => true,  // cookie de session envoyé en HTTPS uniquement (obligatoire)
+        // Clé HMAC (jetons anti-CSRF, liens signés de téléchargement de l'APK). 64 caractères hexadécimaux.
+        // La changer déconnecte les sessions web et invalide les liens de téléchargement en cours.
+        'app_key' => '__APP_KEY__',
+    ],
+    'exports' => [
+        'inline' => false,        // exports traités par bin/worker.php (tâche cron chaque minute)
+    ],
+    'mobile' => [
+        // Version minimale de l'application acceptée (426 sinon). Peut aussi être relevée en publiant
+        // une version « obligatoire » depuis le back-office (Paramètres › Application mobile).
+        'min_app_version' => '1.0.0',
+    ],
+];

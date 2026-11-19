@@ -28,6 +28,13 @@ class Session {
   String get fullName => (profile['full_name'] ?? '').toString();
   String get matricule => (profile['matricule'] ?? '').toString();
   bool get mustChangePassword => profile['must_change_password'] == true;
+
+  List<String> get permissions => (profile['permissions'] as List? ?? const []).cast<String>();
+  List<String> get roles => (profile['roles'] as List? ?? const []).cast<String>();
+
+  /// Profil superviseur (contrôle des collectes, sans collecte) : la tablette ouvre le back-office de supervision
+  /// au lieu de la liste des structures à collecter. Voir ui/supervision_screen.dart.
+  bool get isSupervisor => !permissions.contains('collection.submit') && permissions.contains('collection.review');
 }
 
 /// Informations envoyées à la connexion (modèle, version d'Android).
@@ -89,9 +96,11 @@ class AuthService {
     final roles = (profile['roles'] as List? ?? const []).cast<String>();
     final perms = (profile['permissions'] as List? ?? const []).cast<String>();
     await secrets.saveTokens(d['access_token'] as String?, d['refresh_token'] as String?);
-    if (!perms.contains('collection.submit')) {
+    // Agents recenseurs (collecte) et superviseurs (contrôle) ; les autres profils utilisent le back-office web.
+    if (!perms.contains('collection.submit') && !perms.contains('collection.review')) {
       await _revokeQuietly(); // jetons inutilisables ici : révoqués aussitôt
-      throw AuthException("Ce compte (${roles.join(', ')}) n'est pas un compte d'agent recenseur : utiliser le back-office web.", code: 'NOT_AGENT');
+      throw AuthException("Ce compte (${roles.join(', ')}) n'a pas de profil sur la tablette (ni collecte, ni contrôle) : utiliser le back-office web.",
+          code: 'NOT_AGENT');
     }
     if (existing != null && existing['user_uuid'] != profile['uuid']) {
       if (db.pendingWorkCount() > 0) {
@@ -163,6 +172,15 @@ class AuthService {
     final verifier = await deriveVerifier(next, salt);
     db.execute("UPDATE account SET offline_verifier = ?, verifier_salt = ?, profile_json = json_set(profile_json, '\$.must_change_password', json('false'))",
         [verifier, salt]);
+  }
+
+  /// Adresse d'ouverture du back-office dans l'application (profil superviseur) : ticket à usage unique (60 s)
+  /// échangé par le serveur contre une session web (cookie HttpOnly), sans ressaisir le mot de passe.
+  /// Lève ApiException hors ligne ou si la session de la tablette a expiré.
+  Future<Uri> webSessionUrl() async {
+    final r = await api.post('/auth/web-ticket', {});
+    final ticket = (r.data as Map)['ticket'] as String;
+    return Uri.parse('${api.baseUrl}/auth/web-session').replace(queryParameters: {'ticket': ticket});
   }
 
   /// Déconnexion : jetons révoqués et effacés ; les collectes restent sur la tablette (chiffrées).

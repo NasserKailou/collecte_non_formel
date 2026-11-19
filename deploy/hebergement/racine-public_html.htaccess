@@ -1,0 +1,15 @@
+# À utiliser UNIQUEMENT si la racine web du domaine (public_html, httpdocs…) ne peut pas pointer sur backend/public.
+# Le projet complet est alors déposé dans la racine web ; ce fichier, placé à cette racine, envoie toutes les
+# requêtes vers backend/public/ sans changer l'adresse (https://domaine/app/, https://domaine/api/v1/…).
+# Le reste (backend/config, backend/storage, database, shared, deploy, fichiers .xlsx) n'est jamais servi :
+# une adresse comme /backend/config/local.php aboutit à backend/public/backend/config/local.php, qui n'existe pas.
+Options -Indexes
+DirectoryIndex index.php
+RewriteEngine On
+# HTTPS obligatoire (si l'hébergeur ne le force pas déjà dans son panneau).
+RewriteCond %{HTTPS} !=on
+RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+# Tout vers backend/public/ (les règles de backend/public/.htaccess s'appliquent ensuite).
+RewriteCond %{REQUEST_URI} !^/backend/public/
+RewriteRule ^(.*)$ backend/public/$1 [L]

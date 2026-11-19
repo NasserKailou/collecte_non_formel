@@ -248,6 +248,33 @@ final class ReviewService
     }
 
     /**
+     * Correction par le superviseur : il ouvre le questionnaire, corrige et enregistre une nouvelle révision.
+     * Même droit que pour décider (niveau de contrôle, périmètre, collecte SOUMISE ou prise en charge par lui) ;
+     * la collecte est prise en charge par le superviseur (EN_CONTROLE) et attend sa décision (valider / renvoyer).
+     */
+    public function correct(array $actor, string $uuid, array $in, string $ip, SubmissionService $submissions): array
+    {
+        $comment = $this->comment($in['comment'] ?? null, false);
+        $data = $in['data'] ?? null;
+        if (!is_array($data)) {
+            throw new HttpException(422, 'VALIDATION_FAILED', 'Champ « data » (réponses du questionnaire) obligatoire.');
+        }
+        $warnings = [];
+        $result = $this->act($actor, $uuid, function (array $c) use ($actor, $data, $comment, $ip, $submissions, &$warnings): void {
+            $this->assertCanDecide($actor, $c);
+            $r = $submissions->applyReviewerCorrection($c, $data, $actor['id']);
+            $warnings = $r['warnings'];
+            $this->db->execute("UPDATE collections SET status = 'EN_CONTROLE', claimed_by = ?, claimed_at = COALESCE(claimed_at, NOW()) WHERE id = ?",
+                [$actor['id'], $c['id']]);
+            $c['revision'] = $r['revision'];
+            $this->history($c, 'EN_CONTROLE', (int) $c['review_level'], $actor['id'],
+                'Corrigée par le superviseur' . ($comment === null ? '' : ' : ' . $comment));
+            $this->audit->log($actor['id'], 'COLLECTION_CORRECT', 'collection', $c['uuid'], null, ['revision' => $r['revision']], $comment, $ip);
+        });
+        return $result + ['correction_warnings' => $warnings];
+    }
+
+    /**
      * Validation groupée (superviseur) : chaque collecte passe par validate(), avec tous ses contrôles (droits, niveau,
      * superviseur différent au niveau 2, journal). Une collecte refusée n'empêche pas les autres.
      * @return array{validated:list<string>, failed:list<array{uuid:string, message:string}>}
@@ -353,7 +380,7 @@ final class ReviewService
             $out[] = 'claim';
         }
         if ($canLevel && $mine) {
-            array_push($out, 'validate', 'invalidate');
+            array_push($out, 'validate', 'invalidate', 'correct');
         }
         if ($c['status'] === 'EN_CONTROLE' && ((int) $c['claimed_by'] === $actor['id'] || in_array('ADMIN', $actor['roles'], true))) {
             $out[] = 'release';

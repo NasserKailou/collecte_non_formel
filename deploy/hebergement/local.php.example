@@ -1,0 +1,43 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * Configuration de PRODUCTION pour un hébergement géré (cPanel, Plesk, mutualisé) — à copier en
+ * backend/config/local.php sur le serveur, puis à compléter. Ne jamais le versionner ni l'envoyer par e-mail.
+ *
+ * Le nom de la base et le compte sont ceux créés dans le panneau de l'hébergeur (souvent préfixés :
+ * « moncompte_eftp »). Le compte doit avoir TOUS les droits sur cette base (le privilège SUPER n'est pas nécessaire).
+ */
+
+return [
+    'app' => [
+        'env' => 'prod',      // interdit migrate --fresh et seed-demo.php ; masque les erreurs PHP
+        'debug' => false,
+        // '' si la racine web pointe sur backend/public OU si le .htaccess racine-public_html est utilisé.
+        // '/sous-dossier/backend/public' si le projet est dans un sous-dossier de la racine web, sans réécriture.
+        'base_path' => '',
+    ],
+    'db' => [
+        'host' => 'localhost',            // valeur donnée par l'hébergeur (souvent localhost)
+        'port' => 3306,
+        'name' => 'NOM_DE_LA_BASE',
+        'user' => 'UTILISATEUR_DE_LA_BASE',
+        'pass' => 'MOT_DE_PASSE_DE_LA_BASE',
+    ],
+    'auth' => [
+        'cookie_secure' => true,          // HTTPS obligatoire
+        // 64 caractères hexadécimaux aléatoires, générés UNE fois puis conservés :
+        //   php -r "echo bin2hex(random_bytes(32)), PHP_EOL;"
+        // La changer déconnecte les sessions web et invalide les liens de téléchargement de l'APK en cours.
+        'app_key' => 'REMPLACER_PAR_64_CARACTERES_HEXADECIMAUX',
+    ],
+    'exports' => [
+        // true si l'hébergeur ne permet pas de tâche cron (exports produits pendant la requête : plus lents).
+        // false + tâche cron « php backend/bin/worker.php --once » chaque minute : recommandé.
+        'inline' => false,
+    ],
+    'mobile' => [
+        'min_app_version' => '1.0.0',
+    ],
+];

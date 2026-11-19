@@ -197,6 +197,47 @@ final class AuthService
         $this->revokeFamily($authUser['family_id']);
     }
 
+    /** Durée de validité d'un ticket de passage tablette → back-office (secondes). */
+    public const WEB_TICKET_TTL = 60;
+
+    /**
+     * Ticket à usage unique pour ouvrir le back-office dans l'application mobile (profil superviseur) sans ressaisir
+     * le mot de passe. C'est un jeton d'accès très court, seul dans sa famille (aucun jeton de rafraîchissement), ce
+     * qui permet de le distinguer d'un jeton ordinaire : un jeton de la tablette ne peut pas servir de ticket.
+     */
+    public function issueWebTicket(array $authUser): string
+    {
+        $ticket = bin2hex(random_bytes(32));
+        $this->db->execute(
+            "INSERT INTO api_tokens (user_id, device_id, type, token_hash, family_id, expires_at) VALUES (?, ?, 'ACCESS', ?, ?, NOW() + INTERVAL ? SECOND)",
+            [$authUser['id'], $authUser['device_id'], hash('sha256', $ticket), Text::uuid4(), self::WEB_TICKET_TTL]);
+        return $ticket;
+    }
+
+    /**
+     * Échange un ticket (une seule fois) contre une session web : retourne le jeton d'accès à poser dans le cookie
+     * HttpOnly, ou null si le ticket est inconnu, expiré, déjà utilisé ou n'est pas un ticket.
+     */
+    public function consumeWebTicket(string $ticket): ?string
+    {
+        return $this->db->transaction(function (Database $db) use ($ticket): ?string {
+            $t = $db->fetchOne(
+                "SELECT t.id, t.user_id, t.family_id, t.expires_at, t.revoked_at, TIMESTAMPDIFF(SECOND, t.created_at, t.expires_at) AS ttl,
+                        u.status, u.deleted_at,
+                        (SELECT COUNT(*) FROM api_tokens o WHERE o.family_id = t.family_id AND o.id <> t.id) AS siblings
+                   FROM api_tokens t JOIN users u ON u.id = t.user_id
+                  WHERE t.token_hash = ? AND t.type = 'ACCESS' FOR UPDATE", [hash('sha256', $ticket)]);
+            if ($t === null || (int) $t['siblings'] > 0 || (int) $t['ttl'] > self::WEB_TICKET_TTL + 5) {
+                return null; // inconnu, ou jeton ordinaire présenté comme ticket : refusé sans le révoquer
+            }
+            $this->revokeFamily($t['family_id']); // usage unique
+            if ($t['revoked_at'] !== null || strtotime($t['expires_at']) <= time() || $t['status'] !== 'ACTIF' || $t['deleted_at'] !== null) {
+                return null;
+            }
+            return $this->issueTokens((int) $t['user_id'], null, Text::uuid4())['access_token'];
+        });
+    }
+
     public function changePassword(array $authUser, string $current, string $new): void
     {
         $hash = (string) $this->db->fetchValue('SELECT password_hash FROM users WHERE id = ?', [$authUser['id']]);

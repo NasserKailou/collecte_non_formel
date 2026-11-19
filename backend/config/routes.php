@@ -78,6 +78,29 @@ return static function (App $app): void {
         return Response::noContent();
     }, ['allow_pending' => true]);
 
+    // Profil superviseur de la tablette : le back-office s'ouvre dans l'application sans ressaisir le mot de passe.
+    // 1) la tablette demande un ticket (jeton porteur) ; 2) la vue web intégrée ouvre /auth/web-session?ticket=…,
+    // qui pose le cookie de session HttpOnly puis redirige vers le back-office.
+    $app->route('POST', '/auth/web-ticket', static function (Request $req, array $p, array $user) use ($app): Response {
+        if ($user['via_cookie']) {
+            throw new HttpException(403, 'FORBIDDEN', "Réservé à l'application mobile.");
+        }
+        return Response::data(['ticket' => $app->auth->issueWebTicket($user), 'expires_in' => \App\Modules\Auth\AuthService::WEB_TICKET_TTL]);
+    }, ['permission' => 'collection.review']);
+
+    $app->route('GET', '/auth/web-session', static function (Request $req) use ($app): Response {
+        $ticket = $req->queryString('ticket', 64);
+        $token = $ticket !== null && preg_match('/^[a-f0-9]{64}$/', $ticket) === 1 ? $app->auth->consumeWebTicket($ticket) : null;
+        // Adresse du back-office déduite de celle de l'API (…/api/v1/auth/web-session → …/app/), même en sous-dossier.
+        $uri = (string) parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
+        $pos = strpos($uri, '/api/v1/');
+        $headers = ['Location' => ($pos === false ? '' : substr($uri, 0, $pos)) . '/app/'];
+        if ($token !== null) {
+            $headers['Set-Cookie'] = $app->sessionCookie($token);
+        }
+        return new Response(302, null, $headers);
+    }, ['auth' => false, 'any_version' => true]);
+
     // Test de connexion (bouton « Tester la connexion » de la tablette) : public, sans contrôle de version, lecture seule.
     $app->route('GET', '/health', static function () use ($db, $app): Response {
         $dbOk = true;
@@ -446,6 +469,19 @@ return static function (App $app): void {
         $app->route('POST', "/collections/{uuid}/$action", static fn(Request $req, array $p, array $user) =>
             Response::data($reviews->$action($users->actor($user), $p['uuid'], is_array($req->body) ? $req->body : [], $req->ip)), ['permission' => 'collection.review']);
     }
+    // Questionnaire ouvert par le superviseur (formulaire web) : modifiable s'il peut décider sur cette collecte.
+    $app->route('GET', '/collections/{uuid}/edit', static function (Request $req, array $p, array $user) use ($users, $reviews, $entry): Response {
+        $c = $reviews->get($users->actor($user), $p['uuid']); // 404 hors périmètre
+        return Response::data($entry->reviewView($p['uuid'], in_array('correct', $c['allowed_actions'], true)));
+    }, ['permission' => 'collection.review']);
+    $app->route('POST', '/collections/{uuid}/check', static function (Request $req, array $p, array $user) use ($users, $reviews, $entry): Response {
+        $reviews->get($users->actor($user), $p['uuid']);
+        return Response::data($entry->reviewCheck($p['uuid'], is_array($req->body['data'] ?? null) ? $req->body['data'] : []));
+    }, ['permission' => 'collection.review']);
+    // Correction par le superviseur (nouvelle révision à son nom ; la collecte reste à sa décision).
+    $app->route('PUT', '/collections/{uuid}/data', static fn(Request $req, array $p, array $user) =>
+        Response::data($reviews->correct($users->actor($user), $p['uuid'], is_array($req->body) ? $req->body : [], $req->ip, $submissions)),
+        ['permission' => 'collection.review']);
     // Validation groupée : chaque collecte suit les mêmes contrôles que la validation unitaire ; les refus sont détaillés.
     $app->route('POST', '/collections/validate-batch', static fn(Request $req, array $p, array $user) =>
         Response::data($reviews->validateMany($users->actor($user), is_array($req->body) ? ($req->body['uuids'] ?? null) : null,

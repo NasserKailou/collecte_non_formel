@@ -51,6 +51,7 @@ dependencies:
   package_info_plus: ^10.2.2
   intl: 0.20.2
   url_launcher: ^6.3.3
+  webview_flutter: ^4.14.1
 
 dev_dependencies:
   flutter_test:
@@ -73,6 +74,12 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  # Logo (écran de connexion) et pack du mode Démo (référentiels, questionnaire, centres fictifs ; hors ligne).
+  # Pack : php backend/bin/export-demo-pack.php — Logo et icônes : python tool/generate_branding.py
+  assets:
+    - assets/branding/logo_mark.png
+    - assets/demo/demo_pack.json
 
   # To add assets to your application, add an assets section, like this:
   # assets:

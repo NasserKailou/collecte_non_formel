@@ -7,6 +7,7 @@ import 'src/app_state.dart';
 import 'src/ui/auth_screens.dart';
 import 'src/ui/common.dart';
 import 'src/ui/home_screen.dart';
+import 'src/ui/supervision_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -58,7 +59,10 @@ class _CollecteAppState extends State<CollecteApp> with WidgetsBindingObserver {
               return Scaffold(body: Center(child: Padding(padding: const EdgeInsets.all(24), child: Text(app.fatalError!, textAlign: TextAlign.center))));
             }
             if (!app.ready) return const Scaffold(body: Center(child: CircularProgressIndicator()));
-            return app.session == null ? LoginScreen(app: app) : HomeScreen(app: app);
+            final s = app.session;
+            if (s == null) return LoginScreen(app: app);
+            // Superviseur : back-office de supervision intégré ; agent recenseur : ses structures à collecter.
+            return s.isSupervisor && !app.demo ? SupervisionScreen(app: app) : HomeScreen(app: app);
           },
         ),
       );

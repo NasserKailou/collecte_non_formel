@@ -69,7 +69,15 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _menu(String v) async {
-    if (v == 'check') {
+    if (v == 'demo_exit') {
+      await app.exitDemo();
+    } else if (v == 'demo_reset') {
+      final ok = await confirm(context, 'Réinitialiser la démonstration',
+          'Toutes les saisies de démonstration de cette tablette seront effacées (les centres fictifs reviennent à « À collecter »). '
+              "La collecte réelle n'est pas concernée.",
+          ok: 'Réinitialiser');
+      if (ok) await app.resetDemo();
+    } else if (v == 'check') {
       await showServerCheck(context, app);
       app.changed();
     } else if (v == 'log') {
@@ -149,18 +157,25 @@ class _HomeScreenState extends State<HomeScreen> {
                 PopupMenuButton<String>(
                   tooltip: 'Menu',
                   onSelected: _menu,
-                  itemBuilder: (_) => const [
-                    PopupMenuItem(value: 'check', child: Text('Tester la connexion au serveur')),
-                    PopupMenuItem(value: 'log', child: Text('Journal de synchronisation')),
-                    PopupMenuItem(value: 'lock', child: Text('Verrouiller')),
-                    PopupMenuItem(value: 'logout', child: Text('Se déconnecter')),
-                  ],
+                  itemBuilder: (_) => app.demo
+                      ? const [
+                          PopupMenuItem(value: 'log', child: Text('Journal (envois simulés)')),
+                          PopupMenuItem(value: 'demo_reset', child: Text('Réinitialiser la démo')),
+                          PopupMenuItem(value: 'demo_exit', child: Text('Quitter la démo')),
+                        ]
+                      : const [
+                          PopupMenuItem(value: 'check', child: Text('Tester la connexion au serveur')),
+                          PopupMenuItem(value: 'log', child: Text('Journal de synchronisation')),
+                          PopupMenuItem(value: 'lock', child: Text('Verrouiller')),
+                          PopupMenuItem(value: 'logout', child: Text('Se déconnecter')),
+                        ],
                 ),
               ],
             ),
             body: Column(children: [
+              if (app.demo) _DemoBanner(onExit: () => _menu('demo_exit')),
               if (app.appUpdate != null) _UpdateBanner(app: app, update: app.appUpdate!),
-              _SyncBanner(app: app, pending: pending),
+              _SyncBanner(app: app, pending: pending + app.db.pendingStructures().length, onSend: app.syncing ? null : _sync),
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
                 child: TextField(
@@ -247,6 +262,36 @@ class _HomeScreenState extends State<HomeScreen> {
       );
 }
 
+/// Bandeau permanent du mode Démo : impossible de confondre avec la collecte réelle.
+class _DemoBanner extends StatelessWidget {
+  const _DemoBanner({required this.onExit});
+  final VoidCallback onExit;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+        container: true,
+        label: 'Mode démonstration',
+        child: Container(
+          width: double.infinity,
+          color: brandOrange,
+          padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
+          child: Row(children: [
+            const Icon(Icons.school, color: Colors.white),
+            const SizedBox(width: 10),
+            const Expanded(
+              child: Text('MODE DÉMO — formation. Données fictives, jamais envoyées au serveur.',
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+            ),
+            TextButton(
+              onPressed: onExit,
+              style: TextButton.styleFrom(foregroundColor: Colors.white),
+              child: const Text('Quitter'),
+            ),
+          ]),
+        ),
+      );
+}
+
 /// Nouvelle version de l'application : téléchargement dans le navigateur, puis installation proposée par Android.
 /// Les collectes restent sur la tablette (la base locale est conservée par la mise à jour).
 class _UpdateBanner extends StatelessWidget {
@@ -289,9 +334,12 @@ class _UpdateBanner extends StatelessWidget {
 }
 
 class _SyncBanner extends StatelessWidget {
-  const _SyncBanner({required this.app, required this.pending});
+  const _SyncBanner({required this.app, required this.pending, required this.onSend});
   final AppState app;
   final int pending;
+
+  /// « Envoyer au serveur » : envoie les collectes terminées (et les nouveaux centres) puis reçoit les mises à jour.
+  final VoidCallback? onSend;
 
   @override
   Widget build(BuildContext context) {
@@ -308,6 +356,23 @@ class _SyncBanner extends StatelessWidget {
           Text('Dernière synchronisation réussie : ${formatDateTime(app.lastSuccess)}${offline ? ' · ouverture hors ligne' : ''}',
               style: Theme.of(context).textTheme.bodySmall),
           if (app.lastSyncMessage != null) Text(app.lastSyncMessage!, style: Theme.of(context).textTheme.bodySmall),
+          const SizedBox(height: 8),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              onPressed: onSend,
+              style: FilledButton.styleFrom(backgroundColor: pending > 0 ? brandOrange : brandGreenDark, minimumSize: const Size(64, 48)),
+              icon: app.syncing
+                  ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                  : const Icon(Icons.cloud_upload),
+              label: Text(
+                app.syncing
+                    ? 'Envoi en cours…'
+                    : '${app.demo ? 'Envoyer (simulation)' : 'Envoyer au serveur'}${pending > 0 ? ' ($pending)' : ''}',
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+            ),
+          ),
         ]),
       ),
     );

@@ -107,4 +107,35 @@ final class WebSessionTest extends ApiTestCase
         $this->assertSame(422, $this->call('GET', '/audit-logs', token: $admin, query: ['from' => 'hier'])->status);
         $this->assertSame(403, $this->call('GET', '/audit-logs', token: $this->tokenFor($this->createUser('SUP_REG')))->status);
     }
+    public function testSupervisorTabletOpensTheBackOfficeWithAOneTimeTicket(): void
+    {
+        $sup = $this->createUser('SUP_REG');
+        $token = $this->tokenFor($sup);
+        $r = $this->call('POST', '/auth/web-ticket', [], $token);
+        $this->assertSame(200, $r->status, json_encode($r->body));
+        $ticket = $r->body['data']['ticket'];
+
+        $s = $this->call('GET', '/auth/web-session', query: ['ticket' => $ticket]);
+        $this->assertSame(302, $s->status);
+        $this->assertStringEndsWith('/app/', $s->headers['Location']);
+        $session = $this->cookieOf($s);
+        $me = $this->call('GET', '/me', headers: ['cookie' => "eftp_session=$session"]);
+        $this->assertSame(200, $me->status);
+        $this->assertSame(['SUP_REG'], $me->body['data']['roles']);
+        $this->assertNotEmpty($me->body['data']['csrf_token'], 'Session web complète (jeton CSRF)');
+
+        // Usage unique ; le ticket ne vaut pas jeton d'accès après usage ; la session de la tablette reste valide.
+        $again = $this->call('GET', '/auth/web-session', query: ['ticket' => $ticket]);
+        $this->assertSame(302, $again->status);
+        $this->assertArrayNotHasKey('Set-Cookie', $again->headers);
+        $this->assertSame(401, $this->call('GET', '/me', token: $ticket)->status);
+        $this->assertSame(200, $this->call('GET', '/me', token: $token)->status);
+
+        // Un jeton ordinaire de la tablette ne peut pas servir de ticket (et n'est pas révoqué pour autant).
+        $this->assertArrayNotHasKey('Set-Cookie', $this->call('GET', '/auth/web-session', query: ['ticket' => $token])->headers);
+        $this->assertSame(200, $this->call('GET', '/me', token: $token)->status);
+
+        // Réservé aux comptes qui contrôlent : un agent recenseur n'obtient pas de ticket.
+        $this->assertSame(403, $this->call('POST', '/auth/web-ticket', [], $this->tokenFor($this->createUser('AGENT')))->status);
+    }
 }
