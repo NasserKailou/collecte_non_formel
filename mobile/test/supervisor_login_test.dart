@@ -35,7 +35,7 @@ void main() {
                 'data': {
                   'access_token': 'a' * 64,
                   'refresh_token': 'r' * 64,
-                  'user': {'uuid': 'u-sup', 'full_name': 'Superviseur Test', 'roles': ['SUP_REG'], 'permissions': perms},
+                  'user': {'uuid': 'u-sup', 'matricule': 'SUP001', 'full_name': 'Superviseur Test', 'roles': ['SUP_REG'], 'permissions': perms},
                   'must_change_password': false,
                   'offline_policy': {'max_offline_days': 30, 'max_unlock_failures': 10},
                 }

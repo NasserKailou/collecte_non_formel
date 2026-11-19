@@ -11,6 +11,7 @@ import 'common.dart';
 import 'form_screen.dart';
 import 'new_centre_screen.dart';
 import 'server_check_dialog.dart';
+import 'update_dialog.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, required this.app});
@@ -145,7 +146,10 @@ class _HomeScreenState extends State<HomeScreen> {
               title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 const Text('Mes structures'),
                 Text(app.session?.fullName ?? '', style: const TextStyle(fontSize: 13)),
+                if (_campaignLine(app) case final line?)
+                  Text(line, style: const TextStyle(fontSize: 12, color: Colors.white70), overflow: TextOverflow.ellipsis),
               ]),
+              toolbarHeight: 72,
               actions: [
                 IconButton(
                   tooltip: 'Synchroniser',
@@ -319,10 +323,8 @@ class _UpdateBanner extends StatelessWidget {
           if ((update['notes'] as String?)?.isNotEmpty == true) Text('${update['notes']}', style: Theme.of(context).textTheme.bodySmall),
           const SizedBox(height: 6),
           FilledButton.icon(
-            onPressed: () async {
-              final ok = await app.openAppUpdate();
-              if (!ok && context.mounted) showMessage(context, 'Impossible d\'ouvrir le lien : synchroniser pour obtenir un nouveau lien.', error: true);
-            },
+            // Téléchargement dans l'application (progression), puis installation proposée à la fin.
+            onPressed: () => showUpdateDialog(context, app),
             icon: const Icon(Icons.system_update),
             label: const Text('Télécharger et installer'),
           ),
@@ -405,4 +407,13 @@ class SyncLogScreen extends StatelessWidget {
             ),
     );
   }
+}
+
+/// Ligne affichée sous le nom de l'agent : année statistique et campagne en cours (ex. « 2026-2027 · Recensement EFTP »).
+String? _campaignLine(AppState app) {
+  final c = app.collections.currentCampaign();
+  if (c == null) return null;
+  final year = (c['academic_year_label'] ?? c['academic_year_code']) as String?;
+  final suffix = CollectionService.canCollect(c) ? '' : ' (${'${c['status']}'.toLowerCase()})';
+  return [if (year != null && year.isNotEmpty) year, '${c['name']}$suffix'].join(' · ');
 }

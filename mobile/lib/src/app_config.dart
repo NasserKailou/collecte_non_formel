@@ -23,7 +23,9 @@ abstract final class AppConfig {
   );
 
   /// Version envoyée dans X-App-Version (contrôlée par le serveur : 426 si trop ancienne). Garder alignée sur pubspec.yaml.
-  static const appVersion = '1.0.0';
+  /// Remplacée au démarrage par la version réelle de l'APK installé (AppState.init) : après une mise à jour,
+  /// l'application annonce la bonne version et le bandeau « nouvelle version » disparaît.
+  static String appVersion = '1.0.1';
 
   static const requestTimeout = Duration(seconds: 30);
 

@@ -102,7 +102,17 @@ class _FormScreenState extends State<FormScreen> with SingleTickerProviderStateM
   }
 
   void _revalidate() {
-    _result = _svc.validate(_col, _data);
+    final r = _svc.validate(_col, _data);
+    // Partie IV : les cases « dont apprentis vulnérables » d'un secteur que le centre n'a pas (aucun métier saisi)
+    // ne sont pas signalées comme « non renseignées » : seul un secteur ajouté est à compléter.
+    final unused = {for (final k in const ['s1', 's2', 's3']) if (!_sectorHasTrades(k)) 'sectors.$k.'};
+    _result = ValidationResult(
+      errors: r.errors,
+      warnings: [for (final w in r.warnings) if (!(w.code == 'REQUIRED' && unused.any(w.target.startsWith))) w],
+      cleared: r.cleared,
+      computed: r.computed,
+      data: r.data,
+    );
     final map = <String, List<Issue>>{};
     for (final i in [..._result.errors, ..._result.warnings]) {
       map.putIfAbsent(i.target, () => []).add(i);
@@ -131,6 +141,37 @@ class _FormScreenState extends State<FormScreen> with SingleTickerProviderStateM
       _flush();
       if (mounted) setState(() {});
     });
+  }
+
+  // ------------------------------------------------------------ Partie IV : secteurs
+
+  /// Secteurs ajoutés pendant cette saisie et encore vides (un secteur avec des données est toujours affiché).
+  final Set<String> _openedSectors = {};
+
+  bool _sectorHasTrades(String key) {
+    final t = QuestionnaireEngine.getPath(_data, ['sectors', key, 'trades']);
+    return t is List && t.isNotEmpty;
+  }
+
+  bool _sectorHasData(String key) {
+    if (_sectorHasTrades(key)) return true;
+    final sp = QuestionnaireEngine.getPath(_data, ['sectors', key, 'specials']);
+    return sp is Map && sp.values.any((row) => row is Map && row.values.any((v) => v is num && v != 0)); // des 0 seuls : secteur absent
+  }
+
+  /// « Enregistrer » : la sauvegarde est automatique (à chaque saisie, Précédent / Suivant) ; ce bouton la force
+  /// et la confirme à l'agent.
+  void _saveNow() {
+    FocusScope.of(context).unfocus();
+    _debounce?.cancel();
+    if (!_editable) return;
+    try {
+      _svc.save(_col, _data);
+      setState(_revalidate);
+      showMessage(context, 'Saisie enregistrée sur la tablette.');
+    } catch (e) {
+      showMessage(context, 'Enregistrement impossible : $e', error: true);
+    }
   }
 
   /// Redessine le formulaire (utilisé par les champs composés : tableaux de lignes).
@@ -406,27 +447,41 @@ class _FormScreenState extends State<FormScreen> with SingleTickerProviderStateM
             Row(children: [
               Expanded(
                 child: OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(52)),
+                  style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(52), padding: const EdgeInsets.symmetric(horizontal: 6)),
                   onPressed: i > 0 ? () => _goTo(i - 1) : null,
                   icon: const Icon(Icons.chevron_left),
-                  label: const Text('Précédent'),
+                  label: const FittedBox(child: Text('Précédent')),
                 ),
               ),
-              const SizedBox(width: 12),
+              if (_editable) ...[
+                const SizedBox(width: 8),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(52), foregroundColor: brandGreenDark, padding: const EdgeInsets.symmetric(horizontal: 6)),
+                    onPressed: _saveNow,
+                    icon: const Icon(Icons.save_outlined),
+                    label: const FittedBox(child: Text('Enregistrer')),
+                  ),
+                ),
+              ],
+              const SizedBox(width: 8),
               Expanded(
                 child: last
                     ? (_editable
                         ? FilledButton.icon(
-                            style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52), backgroundColor: brandGreenDark),
+                            style: FilledButton.styleFrom(
+                                minimumSize: const Size.fromHeight(52), backgroundColor: brandGreenDark, padding: const EdgeInsets.symmetric(horizontal: 6)),
                             onPressed: _finish,
                             icon: const Icon(Icons.check_circle),
-                            label: const Text('Terminer'),
+                            label: const FittedBox(child: Text('Terminer')),
                           )
                         : const SizedBox.shrink())
                     : FilledButton(
-                        style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
+                        style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52), padding: const EdgeInsets.symmetric(horizontal: 6)),
                         onPressed: () => _goTo(i + 1),
-                        child: const Row(mainAxisSize: MainAxisSize.min, children: [Text('Suivant'), SizedBox(width: 4), Icon(Icons.chevron_right)]),
+                        child: const FittedBox(
+                            child: Row(mainAxisSize: MainAxisSize.min, children: [Text('Suivant'), SizedBox(width: 4), Icon(Icons.chevron_right)])),
                       ),
               ),
             ]),
@@ -450,8 +505,18 @@ class _FormScreenState extends State<FormScreen> with SingleTickerProviderStateM
     final vis = _visCtx;
     final out = <Widget>[];
     String? group;
+    var sectorsDone = false;
     for (final item in (section['items'] as List).cast<Item>()) {
       if (!_engine.isVisible(item, vis)) continue;
+      if ((item['code'] as String).startsWith('sectors.')) {
+        // Partie IV : un panneau unique « secteur par secteur » (ajouter un secteur, ses métiers, ses vulnérables).
+        if (!sectorsDone) {
+          sectorsDone = true;
+          final items = [for (final it in (section['items'] as List).cast<Item>()) if ((it['code'] as String).startsWith('sectors.')) it];
+          out.add(_SectorsPanel(state: this, items: items));
+        }
+        continue;
+      }
       final g = item['group'] as String?;
       if (g != null && g != group) {
         out.add(Padding(
@@ -836,12 +901,21 @@ class _ValueFieldState extends State<_ValueField> {
             ]),
           );
         } else {
-          input = DropdownButtonFormField<Object>(
-            isExpanded: true,
-            initialValue: options.any((o) => o.$1 == _value) ? _value : null,
-            decoration: decoration.copyWith(hintText: 'Choisir…'),
-            items: [for (final o in options) DropdownMenuItem(value: o.$1, child: Text(o.$2, overflow: TextOverflow.ellipsis))],
-            onChanged: _editable ? _change : null,
+          // Longue liste (métiers…) : fenêtre de choix avec recherche, « Autre » toujours en tête.
+          final current = options.where((o) => o.$1 == _value).firstOrNull;
+          input = InkWell(
+            onTap: !_editable
+                ? null
+                : () async {
+                    final picked = await _pickOption(context, widget.label, options, _value);
+                    if (picked != null) _change(picked);
+                  },
+            child: InputDecorator(
+              decoration: decoration.copyWith(suffixIcon: const Icon(Icons.search), enabled: _editable),
+              isEmpty: current == null,
+              child: Text(current?.$2 ?? 'Choisir… (recherche possible)',
+                  style: current == null ? TextStyle(color: Colors.grey.shade600) : null, maxLines: 2, overflow: TextOverflow.ellipsis),
+            ),
           );
         }
       case 'multi':
@@ -961,22 +1035,53 @@ class _GridField extends StatelessWidget {
       // anomalies de la grille entière ; celles des cases sont listées sous le tableau (vue compacte) ou sous la case
       issues: [for (final i in state._issuesUnder(code)) if (!cellTargets.contains(i.target)) i],
       child: LayoutBuilder(builder: (context, box) {
-        final compact = box.maxWidth >= 120 + cols.length * 64;
-        return compact ? _table(context, box.maxWidth, code, rows, cols, cellIssues) : _cards(code, rows, cols, cell);
+        // Assez large (tablette) : la matrice entière.
+        if (box.maxWidth >= _rowLabelWidth + cols.length * _minCell) return _table(context, box.maxWidth, code, rows, cols, cellIssues);
+        // Étroit (téléphone, blocs imbriqués) : une petite matrice par groupe de colonnes — par secteur (2.1),
+        // par inscrits / placés / outillés (2.2), par promotion (vulnérables, partie IV) — lignes = durées ou catégories.
+        final groups = <String, List<Map>>{};
+        for (final c in cols) {
+          groups.putIfAbsent(_split(c).$1, () => []).add(c);
+        }
+        if (groups.length > 1 && groups.values.every((g) => box.maxWidth >= _rowLabelWidth + g.length * _minCell)) {
+          return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            for (final g in groups.entries)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 14),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(g.key, style: Theme.of(context).textTheme.titleSmall?.copyWith(color: brandGreenDark, fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 4),
+                  _table(context, box.maxWidth, code, rows, g.value,
+                      [for (final i in cellIssues) if (g.value.any((c) => i.target.endsWith('.${c['code']}'))) i],
+                      groupHeader: false),
+                ]),
+              ),
+          ]);
+        }
+        return _cards(code, rows, cols, cell);
       }),
     );
   }
 
-  /// Vue tablette : un vrai tableau (durées en lignes, colonnes regroupées par en-tête), totaux en direct.
-  Widget _table(BuildContext context, double width, String code, List<Map> rows, List<Map> cols, List<Issue> cellIssues) {
+  /// Largeur minimale d'une case de saisie (3 à 4 chiffres lisibles au doigt).
+  static const _minCell = 56.0;
+
+  /// En-têtes : « Secteur Primaire/Agricole — Masculin » → groupe « Secteur Primaire/Agricole », colonne « Masculin ».
+  static (String, String) _split(Map c) {
+    final l = '${c['label']}';
+    final i = l.lastIndexOf(' — ');
+    return i < 0 ? ('', l) : (l.substring(0, i), l.substring(i + 3));
+  }
+
+  /// Vue matrice (durées en lignes, colonnes regroupées par en-tête), totaux en direct. Sans en-tête de groupe
+  /// (petite matrice d'un seul groupe), les intitulés de colonne restent en clair.
+  Widget _table(BuildContext context, double width, String code, List<Map> rows, List<Map> cols, List<Issue> cellIssues,
+      {bool groupHeader = true}) {
     final cellW = (width - _rowLabelWidth) / cols.length;
-    // En-têtes : « Secteur Primaire/Agricole — M » → groupe « Secteur Primaire/Agricole », colonne « M ».
     (String, String) split(Map c) {
-      final l = '${c['label']}';
-      final i = l.lastIndexOf(' — ');
-      if (i < 0) return ('', l);
-      final sub = l.substring(i + 3);
-      return (l.substring(0, i), switch (sub) { 'Masculin' => 'M', 'Féminin' => 'F', 'Total' => 'T', _ => sub });
+      final (g, sub) = _split(c);
+      if (!groupHeader && cellW >= 80) return (g, sub);
+      return (g, switch (sub) { 'Masculin' || 'Hommes' || 'Homme' => 'M', 'Féminin' || 'Femmes' || 'Femme' => 'F', 'Total' => 'T', _ => sub });
     }
     final groups = <(String, int)>[];
     for (final c in cols) {
@@ -1005,13 +1110,13 @@ class _GridField extends StatelessWidget {
     }
     final band = brandGreen.withValues(alpha: .08);
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      if (groups.any((g) => g.$1.isNotEmpty))
+      if (groupHeader && groups.any((g) => g.$1.isNotEmpty))
         Row(children: [
           const SizedBox(width: _rowLabelWidth),
           for (final g in groups) headCell(g.$1, cellW * g.$2, bg: band),
         ]),
       Row(children: [
-        headCell('Durée', _rowLabelWidth, bg: band),
+        headCell(const {'LE3', 'M4_9', 'GT9'}.contains('${rows.first['code']}') ? 'Durée' : 'Catégorie', _rowLabelWidth, bg: band),
         for (final c in cols) headCell(split(c).$2, cellW, bg: band),
       ]),
       for (final r in rows)
@@ -1212,7 +1317,11 @@ class _RosterField extends StatelessWidget {
             ),
         ]),
         childrenPadding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+        // Sous-arbre à clé propre : l'état ouvert/fermé du bloc ne doit pas être relu par les champs qu'il contient.
         children: [
+          KeyedSubtree(
+            key: PageStorageKey('$code[$i]#${state._version}-contenu'),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           for (final col in columns)
             if (state._engine.isVisible(col, ctx))
               Padding(
@@ -1231,6 +1340,8 @@ class _RosterField extends StatelessWidget {
                   },
                 ),
               ),
+            ]),
+          ),
         ],
       ),
     );
@@ -1242,4 +1353,239 @@ class _RosterField extends StatelessWidget {
       .where((s) => s != '—')
       .take(3)
       .join(' · ');
+}
+
+// ============================================================================== Choix dans une longue liste
+
+/// Fenêtre de choix avec recherche (métiers d'un secteur, etc.). « Autre (préciser) » est placé en tête.
+Future<Object?> _pickOption(BuildContext context, String title, List<(Object, String)> options, Object? current) {
+  final others = options.where((o) => o.$1 == 'AUTRE' || o.$2.toLowerCase().startsWith('autre')).toList();
+  final ordered = [...others, ...options.where((o) => !others.contains(o))];
+  String norm(String x) => x.toLowerCase().replaceAll(RegExp('[éèêë]'), 'e').replaceAll(RegExp('[àâä]'), 'a').replaceAll(RegExp('[îï]'), 'i')
+      .replaceAll(RegExp('[ôö]'), 'o').replaceAll(RegExp('[ùûü]'), 'u').replaceAll('ç', 'c');
+  return showModalBottomSheet<Object>(
+    context: context,
+    isScrollControlled: true,
+    showDragHandle: true,
+    builder: (c) {
+      var q = '';
+      return StatefulBuilder(builder: (c, setSheet) {
+        final shown = q.isEmpty ? ordered : ordered.where((o) => others.contains(o) || norm(o.$2).contains(norm(q))).toList();
+        return SafeArea(
+          child: Padding(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(c).viewInsets.bottom),
+            child: SizedBox(
+              height: MediaQuery.of(c).size.height * .75,
+              child: Column(children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                  child: Text(title, style: Theme.of(c).textTheme.titleMedium, textAlign: TextAlign.center),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: TextField(
+                    decoration: const InputDecoration(prefixIcon: Icon(Icons.search), hintText: 'Rechercher (ex. couture, soudure…)'),
+                    onChanged: (v) => setSheet(() => q = v.trim()),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Expanded(
+                  child: ListView(children: [
+                    for (final o in shown)
+                      ListTile(
+                        leading: Icon(o.$1 == current ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+                            color: o.$1 == current ? brandGreenDark : null),
+                        title: Text(o.$2, style: others.contains(o) ? const TextStyle(fontWeight: FontWeight.w600, color: brandOrange) : null),
+                        subtitle: others.contains(o) ? const Text('Ne figure pas dans la liste : le préciser ensuite') : null,
+                        onTap: () => Navigator.pop(c, o.$1),
+                      ),
+                    if (shown.length == others.length && q.isNotEmpty)
+                      const Padding(padding: EdgeInsets.all(16), child: Text('Aucun résultat : choisir « Autre » et préciser.')),
+                  ]),
+                ),
+              ]),
+            ),
+          ),
+        );
+      });
+    },
+  );
+}
+
+// ============================================================================== Partie IV : secteur par secteur
+
+/// Partie IV repensée pour la saisie : l'agent AJOUTE les secteurs où le centre forme des apprentis (comme pour les
+/// formateurs), puis pour chacun ses métiers (liste du secteur + « Autre ») et les apprentis vulnérables. Chaque bloc
+/// se replie pour garder l'écran lisible. Les données gardent le même format (sectors.sN.trades / specials).
+class _SectorsPanel extends StatelessWidget {
+  const _SectorsPanel({required this.state, required this.items});
+  final _FormScreenState state;
+  final List<Item> items;
+
+  static const _icons = {'s1': Icons.agriculture, 's2': Icons.precision_manufacturing, 's3': Icons.storefront};
+
+  @override
+  Widget build(BuildContext context) {
+    // Regroupement par secteur : clé s1/s2/s3 → métiers (tableau de lignes) et vulnérables (grille).
+    final titles = <String, String>{};
+    final tradesOf = <String, Item>{};
+    final specialsOf = <String, Item>{};
+    for (final it in items) {
+      final key = (it['code'] as String).split('.')[1];
+      titles[key] ??= ((it['group'] as String?) ?? key).replaceFirst(RegExp(r'^[0-9.]+\s*'), '');
+      if (it['type'] == 'roster') {
+        tradesOf[key] = it;
+      } else {
+        specialsOf[key] = it;
+      }
+    }
+    final active = [for (final k in titles.keys) if (state._sectorHasData(k) || state._openedSectors.contains(k)) k];
+    final remaining = [for (final k in titles.keys) if (!active.contains(k)) k];
+    final noApprentice = [for (final i in state._issues['sectors.s1.trades'] ?? const <Issue>[]) if (i.code == 'R_NO_APPRENTICE') i];
+
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      Text(
+        active.isEmpty
+            ? 'Ajoutez le ou les secteurs dans lesquels le centre forme des apprentis, puis leurs métiers.'
+            : 'Touchez un secteur pour le déplier ou le replier. Ajoutez un autre secteur si le centre en a plusieurs.',
+        style: Theme.of(context).textTheme.bodyMedium,
+      ),
+      for (final i in noApprentice)
+        Padding(padding: const EdgeInsets.only(top: 8), child: Text(i.message, style: TextStyle(color: Colors.orange.shade900))),
+      const SizedBox(height: 8),
+      for (final k in active) _sectorCard(context, k, titles[k]!, tradesOf[k], specialsOf[k]),
+      if (state._editable && remaining.isNotEmpty)
+        Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: FilledButton.icon(
+            style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52), backgroundColor: brandGreenDark),
+            onPressed: () => _addSector(context, {for (final k in remaining) k: titles[k]!}),
+            icon: const Icon(Icons.add),
+            label: Text(active.isEmpty ? 'Ajouter un secteur' : 'Ajouter un autre secteur'),
+          ),
+        ),
+      if (!state._editable && active.isEmpty) const Text('Aucun secteur renseigné.'),
+    ]);
+  }
+
+  Future<void> _addSector(BuildContext context, Map<String, String> choices) async {
+    final key = choices.length == 1
+        ? choices.keys.first
+        : await showModalBottomSheet<String>(
+            context: context,
+            showDragHandle: true,
+            builder: (c) => SafeArea(
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                const Padding(padding: EdgeInsets.only(bottom: 8), child: Text('Quel secteur ?', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600))),
+                for (final e in choices.entries)
+                  ListTile(leading: Icon(_icons[e.key] ?? Icons.category, color: brandGreenDark), title: Text(e.value), onTap: () => Navigator.pop(c, e.key)),
+                const SizedBox(height: 8),
+              ]),
+            ),
+          );
+    if (key == null) return;
+    state._openedSectors.add(key);
+    // Premier métier prêt à remplir : le choix du métier s'affiche directement.
+    final path = ['sectors', key, 'trades'];
+    if (!state._sectorHasTrades(key)) {
+      QuestionnaireEngine.setPath(state._data, path, [<String, Object?>{}]);
+      state._set(path, QuestionnaireEngine.getPath(state._data, path));
+    }
+    state.refresh(rebuildFields: true, revalidate: true);
+  }
+
+  Widget _sectorCard(BuildContext context, String key, String title, Item? tradesItem, Item? specialsItem) {
+    final trades = QuestionnaireEngine.getPath(state._data, ['sectors', key, 'trades']);
+    final rows = trades is List ? trades.whereType<Map>().toList() : const <Map>[];
+    var apprentices = 0;
+    for (final r in rows) {
+      for (final c in const ['p1_m', 'p1_f', 'p2_m', 'p2_f', 'p3_m', 'p3_f']) {
+        final v = r[c];
+        if (v is num) apprentices += v.toInt();
+      }
+    }
+    final issues = state._issuesUnder('sectors.$key');
+    final errors = issues.where((i) => i.isError).length;
+    final warnings = issues.length - errors;
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: brandGreen.withValues(alpha: .4))),
+      clipBehavior: Clip.antiAlias,
+      child: ExpansionTile(
+        key: PageStorageKey('sector-$key'),
+        initiallyExpanded: state._openedSectors.contains(key) || errors > 0 || rows.isEmpty,
+        backgroundColor: brandGreen.withValues(alpha: .04),
+        leading: Icon(_icons[key] ?? Icons.category, color: brandGreenDark, size: 30),
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
+        subtitle: Text('${rows.length} métier(s) · $apprentices apprenti(s)${warnings > 0 ? ' · $warnings à vérifier' : ''}'),
+        trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+          if (errors > 0) Badge(label: Text('$errors'), backgroundColor: Colors.red.shade700),
+          if (state._editable)
+            IconButton(
+              tooltip: 'Retirer ce secteur',
+              icon: const Icon(Icons.delete_outline),
+              onPressed: () async {
+                if (state._sectorHasData(key) &&
+                    !await confirm(context, 'Retirer le secteur', 'Tous les métiers et effectifs saisis pour « $title » seront effacés.', ok: 'Retirer')) {
+                  return;
+                }
+                state._openedSectors.remove(key);
+                state._set(['sectors', key], null);
+                state.refresh(rebuildFields: true, revalidate: true);
+              },
+            ),
+          const Icon(Icons.expand_more),
+        ]),
+        childrenPadding: const EdgeInsets.fromLTRB(8, 0, 8, 12),
+        // Sous-arbre à clé propre : l'état ouvert/fermé du bloc ne doit pas être relu par les champs qu'il contient.
+        children: [
+          KeyedSubtree(
+            key: PageStorageKey('sector-$key-contenu'),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          if (tradesItem != null) _RosterField(state: state, item: tradesItem, label: 'Métiers du secteur'),
+          if (specialsItem != null)
+            Card(
+              margin: const EdgeInsets.only(top: 8),
+              color: Colors.orange.shade50,
+              child: ExpansionTile(
+                key: PageStorageKey('sector-$key-specials'),
+                leading: Icon(Icons.accessible, color: Colors.orange.shade900),
+                title: const Text('Dont apprentis vulnérables'),
+                subtitle: const Text('Handicapés, réfugiés, retournés, déplacés — 0 si aucun'),
+                childrenPadding: const EdgeInsets.fromLTRB(8, 0, 8, 12),
+                // Sous-arbre à clé propre : l'état ouvert/fermé du bloc ne doit pas être relu par les champs qu'il contient.
+                children: [
+                  KeyedSubtree(
+                    key: PageStorageKey('sector-$key-specials-contenu'),
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                  if (state._editable)
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: TextButton.icon(
+                        onPressed: () {
+                          for (final r in (specialsItem['rows'] as List).cast<Map>()) {
+                            for (final c in (specialsItem['columns'] as List).cast<Map>()) {
+                              final path = ['sectors', key, 'specials', '${r['code']}', '${c['code']}'];
+                              if (QuestionnaireEngine.getPath(state._data, path) == null) QuestionnaireEngine.setPath(state._data, path, 0);
+                            }
+                          }
+                          state._set(['sectors', key, 'specials'], QuestionnaireEngine.getPath(state._data, ['sectors', key, 'specials']));
+                          state.refresh(rebuildFields: true, revalidate: true);
+                        },
+                        icon: const Icon(Icons.exposure_zero),
+                        label: const Text('Aucun apprenti vulnérable : mettre 0 dans les cases vides'),
+                      ),
+                    ),
+                  _GridField(state: state, item: specialsItem, label: 'Effectifs par promotion'),
+                    ]),
+                  ),
+                ],
+              ),
+            ),
+            ]),
+          ),
+        ],
+      ),
+    );
+  }
 }

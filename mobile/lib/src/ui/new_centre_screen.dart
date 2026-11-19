@@ -25,9 +25,9 @@ class _NewCentreScreenState extends State<NewCentreScreen> {
   final _locality = TextEditingController();
   final _scroll = ScrollController();
 
-  late final List<Map<String, Object?>> _campaigns;
-  late final List<Map<String, Object?>> _communes;
-  late final List<Map<String, Object?>> _types;
+  late List<Map<String, Object?>> _campaigns;
+  late List<Map<String, Object?>> _communes;
+  late List<Map<String, Object?>> _types;
 
   int? _campaignId;
   int? _communeId;
@@ -154,10 +154,80 @@ class _NewCentreScreenState extends State<NewCentreScreen> {
       if (!mounted) return;
       await Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => FormScreen(app: app, uuid: col['uuid'] as String)));
     } on CollectionException catch (e) {
-      if (mounted) showMessage(context, e.message, error: true);
+      if (mounted) await _explain(e.message);
+    } catch (e) {
+      // Toute autre erreur est affichée (auparavant le bouton semblait « ne rien faire »).
+      if (mounted) await _explain('Le questionnaire ne peut pas être ouvert : $e\n\nSynchronisez la tablette puis réessayez ; si le problème persiste, signalez-le au superviseur.');
     } finally {
       if (mounted) setState(() => _creating = false);
     }
+  }
+
+  Future<void> _explain(String message) => showDialog<void>(
+        context: context,
+        builder: (c) => AlertDialog(
+          icon: Icon(Icons.error_outline, color: Colors.red.shade800, size: 36),
+          title: const Text('Impossible de commencer'),
+          content: Text(message),
+          actions: [FilledButton(onPressed: () => Navigator.pop(c), child: const Text('Compris'))],
+        ),
+      );
+
+  bool _syncing = false;
+
+  /// Aucune campagne utilisable : on explique pourquoi (campagnes connues et leur état) et on propose de synchroniser.
+  Widget _noCampaign() {
+    final known = app.db.campaigns();
+    String state(Map<String, Object?> c) => switch (c['status']) {
+          'PREPARATION' => "en préparation : pas encore ouverte par l'administrateur",
+          'CLOTUREE' || 'ARCHIVEE' => 'clôturée',
+          _ when c['collection_mode'] == 'PAPIER' => 'collecte sur papier (saisie au back-office)',
+          final s => '$s',
+        };
+    return Scaffold(
+      appBar: AppBar(title: const Text('Nouveau centre')),
+      body: ListView(padding: const EdgeInsets.all(24), children: [
+        Icon(Icons.event_busy, size: 56, color: Colors.grey.shade600),
+        const SizedBox(height: 12),
+        const Text("Aucune campagne ouverte n'est encore arrivée sur cette tablette.", textAlign: TextAlign.center, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+        const SizedBox(height: 12),
+        if (known.isEmpty)
+          const Text(
+              "Le serveur n'a envoyé aucune campagne à ce compte. Vérifiez avec l'administrateur que la campagne est bien OUVERTE "
+              '(back-office › Campagnes › Ouvrir), puis synchronisez.',
+              textAlign: TextAlign.center)
+        else ...[
+          const Text('Campagnes connues de la tablette :', textAlign: TextAlign.center),
+          for (final c in known) Text('• ${c['name']} — ${state(c)}', textAlign: TextAlign.center),
+          const SizedBox(height: 8),
+          const Text("Dès que l'administrateur ouvre la campagne, synchronisez : la création de centres sera possible jusqu'à sa clôture.",
+              textAlign: TextAlign.center),
+        ],
+        const SizedBox(height: 20),
+        FilledButton.icon(
+          onPressed: _syncing
+              ? null
+              : () async {
+                  setState(() => _syncing = true);
+                  await app.synchronize(force: true);
+                  if (!mounted) return;
+                  setState(() {
+                    _syncing = false;
+                    _campaigns = _svc.fieldCampaigns();
+                    _communes = app.db.allowedCommunes();
+                    _types = app.db.structureTypes();
+                    if (_campaigns.length == 1) _campaignId = _campaigns.first['id'] as int;
+                    if (_communes.length == 1) _communeId = _communes.first['id'] as int;
+                  });
+                  if (_campaigns.isEmpty) showMessage(context, app.lastSyncMessage ?? 'Toujours aucune campagne ouverte.', error: !app.lastSyncOk);
+                },
+          icon: _syncing
+              ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+              : const Icon(Icons.sync),
+          label: Text(_syncing ? 'Synchronisation…' : 'Synchroniser maintenant'),
+        ),
+      ]),
+    );
   }
 
   Future<void> _openExisting(Map<String, Object?> s) async {
@@ -172,16 +242,7 @@ class _NewCentreScreenState extends State<NewCentreScreen> {
   @override
   Widget build(BuildContext context) {
     final err = _tried ? _errors() : const <String, String>{};
-    if (_campaigns.isEmpty) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('Nouveau centre')),
-        body: const Padding(
-          padding: EdgeInsets.all(24),
-          child: Text("Aucune campagne ouverte à la collecte sur tablette n'est présente. Synchroniser la tablette (connexion internet), puis réessayer.",
-              textAlign: TextAlign.center),
-        ),
-      );
-    }
+    if (_campaigns.isEmpty) return _noCampaign();
     return Scaffold(
       appBar: AppBar(title: const Text('Nouveau centre')),
       body: SafeArea(

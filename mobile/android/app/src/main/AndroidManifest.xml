@@ -4,6 +4,8 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.CAMERA"/>
+    <!-- Mise à jour depuis l'application : ouverture de l'installeur Android sur l'APK téléchargé. -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
     <!-- Ouverture du lien de téléchargement de la mise à jour dans le navigateur (Android 11+). -->
     <queries>
         <intent>

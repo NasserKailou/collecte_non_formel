@@ -63,10 +63,10 @@ class CollectionService {
     if (existing != null) return existing;
     final a = db.assignment(csId) ?? (throw CollectionException('Affectation inconnue.'));
     final campaign = db.campaign(a['campaign_id'] as int) ?? (throw CollectionException('Campagne inconnue : synchroniser.'));
-    if (campaign['accepts_submissions'] != 1) throw CollectionException("La campagne « ${campaign['name']} » n'accepte pas de collecte (${campaign['status']}).");
     if (campaign['collection_mode'] == 'PAPIER') {
       throw CollectionException('Cette campagne se fait sur questionnaire papier : les fiches sont saisies dans le back-office web (« Ma saisie »).');
     }
+    if (!canCollect(campaign)) throw CollectionException("La campagne « ${campaign['name']} » est clôturée : plus de nouvelle collecte (${campaign['status']}).");
     final version = campaign['questionnaire_version'] as String;
     final data = prefill(engine(version), structureOf(csId));
     final uuid = (a['collection_uuid'] as String?) ?? const Uuid().v4();
@@ -80,8 +80,19 @@ class CollectionService {
   // ----------------------------------------------------------- Centre découvert sur le terrain
 
   /// Campagnes où l'agent peut créer un centre : ouvertes et collectées sur tablette (pas en mode papier).
-  List<Map<String, Object?>> fieldCampaigns() =>
-      db.campaigns().where((c) => c['accepts_submissions'] == 1 && c['collection_mode'] != 'PAPIER').toList();
+  /// Collecte possible sur la tablette tant que la campagne n'est pas clôturée : ouverte, ou suspendue (saisie
+  /// conservée sur la tablette, envoi à la réouverture), hors campagnes « papier ».
+  static bool canCollect(Map<String, Object?> c) =>
+      (c['accepts_submissions'] == 1 || c['status'] == 'OUVERTE' || c['status'] == 'SUSPENDUE') && c['collection_mode'] != 'PAPIER';
+
+  List<Map<String, Object?>> fieldCampaigns() => db.campaigns().where(canCollect).toList();
+
+  /// Campagne affichée sous le nom de l'agent : la plus récente où il peut collecter, sinon la plus récente connue.
+  Map<String, Object?>? currentCampaign() {
+    final all = db.campaigns();
+    if (all.isEmpty) return null;
+    return all.firstWhere(canCollect, orElse: () => all.first);
+  }
 
   /// Nom simplifié pour comparer (minuscules, sans accents ni ponctuation, mots génériques retirés).
   static String normalizeName(String s) {
@@ -132,7 +143,12 @@ class CollectionService {
     if (!['URBAINE', 'RURALE'].contains(zone)) throw CollectionException('Choisir la zone : urbaine ou rurale.');
     final commune = db.one('SELECT c.id, c.department_id, d.region_id FROM communes c JOIN departments d ON d.id = c.department_id WHERE c.id = ?', [communeId])
         ?? (throw CollectionException('Commune inconnue : synchroniser.'));
-    if (!fieldCampaigns().any((c) => c['id'] == campaignId)) throw CollectionException("Cette campagne n'accepte pas de nouveau centre.");
+    final campaign = fieldCampaigns().where((c) => c['id'] == campaignId).firstOrNull ?? (throw CollectionException("Cette campagne n'accepte pas de nouveau centre (clôturée)."));
+    // Questionnaire présent sur la tablette AVANT toute écriture (sinon le centre serait créé sans pouvoir être saisi).
+    final version = campaign['questionnaire_version'] as String;
+    if (db.questionnaire(version) == null) {
+      throw CollectionException("Le questionnaire $version de la campagne n'est pas encore sur la tablette : synchroniser (connexion internet), puis réessayer.");
+    }
 
     final uuid = const Uuid().v4();
     final tempCs = db.nextTempCsId();
@@ -241,7 +257,9 @@ class CollectionService {
     if (!isEditable(col)) throw CollectionException('Cette collecte a déjà été terminée.');
     final campaign = db.campaign(col['campaign_id'] as int);
     if (campaign?['accepts_submissions'] != 1) {
-      throw CollectionException("La campagne n'accepte plus de soumission (${campaign?['status'] ?? 'inconnue'}). La collecte reste enregistrée sur la tablette.");
+      throw CollectionException(campaign?['status'] == 'SUSPENDUE'
+          ? 'La campagne est suspendue : la collecte reste enregistrée sur la tablette. Terminez-la dès que la campagne sera rouverte.'
+          : "La campagne n'accepte plus de soumission (${campaign?['status'] ?? 'inconnue'}). La collecte reste enregistrée sur la tablette.");
     }
     final data = dataOf(col);
     final r = validate(col, data);

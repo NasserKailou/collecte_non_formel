@@ -38,7 +38,7 @@ class LocalDb {
 
   final Database _db;
 
-  static const schemaVersion = 2;
+  static const schemaVersion = 3;
 
   /// Ouvre (ou crée) la base chiffrée. [keyHex] : 64 caractères hexadécimaux.
   static LocalDb open(String path, String keyHex) {
@@ -123,6 +123,14 @@ class LocalDb {
             state TEXT NOT NULL, server_cs_id INTEGER, last_error TEXT, duplicates_json TEXT, created_at TEXT NOT NULL);
         ''');
         _db.userVersion = 2;
+      });
+    }
+    if (_db.userVersion < 3) {
+      // v3 : année statistique de la campagne (affichée sous le nom de l'agent).
+      transaction(() {
+        _db.execute('ALTER TABLE campaigns ADD COLUMN academic_year_code TEXT');
+        _db.execute('ALTER TABLE campaigns ADD COLUMN academic_year_label TEXT');
+        _db.userVersion = 3;
       });
     }
   }
@@ -271,14 +279,19 @@ class LocalDb {
 
   // ------------------------------------------------- Campagnes / affectations
 
-  void upsertCampaign(Map c) => execute(
-      'INSERT INTO campaigns (id, code, name, status, accepts_submissions, opens_on, closes_on, validation_levels, collection_mode, instructions, questionnaire_version) '
-      'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(id) DO UPDATE SET code = excluded.code, name = excluded.name, status = excluded.status, '
-      'accepts_submissions = excluded.accepts_submissions, opens_on = excluded.opens_on, closes_on = excluded.closes_on, '
-      'validation_levels = excluded.validation_levels, collection_mode = excluded.collection_mode, instructions = excluded.instructions, '
-      'questionnaire_version = excluded.questionnaire_version',
-      [c['id'], c['code'], c['name'], c['status'], c['accepts_submissions'] == true ? 1 : 0, c['opens_on'], c['closes_on'], c['validation_levels'],
-        c['collection_mode'] ?? 'TABLETTE', c['instructions'], c['questionnaire_version']]);
+  void upsertCampaign(Map c) {
+    final year = c['academic_year'] is Map ? c['academic_year'] as Map : const {};
+    execute(
+        'INSERT INTO campaigns (id, code, name, status, accepts_submissions, opens_on, closes_on, validation_levels, collection_mode, instructions, '
+        'questionnaire_version, academic_year_code, academic_year_label) '
+        'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(id) DO UPDATE SET code = excluded.code, name = excluded.name, status = excluded.status, '
+        'accepts_submissions = excluded.accepts_submissions, opens_on = excluded.opens_on, closes_on = excluded.closes_on, '
+        'validation_levels = excluded.validation_levels, collection_mode = excluded.collection_mode, instructions = excluded.instructions, '
+        'questionnaire_version = excluded.questionnaire_version, academic_year_code = excluded.academic_year_code, '
+        'academic_year_label = excluded.academic_year_label',
+        [c['id'], c['code'], c['name'], c['status'], c['accepts_submissions'] == true ? 1 : 0, c['opens_on'], c['closes_on'], c['validation_levels'],
+          c['collection_mode'] ?? 'TABLETTE', c['instructions'], c['questionnaire_version'], year['code'], year['label']]);
+  }
 
   List<Map<String, Object?>> campaigns() => select('SELECT * FROM campaigns ORDER BY opens_on DESC');
 

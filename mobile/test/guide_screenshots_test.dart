@@ -122,7 +122,8 @@ void main() {
         'scopes': [{'level': 'DEPARTMENT', 'department_id': 801}]},
       verifier: 'x', salt: '00', offlinePolicy: {'max_offline_days': 30, 'max_unlock_failures': 10});
     db.upsertCampaign({'id': 7, 'code': 'EFTPNF-2027', 'name': 'Recensement EFTP non formel 2027', 'status': 'OUVERTE', 'accepts_submissions': true,
-      'collection_mode': 'TABLETTE', 'opens_on': '2026-11-13', 'closes_on': '2026-12-31', 'validation_levels': 2, 'questionnaire_version': '2025.3'});
+      'collection_mode': 'TABLETTE', 'opens_on': '2026-11-13', 'closes_on': '2026-12-31', 'validation_levels': 2, 'questionnaire_version': '2025.3',
+      'academic_year': {'code': '2026-2027', 'label': 'Année 2026-2027'}});
     var cs = 900;
     for (final s in ['Atelier de couture Al Baraka', 'Garage Espoir', 'Menuiserie Nassara', 'Centre de formation Tagazar', 'Salon de coiffure Bonheur']) {
       db.upsertAssignment({'campaign_structure_id': ++cs, 'campaign_id': 7, 'collection_uuid': null, 'structure': {
@@ -139,8 +140,8 @@ void main() {
     } catch (_) {}
   });
 
-  Future<void> show(WidgetTester tester, Widget home) async {
-    tester.view.physicalSize = const Size(900, 1440); // tablette 7 pouces (600 × 960 dp)
+  Future<void> show(WidgetTester tester, Widget home, {Size size = const Size(900, 1440)}) async {
+    tester.view.physicalSize = size; // par défaut tablette 7 pouces (600 × 960 dp)
     tester.view.devicePixelRatio = 1.5;
     addTearDown(tester.view.reset);
     await tester.pumpWidget(RepaintBoundary(
@@ -265,6 +266,66 @@ void main() {
     await settle(tester);
     await settle(tester);
     await shot(tester, 'm05-coherence-2-1');
+  });
+
+  testWidgets('m08 — partie IV : ajouter un secteur', (tester) async {
+    final uuid = await draftWith({}, unset: ['sectors']);
+    await show(tester, FormScreen(app: app, uuid: uuid));
+    for (var i = 0; i < 3; i++) {
+      await tester.tap(find.text('Suivant'));
+      await settle(tester);
+    }
+    await shot(tester, 'm08-partie4-vide');
+    await tester.tap(find.text('Ajouter un secteur'));
+    await settle(tester);
+    await shot(tester, 'm08b-choix-secteur');
+    await tester.tap(find.textContaining('Secondaire'));
+    await settle(tester);
+    await shot(tester, 'm08c-secteur-ajoute');
+  });
+
+  testWidgets('m09 — partie IV renseignée (secteurs repliables)', (tester) async {
+    final uuid = await draftWith({});
+    await show(tester, FormScreen(app: app, uuid: uuid));
+    for (var i = 0; i < 3; i++) {
+      await tester.tap(find.text('Suivant'));
+      await settle(tester);
+    }
+    await shot(tester, 'm09-partie4-remplie');
+  });
+
+  // Téléphone (360 × 760 dp) : matrices de la partie II et grille des vulnérables de la partie IV.
+  const phone = Size(540, 1140);
+
+  testWidgets('m10 — téléphone : matrices 2.1 et 2.2', (tester) async {
+    final uuid = await draftWith({});
+    await show(tester, FormScreen(app: app, uuid: uuid), size: phone);
+    await tester.tap(find.text('Suivant'));
+    await settle(tester);
+    await shot(tester, 'm10-tel-2-1');
+    final list = find.byType(ListView).last;
+    await tester.scrollUntilVisible(find.textContaining('2.2 '), 300, scrollable: find.descendant(of: list, matching: find.byType(Scrollable)).first);
+    await settle(tester);
+    await shot(tester, 'm10b-tel-2-2');
+  });
+
+  testWidgets('m11 — téléphone : vulnérables partie IV', (tester) async {
+    final uuid = await draftWith({});
+    await show(tester, FormScreen(app: app, uuid: uuid), size: phone);
+    for (var i = 0; i < 3; i++) {
+      await tester.tap(find.text('Suivant'));
+      await settle(tester);
+    }
+    final list = find.byType(ListView).last;
+    await tester.tap(find.text('Secteur Tertiaire/Service'));
+    await settle(tester);
+    final vul = find.text('Dont apprentis vulnérables', skipOffstage: false).last;
+    await tester.scrollUntilVisible(vul, 300, scrollable: find.descendant(of: list, matching: find.byType(Scrollable)).first);
+    await tester.tap(vul);
+    await settle(tester);
+    await tester.drag(find.descendant(of: list, matching: find.byType(Scrollable)).first, const Offset(0, -300));
+    await settle(tester);
+    await shot(tester, 'm11-tel-vulnerables');
   });
 
   testWidgets('m06 — questions vides : Terminer quand même', (tester) async {

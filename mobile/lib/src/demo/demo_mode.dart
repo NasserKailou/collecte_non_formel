@@ -82,6 +82,8 @@ abstract final class DemoMode {
         'collection_mode': 'TABLETTE',
         'instructions': 'Mode démonstration : les saisies restent sur cette tablette et ne sont jamais envoyées au serveur.',
         'questionnaire_version': version,
+        // Même affichage qu'en collecte réelle : année statistique sous le nom de l'agent.
+        'academic_year': {'code': 'DEMO', 'label': 'Année ${today.month >= 9 ? today.year : today.year - 1}-${today.month >= 9 ? today.year + 1 : today.year}'},
       });
       var cs = 1;
       for (final s in (pack['structures'] as List).cast<Map>()) {

@@ -9,14 +9,15 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'app_config.dart';
 import 'data/local_db.dart';
 import 'data/secure_store.dart';
 import 'demo/demo_mode.dart';
 import 'net/api_client.dart';
+import 'services/app_updater.dart';
 import 'services/auth_service.dart';
 import 'services/collection_service.dart';
 import 'services/sync_service.dart';
@@ -50,6 +51,10 @@ class AppState extends ChangeNotifier {
 
   Future<void> init() async {
     try {
+      // Version réelle de l'APK installé (et non une constante) : envoyée au serveur, comparée aux annonces.
+      try {
+        AppConfig.appVersion = (await PackageInfo.fromPlatform()).version;
+      } catch (_) {}
       final secrets = Secrets(KeystoreSecretStore());
       final dir = await getApplicationSupportDirectory();
       _dataDir = dir.path;
@@ -201,17 +206,29 @@ class AppState extends ChangeNotifier {
   }
 
   /// Nouvelle version de l'application annoncée par le serveur (null si à jour).
+  /// Annonce ignorée si la version annoncée est déjà installée : le bandeau disparaît après la mise à jour.
   Map<String, Object?>? get appUpdate {
     final v = ready ? db.kv('app.update') : null;
-    return v == null ? null : Map<String, Object?>.from(jsonDecode(v) as Map);
+    if (v == null) return null;
+    final u = Map<String, Object?>.from(jsonDecode(v) as Map);
+    if (AppUpdater.compareVersions('${u['version'] ?? ''}', AppConfig.appVersion) <= 0) {
+      db.setKv('app.update', null);
+      return null;
+    }
+    return u;
   }
 
-  /// Ouvre le lien de téléchargement signé dans le navigateur : Android télécharge l'APK puis propose l'installation.
-  Future<bool> openAppUpdate() async {
-    final u = appUpdate;
-    final path = u?['download_path'] as String?;
-    if (path == null) return false;
-    return launchUrl(Uri.parse('${AppConfig.apiBaseUrl}$path'), mode: LaunchMode.externalApplication);
+  /// Adresse de téléchargement (lien signé, à durée limitée) de la version annoncée.
+  Uri? get appUpdateUrl {
+    final path = appUpdate?['download_path'] as String?;
+    return path == null ? null : Uri.parse('${AppConfig.apiBaseUrl}$path');
+  }
+
+  /// Redemande l'annonce au serveur (nouveau lien signé) ; sans réseau, l'annonce précédente est gardée.
+  Future<void> refreshAppUpdate() async {
+    if (demo) return;
+    await sync.checkAppUpdate(SyncReport());
+    notifyListeners();
   }
 
   DateTime? get lastSuccess {
