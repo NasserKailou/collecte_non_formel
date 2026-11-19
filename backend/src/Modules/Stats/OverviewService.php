@@ -81,8 +81,11 @@ final class OverviewService
             $decisions[$r['decision']] = (int) $r['n'];
         }
         $reasons = array_map(static fn($r) => ['label' => $r['label'], 'count' => (int) $r['n']], $this->db->fetchAll(
-            "SELECT COALESCE(rr.label, 'Motif non précisé') AS label, COUNT(*) AS n FROM collection_reviews r JOIN collections c ON c.id = r.collection_id
-               LEFT JOIN rejection_reasons rr ON rr.id = r.reason_id WHERE $w AND r.decision = 'INVALIDEE' GROUP BY label ORDER BY n DESC", $p));
+            // Table dérivée : sous MySQL, « GROUP BY label » viserait la colonne rr.label et non l'alias.
+            "SELECT x.label, COUNT(*) AS n FROM (SELECT COALESCE(rr.label, 'Motif non précisé') AS label
+                 FROM collection_reviews r JOIN collections c ON c.id = r.collection_id
+                 LEFT JOIN rejection_reasons rr ON rr.id = r.reason_id WHERE $w AND r.decision = 'INVALIDEE') x
+              GROUP BY x.label ORDER BY n DESC", $p));
         // Qualité au premier contrôle : part des collectes dont la première décision est un refus.
         $firstPass = $this->db->fetchOne(
             "SELECT COUNT(*) AS decided, SUM(r.decision = 'INVALIDEE') AS refused FROM collection_reviews r JOIN collections c ON c.id = r.collection_id

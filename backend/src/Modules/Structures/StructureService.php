@@ -118,6 +118,34 @@ final class StructureService
     }
 
     /**
+     * Import Excel : contrôle d'une ligne avec les règles de la saisie manuelle (code facultatif).
+     * @return array{0:?array, 1:list<array{field:string, message:string}>} données normalisées (null si invalide), erreurs
+     */
+    public function checkImportRow(array $in): array
+    {
+        try {
+            return [$this->validate($in, null, false), []];
+        } catch (HttpException $e) {
+            return [null, $e->details['errors'] ?? [['field' => '', 'message' => $e->getMessage()]]];
+        }
+    }
+
+    /**
+     * Import Excel : création d'une structure déjà contrôlée (dans la transaction de l'import).
+     * Avec code officiel : ACTIVE ; sans code : PROPOSEE (à codifier puis approuver depuis la fiche).
+     */
+    public function insertImported(array $actor, array $data, string $importUuid, ?string $note, string $ip): int
+    {
+        $active = $data['official_code'] !== null;
+        $id = $this->insert($data + ['uuid' => Text::uuid4(), 'created_by' => $actor['id'], 'status' => $active ? 'ACTIVE' : 'PROPOSEE']
+            + ($active ? ['approved_by' => $actor['id'], 'approved_at' => date('Y-m-d H:i:s')] : ['proposed_by' => $actor['id']]));
+        $this->logHistory($id, $actor['id'], $active ? 'CREATION' : 'PROPOSITION', $this->publicFields($data),
+            trim("Import Excel $importUuid" . ($note !== null ? " — $note" : '')));
+        $this->audit->log($actor['id'], 'STRUCTURE_CREATE', 'structure', (string) $id, null, $this->publicFields($data) + ['import' => $importUuid], null, $ip);
+        return $id;
+    }
+
+    /**
      * Proposition d'une structure découverte sur le terrain (agent). Idempotente : le même UUID renvoie
      * la même structure. Autorisée dans une commune de la zone de l'agent (périmètre ou zone de campagne en cours).
      * @return array{structure:array, possible_duplicates:list<array>, replayed:bool}

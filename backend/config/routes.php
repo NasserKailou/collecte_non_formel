@@ -245,19 +245,46 @@ return static function (App $app): void {
         return Response::data($importer->preview($users->actor($user), $file), 201);
     }, ['permission' => 'user.import']);
 
+    // ---------------------------------------------------------------- Import Excel des centres connus (registre)
+    $structureImporter = new \App\Modules\Structures\StructureImporter($db, $app->config['paths']['storage'], new StructureService($db));
+    $app->route('GET', '/imports/structures/template', static function (Request $req, array $p, array $user) use ($structureImporter, $users, $app): Response {
+        $path = $structureImporter->writeTemplate($app->config['paths']['storage'] . '/templates/modele-import-centres-' . (int) $user['id'] . '.xlsx',
+            $users->actor($user));
+        return Response::file($path, 'modele-import-centres.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    }, ['permission' => 'structure.manage']);
+
+    $app->route('POST', '/imports/structures', static function (Request $req, array $p, array $user) use ($users, $structureImporter): Response {
+        $file = $req->file('file') ?? throw new HttpException(422, 'VALIDATION_FAILED', 'Fichier attendu dans le champ « file » (multipart/form-data).');
+        return Response::data($structureImporter->preview($users->actor($user), $file), 201);
+    }, ['permission' => 'structure.manage']);
+
+    // Routes communes aux deux imports : l'importeur (et la permission exigée) dépend du type de l'import.
+    $importOf = static function (string $id, array $user) use ($db, $importer, $structureImporter) {
+        $type = $db->fetchValue('SELECT type FROM imports WHERE uuid = ?', [$id]);
+        [$service, $permission] = match ($type) {
+            'USERS' => [$importer, 'user.import'],
+            'STRUCTURES' => [$structureImporter, 'structure.manage'],
+            default => throw new HttpException(404, 'NOT_FOUND', 'Import introuvable.'),
+        };
+        if (!in_array($permission, $user['permissions'], true)) {
+            throw new HttpException(404, 'NOT_FOUND', 'Import introuvable.');
+        }
+        return $service;
+    };
+
     $app->route('GET', '/imports/{id}', static fn(Request $req, array $p, array $user) =>
-        Response::data($importer->get($users->actor($user), $p['id'])), ['permission' => 'user.import']);
+        Response::data($importOf($p['id'], $user)->get($users->actor($user), $p['id'])));
 
     $app->route('POST', '/imports/{id}/commit', static fn(Request $req, array $p, array $user) =>
-        Response::data($importer->commit($users->actor($user), $p['id'], $req->ip)), ['permission' => 'user.import']);
+        Response::data($importOf($p['id'], $user)->commit($users->actor($user), $p['id'], $req->ip)));
 
     $app->route('POST', '/imports/{id}/cancel', static fn(Request $req, array $p, array $user) =>
-        Response::data($importer->cancel($users->actor($user), $p['id'], $req->ip)), ['permission' => 'user.import']);
+        Response::data($importOf($p['id'], $user)->cancel($users->actor($user), $p['id'], $req->ip)));
 
-    $app->route('GET', '/imports/{id}/report', static function (Request $req, array $p, array $user) use ($users, $importer): Response {
-        [$path, $name, $mime] = $importer->report($users->actor($user), $p['id'], $req->ip);
+    $app->route('GET', '/imports/{id}/report', static function (Request $req, array $p, array $user) use ($users, $importOf): Response {
+        [$path, $name, $mime] = $importOf($p['id'], $user)->report($users->actor($user), $p['id'], $req->ip);
         return Response::file($path, $name, $mime);
-    }, ['permission' => 'user.import']);
+    });
 
     // ---------------------------------------------------------------- Structures (lot L3)
     $structures = new StructureService($db);

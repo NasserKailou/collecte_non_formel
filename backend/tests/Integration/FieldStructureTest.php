@@ -85,6 +85,19 @@ final class FieldStructureTest extends ApiTestCase
         $this->assertNotEmpty($twin->body['data']['possible_duplicates']);
     }
 
+    /** Un agent tout juste créé (périmètre seul, aucune affectation ni zone de campagne) reçoit la campagne ouverte. */
+    public function testNewAgentWithoutAssignmentReceivesOpenCampaigns(): void
+    {
+        $campaign = $this->openCampaign();
+        $token = $this->tokenFor($this->createUser('AGENT', scopes: [['level' => 'COMMUNE', 'commune_id' => self::communeId('10101')]]));
+        $pull = $this->call('GET', '/sync/pull', token: $token)->body['data'];
+        $this->assertContains($campaign['id'], array_column($pull['campaigns'], 'id'), 'Sans affectation, la campagne ouverte doit arriver sur la tablette');
+        $this->assertSame([], $pull['assignments'], 'Aucun centre du registre ne lui est montré sans affectation');
+
+        $r = $this->call('POST', "/campaigns/{$campaign['id']}/field-structures", $this->newCentre('Premier centre ' . bin2hex(random_bytes(3))), $token);
+        $this->assertSame(201, $r->status, json_encode($r->body, JSON_UNESCAPED_UNICODE));
+    }
+
     public function testCentreMustBeInTheAgentAreaAndTheCampaignOpen(): void
     {
         $campaign = $this->openCampaign();

@@ -26,6 +26,7 @@ const ROUTES = [
   { path: '/carte', title: 'Carte des centres', icon: 'geo-alt', perm: 'stats.view', render: mapPage.render },
   { path: '/exports', title: 'Exports', icon: 'download', perm: 'export.create', render: stats.exportsPage },
   { path: '/structures', title: 'Structures', icon: 'building', perm: 'structure.view', render: structures.render },
+  { path: '/import-centres', title: 'Import des centres', icon: 'file-earmark-arrow-up', perm: 'structure.manage', render: structures.importPage },
   { path: '/campagnes', title: 'Campagnes', icon: 'calendar3', perm: 'campaign.manage', render: campaigns.render },
   { path: '/affectations', title: 'Affectations', icon: 'diagram-3', perm: 'assignment.manage', render: campaigns.assignments },
   { path: '/utilisateurs', title: 'Utilisateurs', icon: 'people', perm: 'user.view', render: users.render },

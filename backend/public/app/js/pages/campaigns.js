@@ -201,7 +201,11 @@ export async function assignments(el) {
   }
   const agents = (await get('/users', { role: 'AGENT', status: 'ACTIF', per_page: 200 })).data;
   el.innerHTML = pageHeader('Affectations des structures aux agents', "<button class=\"btn btn-outline-success\" data-action=\"areas\"><i class=\"bi bi-geo me-1\"></i>Zones de travail d'un agent</button>")
-    + `<div class="card mb-3"><div class="card-body filters d-flex flex-wrap gap-2 align-items-center">
+    + `<div class="alert alert-info small"><i class="bi bi-info-circle me-1"></i>
+        <strong>L'affectation n'est pas nécessaire pour commencer.</strong> Dès qu'un agent est créé avec son périmètre (ou une zone de travail),
+        il peut, sur la tablette, recenser les nouveaux centres de ses communes et les collecter : chaque centre ajouté lui est affecté automatiquement.
+        Affecter ici sert uniquement aux centres <strong>déjà connus du registre</strong>, pour qu'un seul agent les voie et les collecte.</div>
+      <div class="card mb-3"><div class="card-body filters d-flex flex-wrap gap-2 align-items-center">
         <select class="form-select" id="f-camp" aria-label="Campagne">${options(camps.map((c) => ({ id: c.id, name: `${c.code} — ${c.name}` })), query.get('campaign_id') || camps[0].id)}</select>
         <select class="form-select" data-geo="region" aria-label="Région"></select>
         <select class="form-select" data-geo="department" aria-label="Département"></select>

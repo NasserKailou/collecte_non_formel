@@ -357,7 +357,8 @@ final class CollectionsApiTest extends ApiTestCase
         $this->assertSame(200, $full->status, json_encode($full->body, JSON_UNESCAPED_UNICODE));
         $d = $full->body['data'];
         $this->assertTrue($d['full']);
-        $this->assertSame([$ctx['campaign']['id']], array_column($d['campaigns'], 'id'));
+        // Toutes les campagnes ouvertes arrivent (recensement de nouveaux centres sans affectation), dont celle de l'agent.
+        $this->assertContains($ctx['campaign']['id'], array_column($d['campaigns'], 'id'));
         $this->assertSame('a', $d['assignments'][0]['structure']['zone'], 'Identité codée comme dans le questionnaire (1.7 a = urbaine)');
         $this->assertSame('b', $d['assignments'][0]['structure']['legal_status']);
         $this->assertSame($ctx['cs'], $d['assignments'][0]['campaign_structure_id']);

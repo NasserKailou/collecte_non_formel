@@ -1,5 +1,5 @@
 // Registre des structures : liste, création (doublons), fiche, historique, décisions sur les propositions.
-import { get, post, patch } from '../api.js';
+import { get, post, patch, api, download } from '../api.js';
 import {
   h, badge, fmtDate, modal, confirmBox, toast, toastError, formValues, options, getTerritory, bindGeoSelects,
   serverTable, pageHeader, showFormError, setFieldError, enhanceForm, REQ, STATUS_LABELS,
@@ -14,7 +14,9 @@ const getTypes = async () => (types ??= (await get('/referentials/structure-type
 export async function render(el) {
   const query = new URLSearchParams(window.location.hash.split('?')[1] || '');
   await getTypes();
-  el.innerHTML = pageHeader('Structures', can('structure.manage') ? '<button class="btn btn-brand" data-action="create"><i class="bi bi-plus-lg me-1"></i>Nouvelle structure</button>' : '')
+  el.innerHTML = pageHeader('Structures', can('structure.manage')
+    ? '<a class="btn btn-outline-success me-2" href="#/import-centres"><i class="bi bi-file-earmark-arrow-up me-1"></i>Importer (Excel)</a>'
+      + '<button class="btn btn-brand" data-action="create"><i class="bi bi-plus-lg me-1"></i>Nouvelle structure</button>' : '')
     + `<div class="card mb-3"><div class="card-body filters d-flex flex-wrap gap-2">
         <input class="form-control" id="f-q" placeholder="Nom ou code" aria-label="Recherche">
         <select class="form-select" id="f-status" aria-label="Statut">${options(['ACTIVE', 'PROPOSEE', 'FERMEE', 'REJETEE', 'FUSIONNEE'].map((s) => ({ id: s, name: STATUS_LABELS[s] })), query.get('status'), { empty: 'Tous les statuts' })}</select>
@@ -258,4 +260,100 @@ function mergeForm(s, done) {
     }, 300);
   });
   search.dispatchEvent(new Event('input'));
+}
+
+// ===================================================================== Import Excel des centres connus
+
+export async function importPage(el) {
+  el.innerHTML = pageHeader('Import des centres', '<a class="btn btn-outline-secondary" href="#/structures"><i class="bi bi-arrow-left me-1"></i>Structures</a>')
+    + `<div class="card mb-3"><div class="card-body">
+        <ol class="mb-3">
+          <li>Télécharger le modèle et le remplir (une ligne par centre), sans modifier la ligne d'en-tête.
+            Type de structure, statut, zone, région, département et commune se <strong>choisissent dans des listes déroulantes</strong>
+            (région d'abord : seuls ses départements, puis leurs communes, sont proposés), limitées à votre périmètre.</li>
+          <li>Envoyer le fichier : il est entièrement contrôlé (mêmes règles que la saisie d'une structure, doublons), <strong>sans rien créer</strong>.</li>
+          <li>Si aucune anomalie n'est signalée, valider : tous les centres sont créés en une fois, ou aucun.</li>
+        </ol>
+        <p class="small text-muted mb-3">Avec un code officiel (10 chiffres), le centre est créé <strong>actif</strong> : il peut être ciblé par une campagne puis
+          affecté à un agent (page Affectations). Sans code, il est créé <strong>proposé</strong>, à codifier et approuver depuis sa fiche.</p>
+        <div class="row g-3 align-items-end">
+          <div class="col-md-auto"><button class="btn btn-outline-success" id="tpl"><i class="bi bi-download me-1" aria-hidden="true"></i>1. Télécharger le modèle</button></div>
+          <div class="col-md"><label class="form-label" for="file">2. Fichier rempli${REQ}</label>
+            <input class="form-control" type="file" id="file" name="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" aria-describedby="file-hint">
+            <small class="form-hint" id="file-hint">Classeur Excel .xlsx, 5 Mo et 5 000 lignes au plus.</small></div>
+          <div class="col-md-auto"><button class="btn btn-brand" id="send"><i class="bi bi-upload me-1" aria-hidden="true"></i>3. Contrôler le fichier</button></div>
+        </div></div></div>
+      <div id="result" aria-live="polite"></div>`;
+  const input = el.querySelector('#file');
+  const fileProblem = (f) => {
+    if (!f) return 'Choisir le fichier à contrôler.';
+    if (!/\.xlsx$/i.test(f.name)) return 'Le fichier doit être un classeur Excel .xlsx (enregistrer le modèle au format .xlsx).';
+    if (f.size > 5 * 1024 * 1024) return `Fichier trop volumineux (${(f.size / 1048576).toFixed(1)} Mo ; 5 Mo au plus).`;
+    return null;
+  };
+  input.addEventListener('change', () => setFieldError(input, input.files[0] ? fileProblem(input.files[0]) : null));
+  el.querySelector('#tpl').addEventListener('click', () => download('/imports/structures/template', 'modele-import-centres.xlsx').catch(toastError));
+  el.querySelector('#send').addEventListener('click', async (ev) => {
+    const btn = ev.currentTarget;
+    const f = input.files[0];
+    const problem = fileProblem(f);
+    setFieldError(input, problem);
+    if (problem) { input.focus(); return; }
+    const fd = new FormData();
+    fd.append('file', f);
+    const label = btn.innerHTML;
+    btn.disabled = true;
+    btn.setAttribute('aria-busy', 'true');
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Contrôle en cours…';
+    try {
+      showImport(el.querySelector('#result'), (await api('POST', '/imports/structures', fd)).data);
+    } catch (e) { toastError(e); } finally {
+      btn.disabled = false;
+      btn.removeAttribute('aria-busy');
+      btn.innerHTML = label;
+    }
+  });
+}
+
+function showImport(box, imp) {
+  const counts = imp.by_status || {};
+  box.innerHTML = `<div class="card"><div class="card-body">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+      <div><h2 class="h5 mb-1">${h(imp.file_name)} ${badge(imp.status)}</h2>
+        <div class="small">${h(imp.total_rows)} ligne(s) — <span class="text-success">${h(imp.valid_rows)} valide(s)</span> — <span class="text-danger">${h(imp.error_rows)} en erreur</span>
+        ${counts.ACTIVE ? ` — ${h(counts.ACTIVE)} actif(s) (avec code)` : ''}${counts.PROPOSEE ? ` — ${h(counts.PROPOSEE)} proposé(s) (sans code)` : ''}</div></div>
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-secondary" data-act="report"><i class="bi bi-file-earmark-spreadsheet me-1"></i>Rapport de contrôle</button>
+        ${imp.status === 'PREVISUALISE' ? '<button class="btn btn-outline-danger" data-act="cancel">Abandonner</button>' : ''}
+        ${imp.can_commit ? `<button class="btn btn-green" data-act="commit"><i class="bi bi-check2-circle me-1"></i>Créer les ${h(imp.total_rows)} centres</button>` : ''}
+      </div></div>
+    ${imp.status === 'IMPORTE' ? '<div class="alert alert-success">Centres créés. Étape suivante : les cibler dans une campagne (page Campagnes), puis les affecter aux agents (page Affectations).</div>' : ''}
+    ${(imp.fatal_errors || []).map((f) => `<div class="alert alert-danger">${h(f)}</div>`).join('')}
+    ${!imp.can_commit && imp.status === 'PREVISUALISE' && !(imp.fatal_errors || []).length ? "<div class=\"alert alert-warning\">Corriger les lignes en erreur dans le fichier, puis le renvoyer. L'import est tout-ou-rien.</div>" : ''}
+    <div class="table-responsive"><table class="table table-sm"><thead><tr><th>Ligne</th><th>Code</th><th>Centre</th><th>Type</th><th>Commune</th><th>Création</th><th>Contrôle</th></tr></thead><tbody>
+    ${(imp.rows || []).map((r) => `<tr class="${r.errors.length ? 'table-danger' : ''}"><td>${h(r.line)}</td><td><code>${h(r.code || '')}</code></td><td>${h(r.name)}</td>
+      <td>${h(r.type || '')}</td><td>${h(r.commune || '')}</td><td>${r.status ? badge(r.status) : ''}</td>
+      <td>${r.errors.length ? `<ul class="mb-0 ps-3 small">${r.errors.map((e) => `<li>${h(e)}</li>`).join('')}</ul>`
+        : `<span class="text-success">OK</span>${r.duplicates?.length ? `<div class="small text-warning-emphasis">Doublon vérifié : ${h(r.duplicates.join(' ; '))}</div>` : ''}`}</td></tr>`).join('')}
+    </tbody></table></div>
+    ${imp.rows_truncated ? '<p class="small text-muted">Affichage limité : la totalité figure dans le rapport de contrôle.</p>' : ''}
+  </div></div>`;
+  box.onclick = async (ev) => {
+    const b = ev.target.closest('[data-act]');
+    if (!b) return;
+    try {
+      if (b.dataset.act === 'report') await download(`/imports/${imp.id}/report`, 'controle-import-centres.xlsx');
+      if (b.dataset.act === 'cancel') showImport(box, { ...imp, ...(await post(`/imports/${imp.id}/cancel`)).data, rows: imp.rows });
+      if (b.dataset.act === 'commit') {
+        if (await confirmBox({ title: 'Créer les centres', message: `${imp.total_rows} centres vont être ajoutés au registre.`, confirmLabel: 'Créer' }) === null) return;
+        b.disabled = true;
+        const r = (await post(`/imports/${imp.id}/commit`)).data;
+        toast(`${r.created} centre(s) créé(s) : ${r.active} actif(s), ${r.proposed} proposé(s).`);
+        showImport(box, { ...imp, ...r.import, rows: imp.rows, can_commit: false });
+      }
+    } catch (e) {
+      toastError(e);
+      b.disabled = false;
+    }
+  };
 }

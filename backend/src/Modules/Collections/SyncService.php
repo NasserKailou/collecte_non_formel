@@ -34,11 +34,15 @@ final class SyncService
         $now = (string) $this->db->fetchValue('SELECT NOW()');
 
         $campaignFilter = $campaignId !== null ? ' AND c.id = ?' : '';
+        // Campagnes de l'agent : toute campagne ouverte (ou suspendue) — l'agent y recense de nouveaux centres dans
+        // son périmètre sans attendre d'affectation (l'affectation ne sert qu'aux centres déjà connus du registre) —,
+        // plus les campagnes clôturées où il a des affectations ou une zone de travail (corrections, historique).
         $campaigns = $this->db->fetchAll(
             "SELECT c.id, c.code, c.name, c.status, c.opens_on, c.closes_on, c.validation_levels, c.collection_mode, c.instructions, v.version_code AS questionnaire_version
                FROM campaigns c JOIN questionnaire_versions v ON v.id = c.questionnaire_version_id
               WHERE c.status <> 'ARCHIVEE' $campaignFilter AND (
-                    EXISTS (SELECT 1 FROM campaign_structures cs JOIN assignments a ON a.campaign_structure_id = cs.id
+                    c.status IN ('OUVERTE', 'SUSPENDUE')
+                 OR EXISTS (SELECT 1 FROM campaign_structures cs JOIN assignments a ON a.campaign_structure_id = cs.id
                              WHERE cs.campaign_id = c.id AND a.agent_id = ?)
                  OR EXISTS (SELECT 1 FROM agent_areas aa WHERE aa.campaign_id = c.id AND aa.agent_id = ?))
               ORDER BY c.opens_on DESC", [...($campaignId !== null ? [$campaignId] : []), $user['id'], $user['id']]);

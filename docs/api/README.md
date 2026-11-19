@@ -192,7 +192,7 @@ Niveau 1 : superviseur départemental dont le périmètre couvre le département
 
 ### 4.1 Synchronisation descendante — précisions (lot L4)
 
-`GET /sync/pull?since=&campaign_id=` (`collection.submit`) : campagnes de l'agent (non archivées), affectations actives modifiées depuis le curseur (identité de la structure codée comme dans le questionnaire : `zone` a/b, `legal_status` a/b, `type_code`), `removed_assignments` (affectations retirées ou réaffectées), et collectes de l'agent avec le dernier retour du superviseur ; pour une collecte `INVALIDEE` ou `REOUVERTE`, `editable: true` et `data` (dernière révision), ce qui permet la correction sur une autre tablette ou par un agent réaffecté. Curseur : horodatage serveur (comparaison inclusive ; un élément peut revenir deux fois, à appliquer par remplacement). Curseur illisible ⇒ `422` : reprendre une synchronisation complète (sans `since`).
+`GET /sync/pull?since=&campaign_id=` (`collection.submit`) : campagnes de l'agent — **toute campagne `OUVERTE` ou `SUSPENDUE`**, même sans affectation (décision du 19/11/2026 : un agent créé avec son périmètre recense et collecte aussitôt les nouveaux centres de ses communes, chacun lui étant affecté automatiquement ; l'affectation ne sert qu'aux centres déjà connus du registre), plus les campagnes clôturées où il a des affectations ou une zone de travail —, affectations actives modifiées depuis le curseur (identité de la structure codée comme dans le questionnaire : `zone` a/b, `legal_status` a/b, `type_code`), `removed_assignments` (affectations retirées ou réaffectées), et collectes de l'agent avec le dernier retour du superviseur ; pour une collecte `INVALIDEE` ou `REOUVERTE`, `editable: true` et `data` (dernière révision), ce qui permet la correction sur une autre tablette ou par un agent réaffecté. Curseur : horodatage serveur (comparaison inclusive ; un élément peut revenir deux fois, à appliquer par remplacement). Curseur illisible ⇒ `422` : reprendre une synchronisation complète (sans `since`).
 
 ### 4.2 Contexte de contrôle transmis à la tablette (lot L7)
 
@@ -317,6 +317,21 @@ Permission `user.import` ; un import n'est visible que de son auteur (et de l'ad
 | POST | `/structures/{uuid}/close`, `/reopen` | `structure.manage` | `{reason}` : `ACTIVE ⇄ FERMEE` |
 
 Règles : code officiel à 10 chiffres **unique** (bloquant) et obligatoire pour une structure `ACTIVE` ; coordonnées dans l'emprise du Niger ; dates non futures. **Doublons probables** (même commune et nom identique ou proche — mots génériques ignorés, distance d'édition faible — ou point GPS à moins de 100 m) : `409 DUPLICATE_SUSPECTED` avec `details.candidates[]`, création possible en renvoyant `confirm_duplicates: true` (tracé dans l'historique). Le village/quartier saisi alimente `localities` (source `TERRAIN`, statut `PROPOSEE`).
+
+### 5.3 bis Import Excel des centres connus (19/11/2026)
+
+Même fonctionnement que l'import des agents (§5.2), permission `structure.manage`, page « Import des centres » du back-office (bouton « Importer (Excel) » de la page Structures).
+
+| Méthode | Chemin | Description |
+|---|---|---|
+| GET | `/imports/structures/template` | Modèle `.xlsx` propre à l'utilisateur : feuille « Centres » avec **listes déroulantes** — type de structure (« c - Atelier »), statut (Public/Privé), zone (Urbaine/Rurale), Région → Département → Commune **en cascade** et limités au périmètre, « Doublon vérifié » (Oui/Non) ; feuilles « Notice » et « Territoire » |
+| POST | `/imports/structures` | `multipart/form-data`, champ `file` (5 Mo, 5 000 lignes) → `201` contrôle sans écriture : `{id, status, total_rows, valid_rows, error_rows, can_commit, fatal_errors, by_status: {ACTIVE, PROPOSEE}, rows[{line, code, name, type, commune, status, duplicates[], errors[]}]}` |
+| GET | `/imports/{id}`, `/imports/{id}/report` | État ; rapport de contrôle `.xlsx` |
+| POST | `/imports/{id}/commit`, `/imports/{id}/cancel` | Recontrôle complet puis création de **tous** les centres en une transaction (`{created, active, proposed}`), ou d'aucun (`422 IMPORT_REJECTED`) ; abandon |
+
+Les routes `/imports/{id}…` sont communes aux deux imports : l'importeur et la permission exigée (`user.import` ou `structure.manage`) dépendent du type de l'import ; sinon `404`.
+
+Contrôles par ligne : règles de la saisie manuelle (`StructureService` : nom, type et précision « Autre », code à 10 chiffres unique, coordonnées dans l'emprise du Niger, dates non futures), commune du périmètre de l'importateur, code ou nom+commune en double dans le fichier, **doublon probable** avec le registre (même commune et nom proche, ou point GPS à moins de 100 m) bloquant sauf « Doublon vérifié = Oui ». Valeurs acceptées : libellés des listes, codes (a–k, RENACOM), dates Excel, JJ/MM/AAAA ou AAAA-MM-JJ, virgule décimale. Avec code officiel : centre `ACTIVE` (ciblable et affectable aussitôt) ; sans code : `PROPOSEE` (à codifier puis approuver depuis la fiche). Historique de chaque centre : « Import Excel <id> ».
 
 ### 5.4 Années et campagnes (implémenté — lot L3)
 

@@ -84,9 +84,13 @@ final class AnnuaireTables
         $tradeExpr = "COALESCE(tr.label, CONCAT('Autre : ', ct.trade_other_label))";
         $order = array_flip(array_column($this->geo, 0));
         $geoById = array_column($this->geo, null, 0);
-        $trades = $q("SELECT c.commune_id AS cid, se.id AS sid, se.label AS sector, $tradeExpr AS trade, SUM($promoM) AS m, SUM($promoF) AS f, COUNT(DISTINCT c.id) AS centres
-                        FROM collection_trades ct JOIN collections c ON c.id = ct.collection_id JOIN sectors se ON se.id = ct.sector_id LEFT JOIN trades tr ON tr.id = ct.trade_id
-                       WHERE $where GROUP BY c.commune_id, se.id, se.label, $tradeExpr");
+        // Table dérivée : MySQL 8 refuse GROUP BY COALESCE(tr.label, …) (« 'tr.label' isn't in GROUP BY »).
+        $trades = $q("SELECT x.cid, x.sid, x.sector, x.trade, SUM(x.m) AS m, SUM(x.f) AS f, COUNT(DISTINCT x.coll) AS centres
+                        FROM (SELECT c.commune_id AS cid, se.id AS sid, se.label AS sector, $tradeExpr AS trade, $promoM AS m, $promoF AS f, c.id AS coll
+                                FROM collection_trades ct JOIN collections c ON c.id = ct.collection_id JOIN sectors se ON se.id = ct.sector_id
+                                LEFT JOIN trades tr ON tr.id = ct.trade_id
+                               WHERE $where) x
+                       GROUP BY x.cid, x.sid, x.sector, x.trade");
         usort($trades, static fn($a, $b) => [$order[(int) $a['cid']] ?? PHP_INT_MAX, (int) $a['sid'], -((int) $a['m'] + (int) $a['f']), $a['trade']]
             <=> [$order[(int) $b['cid']] ?? PHP_INT_MAX, (int) $b['sid'], -((int) $b['m'] + (int) $b['f']), $b['trade']]);
         $rows = [];

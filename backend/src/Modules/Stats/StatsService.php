@@ -168,10 +168,13 @@ final class StatsService
                                 WHERE $where GROUP BY ct.duration_class ORDER BY FIELD(ct.duration_class, 'LE3', 'M4_9', 'GT9')");
         $appBySector = $all("SELECT se.id AS k, se.label, SUM($promoM) AS m, SUM($promoF) AS f FROM collection_trades ct JOIN collections c ON c.id = ct.collection_id
                               JOIN sectors se ON se.id = ct.sector_id WHERE $where GROUP BY se.id, se.label ORDER BY se.id");
-        $topTrades = $all("SELECT COALESCE(tr.label, CONCAT('Autre : ', ct.trade_other_label)) AS label, SUM($promoM + $promoF) AS total,
-                                  COUNT(DISTINCT ct.collection_id) AS structures
-                             FROM collection_trades ct JOIN collections c ON c.id = ct.collection_id LEFT JOIN trades tr ON tr.id = ct.trade_id
-                            WHERE $where GROUP BY COALESCE(tr.label, CONCAT('Autre : ', ct.trade_other_label)) ORDER BY total DESC LIMIT 15");
+        // Regroupement sur une table dérivée : MySQL 8 (ONLY_FULL_GROUP_BY) refuse GROUP BY COALESCE(tr.label, …)
+        // (« 'tr.label' isn't in GROUP BY »), contrairement à MariaDB.
+        $topTrades = $all("SELECT x.label, SUM(x.n) AS total, COUNT(DISTINCT x.collection_id) AS structures
+                             FROM (SELECT COALESCE(tr.label, CONCAT('Autre : ', ct.trade_other_label)) AS label, $promoM + $promoF AS n, ct.collection_id
+                                     FROM collection_trades ct JOIN collections c ON c.id = ct.collection_id LEFT JOIN trades tr ON tr.id = ct.trade_id
+                                    WHERE $where) x
+                            GROUP BY x.label ORDER BY total DESC LIMIT 15");
         $vulnerable = $all("SELECT css.category AS k, SUM(css.p1_m + css.p2_m + css.p3_m) AS m, SUM(css.p1_f + css.p2_f + css.p3_f) AS f
                               FROM collection_sector_specials css JOIN collections c ON c.id = css.collection_id WHERE $where
                              GROUP BY css.category ORDER BY FIELD(css.category, 'HANDICAPES', 'REFUGIES', 'RETOURNES', 'DEPLACES')");
